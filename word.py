@@ -47,9 +47,15 @@ def word_to_seglist(word):
 
     return seglist
 
+def print_word_and_seglist(word):
+    seglist = word_to_seglist(word)
+    print(f'{word}\t{repr(seglist)}')
+
 if __name__ == '__main__':
+    test = 't͡ʃʲʷiɖ͡ʐˠˤuðʰ'
+    print_word_and_seglist(test)
+
     for word in argv[1:]:
-        seglist = word_to_seglist(word)
-        print(seglist)
+        print_word_and_seglist(word)
     exit(0)
 
