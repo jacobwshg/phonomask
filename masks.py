@@ -101,9 +101,6 @@ ormask = {bin(self.ormask)})'
     def set_seg_bits(self, seg_bstring):
         return seg_bstring & self.andmask | self.ormask
 
-def test_dummy_rule():
-    
-
 if __name__ == '__main__':
     from collections import defaultdict as DDict
     ofsmap = DDict(lambda: -1)
@@ -112,10 +109,11 @@ if __name__ == '__main__':
         ofsmap[feature] = ofs
     print('Feature offset map')
     for item in ofsmap.items():
-        print(item)
-    '''
+        print(f'    {item}')
+    print('... | lat | nas | son | cons | syl')
+    print('')
 
-    print('[+syl, -cons, +son, +nas, -lat]')
+    print('Dummy feature bundle: [+syl, -cons, +son, +nas, -lat]')
     fvtups = [\
         FVTuple(feature = 'syl',  value = True),\
         FVTuple(feature = 'cons', value = False),\
@@ -127,6 +125,7 @@ if __name__ == '__main__':
     setter = Setter(fvtups, ofsmap)
     print(tester)
     print(setter)
+    print('')
 
     # Dummy rule 
     '''
@@ -148,16 +147,16 @@ if __name__ == '__main__':
     tester = Tester(tester_fvtups, ofsmap)
     setter = Setter(setter_fvtups, ofsmap)
     seg_bstrings = [
-        0b1101100, 0b1001100, 0b1011110,\ # should pass test
-        0b1010110, 0b1100101, 0b1110110,\ # should fail test
+        # should pass test
+        0b1101100, 0b1001100, 0b1011110,\
+        # should fail test
+        0b1010110, 0b1100101, 0b1110110,\
     ]
     for sb in seg_bstrings:
-        sb_ = sb
         sb_new = sb
         if tester.test_seg_bits(sb):
             sb_new = setter.set_seg_bits(sb)
-        print(f'') 
+        print(f'{bin(sb)} -> {bin(sb_new)}') 
 
-    pass
     exit(0)
 
