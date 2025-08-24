@@ -15,13 +15,13 @@ class Tester:
 
       [-syl] 
           andmask = 0b001 
-          xormask = 0b000
+          xormask = 0b000 (logically 0b__0)
       [+cons]
           andmask = 0b010
-          xormask = 0b010
+          xormask = 0b010 (logically 0b_1_)
       [-cons, +son]
           andmask = 0b110
-          xormask = 0b100 
+          xormask = 0b100 (logically 0b10_)
 
     """
 
@@ -65,13 +65,13 @@ class Setter:
 
       [-syl] 
           andmask = 0b110
-          ormask  = 0b000
+          ormask  = 0b000 (logically 0b__0)
       [+cons]
           andmask = 0b101
-          ormask  = 0b010
+          ormask  = 0b010 (logically 0b_1_)
       [-cons, +son]
           andmask = 0b001
-          ormask  = 0b100
+          ormask  = 0b100 (logically 0b10_)
 
     """
 
