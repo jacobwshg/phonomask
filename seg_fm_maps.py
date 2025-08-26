@@ -12,5 +12,13 @@ class SFMaps:
         self.seg_fm_map.setdefault(segment, feat_mat)
         self.fm_seg_map.setdefault(feat_mat, segment)
 
+    # TODO: handle missing segment
+    def feat_mtx_of(self, segment):
+        self.seg_fm_map.get(segment)
+
+    # TODO: handle missing segment
+    def segment_of(self, feat_mtx):
+        self.fm_seg_map.get(feat_mtx)
+
 __all__ = [ 'SFMaps', ]
 

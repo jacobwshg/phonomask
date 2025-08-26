@@ -1,12 +1,13 @@
 import csv
 
 from seg_fm_maps import SFMaps
+from feat_ofs_maps import OfsMaps
 
 # Manager
 class FeatureProfile:
-    def __init__(self, table_path, ofsmap={}, sfmaps=SFMaps()):
+    def __init__(self, table_path, ofsmaps=OfsMaps(), sfmaps=SFMaps()):
         self.table_path = table_path
-        self.ofsmap = ofsmap
+        self.ofsmaps = ofsmaps
         self.sfmaps = sfmaps
         self.num_feats = 0
 
@@ -14,16 +15,16 @@ class FeatureProfile:
         self.table_path = new_path
 
     def load_table(self):
+        self.ofsmaps = OfsMaps()
+        self.sfmaps = SFMaps()
         self.num_feats = 0
         with open(self.table_path, mode='r', encoding='utf-8') as table:
             reader = csv.reader(table)
             for rowno, row in enumerate(reader):
                 if rowno == 0:
                     # Header row with feature labels
-                    for offset, feature in enumerate(row[1:]):
-                        # Skip cell (0, 0), which is "IPA"
-                        self.ofsmap.setdefault(feature, offset)
-                        self.num_feats += 1
+                    # Skip cell (0, 0), which is "IPA"
+                    self.num_feats = self.ofsmaps.register_feature_list(row[1:])
                 else:
                     # Content row with an IPA segment and its 
                     # feature values
@@ -39,11 +40,11 @@ class FeatureProfile:
     # TODO
     def __repr__(self):
         header = '[[Feature Profile]]'
-        ofsmap_str = ' '.join([repr(item) for item in self.ofsmap.items()])
+        fmlayout = self.ofsmaps.get_feat_mtx_layout()
         seg_fm_list = self.sfmaps.to_list()
         seg_fm_str = '\n'.join([f'{seg}\t{fm:0>{self.num_feats}b}'\
                                 for seg, fm in seg_fm_list])
-        return '\n'.join([header, ofsmap_str, seg_fm_str, ])
+        return '\n'.join([header, fmlayout, seg_fm_str, ])
 
     # Serialize
     def to_file(self, path):
@@ -60,8 +61,6 @@ class FeatureProfile:
 
 if __name__ == '__main__':
     table_path = './lx301-base.csv'
-    ofsmap = {}
-    sfmaps = SFMaps()
     profile = FeatureProfile(table_path)
     profile.load_table()
     print(profile)
