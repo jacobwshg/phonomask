@@ -14,7 +14,7 @@ class FeatureProfile:
         self.table_path = new_path
 
     def load_table(self):
-        num_feats = 0
+        self.num_feats = 0
         with open(self.table_path, mode='r', encoding='utf-8') as table:
             reader = csv.reader(table)
             for rowno, row in enumerate(reader):
@@ -39,7 +39,11 @@ class FeatureProfile:
     # TODO
     def __repr__(self):
         header = '[[Feature Profile]]'
-        return header
+        ofsmap_str = ' '.join([repr(item) for item in self.ofsmap.items()])
+        seg_fm_list = self.sfmaps.to_list()
+        seg_fm_str = '\n'.join([f'{seg}\t{fm:0>{self.num_feats}b}'\
+                                for seg, fm in seg_fm_list])
+        return '\n'.join([header, ofsmap_str, seg_fm_str, ])
 
     # Serialize
     def to_file(self, path):
@@ -60,9 +64,7 @@ if __name__ == '__main__':
     sfmaps = SFMaps()
     profile = FeatureProfile(table_path)
     profile.load_table()
-    for item in profile.ofsmap.items():
-        print(item)
-    profile.to_file('./lx301-ser.csv')
+    print(profile)
 
 __all__ = [ 'FeatureProfile', ]
 
