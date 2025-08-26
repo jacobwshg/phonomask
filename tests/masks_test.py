@@ -1,4 +1,78 @@
-from .. import masks
+import setup
+
+from masks import Tester, Setter
+from fvtuple import FVTuple
+
+# Subset of features for testing
+test_features = ['syl', 'cons', 'son', 'nas', 'lat']
+# Feature offset map for testing
+test_ofsmap = {}
+for ofs, feature in enumerate(test_features):
+    test_ofsmap.setdefault(feature, ofs)
+
+print('Feature offset map: ')
+for item in test_ofsmap.items():
+    print(f'  {item}')
+
+# Print features layout
+ofsmap_sorted_rev = sorted(test_ofsmap.items(), key = lambda kv:-kv[1])
+layout = ' | '.join([f'{kv[0]}' for kv in ofsmap_sorted_rev])
+print(layout)
+
+print('')
+
+def feature_bundle_test():
+    print('Dummy feature bundle: [+syl, -cons, +son, +nas, -lat]')
+    fvtups = [\
+        FVTuple(feature = 'syl',  value = True),\
+        FVTuple(feature = 'cons', value = False),\
+        FVTuple(feature = 'son',  value = True),\
+        FVTuple(feature = 'nas',  value = True),\
+        FVTuple(feature = 'lat',  value = False),\
+    ]
+    tester = Tester(fvtups, test_ofsmap)
+    setter = Setter(fvtups, test_ofsmap)
+    print(tester)
+    print(setter)
+
+def rule_test():
+    # Dummy rule 
+    print('Dummy rule: [-syl, +son, +nas] -> [+syl, +cons, -lat]')
+    '''
+       ... lat | nas | son | cons | syl
+             _     1     1      _     0
+    -> ...  *0     1     1     *1    *1
+    '''
+    tester_fvtups = [\
+        FVTuple(feature = 'syl', value = False),\
+        FVTuple(feature = 'son', value = True),\
+        FVTuple(feature = 'nas', value = True),\
+    ]
+    setter_fvtups = [\
+        FVTuple(feature = 'syl',  value = True),\
+        FVTuple(feature = 'cons', value = True),\
+        FVTuple(feature = 'lat',  value = False),\
+    ]
+    tester = Tester(tester_fvtups, test_ofsmap)
+    setter = Setter(setter_fvtups, test_ofsmap)
+
+    # Dummy feature matrices as bit-strings
+    # (may not describe meaningful segments)
+    seg_bstrings = [
+        # should pass test
+        0b1101100, 0b1001100, 0b1011110,\
+        # should fail test
+        0b1010110, 0b1100101, 0b1110110,\
+    ]
+    for sb in seg_bstrings:
+        sb_new = sb
+        if tester.test_seg_bits(sb):
+            sb_new = setter.set_seg_bits(sb)
+        print(f'{bin(sb)} -> {bin(sb_new)}')
 
 
+if __name__ == '__main__':
+    feature_bundle_test()
+    rule_test()
+    exit(0)
 

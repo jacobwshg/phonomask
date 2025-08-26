@@ -6,3 +6,5 @@ from collections import namedtuple as NTup
 # TODO: 0 value?
 FVTuple = NTup('FVTuple', ['feature', 'value'])
 
+__all__ = [ 'FVTuple', ]
+
