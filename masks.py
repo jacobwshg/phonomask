@@ -101,5 +101,5 @@ ormask = {bin(self.ormask)})'
     def set_feat_mtx(self, feat_mtx):
         return feat_mtx & self.andmask | self.ormask
 
-__all__ = [ 'Tester', 'Setter' ]
+__all__ = [ 'Tester', 'Setter', ]
 

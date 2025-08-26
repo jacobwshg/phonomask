@@ -49,7 +49,7 @@ def word_to_seglist(word):
 
 def print_word_and_seglist(word):
     seglist = word_to_seglist(word)
-    print(f'{word}\t{repr(seglist)}')
+    print(f'{word}\t{seglist}')
 
 if __name__ == '__main__':
     test = 't͡ʃʲʷiɖ͡ʐˠˤuðʰ'

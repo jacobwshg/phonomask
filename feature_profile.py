@@ -38,7 +38,7 @@ class FeatureProfile:
                     self.sfmaps.register(segment, feat_mtx)
 
     # TODO
-    def __repr__(self):
+    def __str__(self):
         header = '[[Feature Profile]]'
         fmlayout = self.ofsmaps.get_feat_mtx_layout()
         seg_fm_list = self.sfmaps.to_list()
