@@ -46,9 +46,9 @@ class Tester:
         return f'Tester(andmask = {bin(self.andmask)}, \
 xormask = {bin(self.xormask)})'
 
-    # True iff a segment matches the feature bundle
-    def test_seg_bits(self, seg_bstring):
-      return (seg_bstring & self.andmask) ^ self.xormask == 0
+    # True iff a segment's feature matrix matches the given feature bundle
+    def test_feat_mtx(self, feat_mtx):
+      return (feat_mtx & self.andmask) ^ self.xormask == 0
 
 # Used in the `B` part of a rule
 class Setter:
@@ -97,7 +97,7 @@ class Setter:
         return f'Setter(andmask = {bin(self.andmask)}, \
 ormask = {bin(self.ormask)})'
 
-    # Apply a specified change to a segment's bit-string
-    def set_seg_bits(self, seg_bstring):
-        return seg_bstring & self.andmask | self.ormask
+    # Apply a specified change to a segment's feature matrix
+    def set_feat_mtx(self, feat_mtx):
+        return feat_mtx & self.andmask | self.ormask
 

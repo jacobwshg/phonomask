@@ -56,19 +56,19 @@ def rule_test():
     tester = Tester(tester_fvtups, test_ofsmap)
     setter = Setter(setter_fvtups, test_ofsmap)
 
-    # Dummy feature matrices as bit-strings
+    # Dummy feature matrices
     # (may not describe meaningful segments)
-    seg_bstrings = [
+    feat_mtxs = [
         # should pass test
         0b1101100, 0b1001100, 0b1011110,\
         # should fail test
         0b1010110, 0b1100101, 0b1110110,\
     ]
-    for sb in seg_bstrings:
-        sb_new = sb
-        if tester.test_seg_bits(sb):
-            sb_new = setter.set_seg_bits(sb)
-        print(f'{bin(sb)} -> {bin(sb_new)}')
+    for fm in feat_mtxs:
+        fm_new = fm
+        if tester.test_feat_mtx(fm):
+            sb_new = setter.set_feat_mtx(fm)
+        print(f'{bin(fm)} -> {bin(fm_new)}')
 
 
 if __name__ == '__main__':
