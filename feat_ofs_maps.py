@@ -41,12 +41,13 @@ class OfsMaps:
 
     def sort(self):
         if not self.is_sorted:
-            self.feats_by_ofs = sorted(self.ofs_feat_map.items(), key=lambda kv:-kv[0])
+            self.feats_by_ofs = sorted(self.feat_ofs_map.items(),\
+                                       key=lambda feat_ofs:-feat_ofs[1])
             self.is_sorted = True
 
     def get_feat_mtx_layout(self):
         self.sort()
-        return ' | '.join([feature for offset, feature in self.feats_by_ofs])
+        return ' | '.join([feature for feature, offset in self.feats_by_ofs])
 
 __all__ = [ 'OfsMaps', ]
 
