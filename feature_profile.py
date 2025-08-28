@@ -51,16 +51,36 @@ class FeatureProfile:
         return '\n'.join([header, fmlayout, seg_fm_str, ])
 
     # Serialize
+    '''
+    TODO: not ready yet;
+    now only segment - feat mtx mappings
+    need to keep feature labels and layout, or else mappings meaningless
+    '''
     def to_file(self, path):
-        contents = self.sfmaps.to_list()
+        seg_fm_list = self.sfmaps.to_list()
         with open(path, mode='w', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow([self.table_path])
-            for seg, fm in contents:
+            for seg, fm in seg_fm_list:
                 writer.writerow([seg, fm])
 
     # Deserialize
     def from_file(self, path):
+        pass
+
+    # Return feature matrix string of segment
+    def feat_mtx_string_of(self, segment):
+        # Obtain feature matrix of segment
+        feat_mtx = self.sfmaps.feat_mtx_of(segment)
+        if feat_mtx is None:
+            print(f'Segment [{segment}] not found in feature profile')
+            return ''
+        else:
+            # Obtain string form of feature matrix
+            return self.ofsmaps.feat_mtx_string(feat_mtx)
+
+    # Return a string for a segment's positive features
+    def positive_features_of(self, segment):
         pass
 
 prof_lx301 = FeatureProfile('./lx301-base.csv')
