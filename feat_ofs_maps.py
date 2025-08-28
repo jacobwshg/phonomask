@@ -49,5 +49,23 @@ class OfsMaps:
         self.sort()
         return ' | '.join([feature for feature, offset in self.feats_by_ofs])
 
+    """
+    Restore string form of a feature matrix
+    Example
+        Feature matrix layout = son | syl | cons
+        Feature matrix = 0b110
+        String = '[-cons, +syl, +son]'
+    """
+    def feat_mtx_string(self, feat_mtx):
+        # Accumulator list of '+/-feature' strings
+        feat_val_list = []
+        num_feats = len(self.feat_ofs_map)
+        for offset in range(num_feats):
+            feature = self.ofs_feat_map.get(offset)
+            value = feat_mtx >> offset & 0b1
+            feat_val_list.append(f'+{feature}' if value == 0b1 else f'-{feature}')
+        feat_val_str = ', '.join(feat_val_list)
+        return f'[{feat_val_str}]'
+
 __all__ = [ 'OfsMaps', ]
 

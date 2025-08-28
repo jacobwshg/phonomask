@@ -10,32 +10,36 @@ class FeatureProfile:
         self.ofsmaps = ofsmaps
         self.sfmaps = sfmaps
         self.num_feats = 0
+        self.loaded = False
 
     def set_table_path(self, new_path):
         self.table_path = new_path
+        self.loaded = False
 
     def load_table(self):
-        self.ofsmaps = OfsMaps()
-        self.sfmaps = SFMaps()
-        self.num_feats = 0
-        with open(self.table_path, mode='r', encoding='utf-8') as table:
-            reader = csv.reader(table)
-            for rowno, row in enumerate(reader):
-                if rowno == 0:
-                    # Header row with feature labels
-                    # Skip cell (0, 0), which is "IPA"
-                    self.num_feats = self.ofsmaps.register_feature_list(row[1:])
-                else:
-                    # Content row with an IPA segment and its 
-                    # feature values
-                    segment = row[0]
-                    feat_mtx = 0b0
-                    for offset, feat_val in enumerate(row[1:]):
-                        if feat_val == '+':
-                            feat_mtx |= (0b1 << offset)
-                        elif feat_val != '-':
-                            print(f'warning: {segment} has nonbinary feature value')
-                    self.sfmaps.register(segment, feat_mtx)
+        if not self.loaded:
+            self.ofsmaps = OfsMaps()
+            self.sfmaps = SFMaps()
+            self.num_feats = 0
+            with open(self.table_path, mode='r', encoding='utf-8') as table:
+                reader = csv.reader(table)
+                for rowno, row in enumerate(reader):
+                    if rowno == 0:
+                        # Header row with feature labels
+                        # Skip cell (0, 0), which is "IPA"
+                        self.num_feats = self.ofsmaps.register_feature_list(row[1:])
+                    else:
+                        # Content row with an IPA segment and its 
+                        # feature values
+                        segment = row[0]
+                        feat_mtx = 0b0
+                        for offset, feat_val in enumerate(row[1:]):
+                            if feat_val == '+':
+                                feat_mtx |= (0b1 << offset)
+                            elif feat_val != '-':
+                                print(f'warning: {segment} has nonbinary feature value')
+                        self.sfmaps.register(segment, feat_mtx)
+            self.loaded = True
 
     # TODO
     def __str__(self):
@@ -59,11 +63,13 @@ class FeatureProfile:
     def from_file(self, path):
         pass
 
+prof_lx301 = FeatureProfile('./lx301-base.csv')
+
 if __name__ == '__main__':
     table_path = './lx301-base.csv'
     profile = FeatureProfile(table_path)
     profile.load_table()
     print(profile)
 
-__all__ = [ 'FeatureProfile', ]
+__all__ = [ 'FeatureProfile', 'prof_lx301' ]
 
