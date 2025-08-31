@@ -29,6 +29,7 @@ class Tester:
         andmask = 0b0
         xormask = 0b0
 
+        # 'Push' feature-value tuples into mask for feature bundle
         for t in fvtups:
             feature = t.feature
             offset = ofsmap[feature]
@@ -41,10 +42,11 @@ class Tester:
         
         self.andmask = andmask
         self.xormask = xormask
+        self.nfeats = len(ofsmap)
     
     def __repr__(self):
-        return f'Tester(andmask = {bin(self.andmask)}, \
-xormask = {bin(self.xormask)})'
+        return f'Tester(andmask = {self.andmask:0>{self.nfeats}b}, \
+xormask = {self.xormask:0>{self.nfeats}b})'
 
     # True iff a segment's feature matrix matches the given feature bundle
     def test_feat_mtx(self, feat_mtx):
@@ -89,13 +91,22 @@ class Setter:
             if value:
                 ormask |= feature_flag
 
-        andmask = ~andmask
+        # Total number of features in the active feature profile
+        num_total_feats = len(ofsmap)
+        feat_mtx_mask =  (0b1 << num_total_feats) - 1
+        '''
+        Make andmask into its 'negative film' in order to clear 
+        rather than test for positive feature bits.
+        Also discard higher 1's above features
+        '''
+        andmask = (~andmask) & feat_mtx_mask
         self.andmask = andmask
         self.ormask = ormask
+        self.nfeats = num_total_feats
 
     def __repr__(self):
-        return f'Setter(andmask = {bin(self.andmask)}, \
-ormask = {bin(self.ormask)})'
+        return f'Setter(andmask = {self.andmask:0>{self.nfeats}b}, \
+ormask = {self.ormask:0>{self.nfeats}b})'
 
     # Apply a specified change to a segment's feature matrix
     def set_feat_mtx(self, feat_mtx):

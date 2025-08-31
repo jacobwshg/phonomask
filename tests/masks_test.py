@@ -15,8 +15,8 @@ for item in test_ofsmap.items():
     print(f'  {item}')
 
 # Print features layout
-ofsmap_sorted_rev = sorted(test_ofsmap.items(), key = lambda kv:-kv[1])
-layout = ' | '.join([f'{kv[0]}' for kv in ofsmap_sorted_rev])
+feats_by_ofs = sorted(test_ofsmap.items(), key=lambda feat_ofs:-feat_ofs[1])
+layout = ' | '.join([f'{feat}' for feat, _ in feats_by_ofs])
 print(layout)
 
 print('')
@@ -39,9 +39,9 @@ def rule_test():
     # Dummy rule 
     print('Dummy rule: [-syl, +son, +nas] -> [+syl, +cons, -lat]')
     '''
-       ... lat | nas | son | cons | syl
-             _     1     1      _     0
-    -> ...  *0     1     1     *1    *1
+       lat | nas | son | cons | syl
+         _     1     1      _     0
+    ->  *0     1     1     *1    *1
     '''
     tester_fvtups = [\
         FVTuple(feature = 'syl', value = False),\
@@ -55,20 +55,22 @@ def rule_test():
     ]
     tester = Tester(tester_fvtups, test_ofsmap)
     setter = Setter(setter_fvtups, test_ofsmap)
+    print(tester, setter)
 
     # Dummy feature matrices
     # (may not describe meaningful segments)
     feat_mtxs = [
         # should pass test
-        0b1101100, 0b1001100, 0b1011110,\
+        0b01100, 0b01110, 0b11100,\
         # should fail test
-        0b1010110, 0b1100101, 0b1110110,\
+        0b10110, 0b01101, 0b01001,\
     ]
+    nfeats = len(test_ofsmap)
     for fm in feat_mtxs:
         fm_new = fm
         if tester.test_feat_mtx(fm):
-            sb_new = setter.set_feat_mtx(fm)
-        print(f'{bin(fm)} -> {bin(fm_new)}')
+            fm_new = setter.set_feat_mtx(fm)
+        print(f'Segment {fm:0>{nfeats}b} -> {fm_new:0>{nfeats}b}')
 
 
 if __name__ == '__main__':
