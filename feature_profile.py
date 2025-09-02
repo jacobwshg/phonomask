@@ -9,7 +9,6 @@ class FeatureProfile:
         self.table_path = table_path
         self.ofsmaps = ofsmaps
         self.sfmaps = sfmaps
-        self.num_feats = 0
         self.loaded = False
 
     def set_table_path(self, new_path):
@@ -20,17 +19,16 @@ class FeatureProfile:
         if not self.loaded:
             self.ofsmaps = OfsMaps()
             self.sfmaps = SFMaps()
-            self.num_feats = 0
             with open(self.table_path, mode='r', encoding='utf-8') as table:
                 reader = csv.reader(table)
                 for rowno, row in enumerate(reader):
                     if rowno == 0:
-                        # Header row with feature labels
+                        # Header row; register feature labels
                         # Skip cell (0, 0), which is "IPA"
-                        self.num_feats = self.ofsmaps.register_feature_list(row[1:])
+                        self.ofsmaps.register_feature_list(row[1:])
                     else:
-                        # Content row with an IPA segment and its 
-                        # feature values
+                        # Content row with an IPA segment and its feature values;
+                        # Compute and register the segment's feature matrix
                         segment = row[0]
                         feat_mtx = 0b0
                         for offset, feat_val in enumerate(row[1:]):
@@ -41,12 +39,15 @@ class FeatureProfile:
                         self.sfmaps.register(segment, feat_mtx)
             self.loaded = True
 
+    def num_feats(self):
+        return self.ofsmaps.num_feats
+
     # TODO
     def __str__(self):
         header = '[[Feature Profile]]'
         fmlayout = self.ofsmaps.get_feat_mtx_layout()
         seg_fm_list = self.sfmaps.to_list()
-        seg_fm_str = '\n'.join([f'{seg}\t{fm:0>{self.num_feats}b}'\
+        seg_fm_str = '\n'.join([f'{seg}\t{fm:0>{self.num_feats()}b}'\
                                 for seg, fm in seg_fm_list])
         return '\n'.join([header, fmlayout, seg_fm_str, ])
 
@@ -68,8 +69,8 @@ class FeatureProfile:
     def from_file(self, path):
         pass
 
-    # Return feature matrix string of segment
-    def feat_mtx_string_of(self, segment):
+    # Return human-readable feature matrix string of a segment
+    def seg_to_fm_string(self, segment):
         # Obtain feature matrix of segment
         feat_mtx = self.sfmaps.feat_mtx_of(segment)
         if feat_mtx is None:
@@ -91,5 +92,8 @@ if __name__ == '__main__':
     profile.load_table()
     print(profile)
 
-__all__ = [ 'FeatureProfile', 'prof_lx301' ]
+__all__ = [\
+    'FeatureProfile',\
+    'prof_lx301',\
+]
 
