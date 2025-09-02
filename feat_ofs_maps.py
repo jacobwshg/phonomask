@@ -14,13 +14,19 @@ class OfsMaps:
         self.feats_by_ofs = []
         self.is_sorted = False
 
+    """
+    Register a single feature-offset mapping
+    """
     def register(self, feature, offset):
         self.feat_ofs_map.setdefault(feature, offset)
         self.ofs_feat_map.setdefault(offset, feature)
         self.is_sorted = False
 
-    # Register the complete feature list of a table
-    # Return the number of features registered
+    """
+    Register the complete feature list of a table
+    by assigning offsets to features in the order encountered
+    Return the number of features registered
+    """
     def register_feature_list(self, features):
         num_feats = 0
         self.feat_ofs_map = {}
@@ -39,18 +45,25 @@ class OfsMaps:
     def offset_of(self, feature):
         return self.feat_ofs_map.get(feature)
 
+    """
+    Cache a sorted representation as a member
+    """
     def sort(self):
         if not self.is_sorted:
             self.feats_by_ofs = sorted(self.feat_ofs_map.items(),\
                                        key=lambda feat_ofs:-feat_ofs[1])
             self.is_sorted = True
 
+    """
+    Return a string that shows the bitwise layout of features
+    as described by their offsets
+    """
     def get_feat_mtx_layout(self):
         self.sort()
         return ' | '.join([feature for feature, offset in self.feats_by_ofs])
 
     """
-    Restore string form of a feature matrix
+    Restore the human-readable string form of a feature matrix
     Example
         Feature matrix layout = son | syl | cons
         Feature matrix = 0b110
@@ -67,5 +80,7 @@ class OfsMaps:
         feat_val_str = ', '.join(feat_val_list)
         return f'[{feat_val_str}]'
 
-__all__ = [ 'OfsMaps', ]
+__all__ = [\
+    'OfsMaps',\
+]
 
