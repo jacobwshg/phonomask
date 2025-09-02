@@ -8,6 +8,7 @@ class OfsMaps:
         self.feat_ofs_map = {}
         self.ofs_feat_map = {}
         self.num_feats = 0
+
         '''
         Cached mapping list ordered by descending offset -
         used for printing bitwise layout of feature matrices
@@ -63,18 +64,28 @@ class OfsMaps:
 
     """
     Restore the human-readable string form of a feature matrix
-    Example
+        Example
         Feature matrix layout = son | syl | cons
         Feature matrix = 0b110
         String = '[-cons, +syl, +son]'
+    EFFECTIVE_MASK allows for selective emission of features
+    If POSITIVE_ONLY is True, only positive effective features are emitted 
     """
-    def feat_mtx_string(self, feat_mtx):
+    def feat_mtx_string(self, feat_mtx, effective_mask, positive_only):
         # Accumulator list of '+/-feature' strings
         feat_val_list = []
         for offset in range(self.num_feats):
-            feature = self.ofs_feat_map.get(offset)
-            value = feat_mtx >> offset & 0b1
-            feat_val_list.append(f'+{feature}' if value == 0b1 else f'-{feature}')
+            feature = self.feature_at(offset)
+            if (effective_mask >> offset) & 0b1 == 0b1:
+                # Feature is effective; candidate for emission
+                value = feat_mtx >> offset & 0b1
+                '''Old implementation without positivity condition
+                feat_val_list.append(f'+{feature}' if value == 0b1 else f'-{feature}'
+                '''
+                if value == 0b1:
+                    feat_val_list.append(f'+{feature}')
+                elif not positive_only:
+                    feat_val_list.append(f'-{feature}')
         feat_val_str = ', '.join(feat_val_list)
         return f'[{feat_val_str}]'
 
