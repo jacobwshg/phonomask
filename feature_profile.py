@@ -100,18 +100,22 @@ feature value currently cast to `-`')
             return self.ofsmaps.feat_mtx_string(feat_mtx, ef_mask, pos_only)
 
     # Return a human-readable string for the complete feature matrix of a segment
-    def seg_features(self, segment):
+    def segment_features(self, segment):
         return self.seg_effective_features(segment)
 
     # Return a human-readable string for a segment's positive features
     def seg_positive_features(self, segment):
         return self.seg_effective_features(segment, pos_only=True)
 
-    def shared_features(self, segments_str):
+    def compare_seg_features(self, segments_str, show_shared):
         segments = segments_str.split(' ')
         if not segments:
             print('No segment provided!')
             return None
+        elif (not show_shared) and len(segments) > 2:
+            print('Unable to compare changed features for more than 2 segments')
+            return None
+
         valid_segments = []
         feat_mtxs = []
         for seg in segments:
@@ -122,17 +126,29 @@ feature value currently cast to `-`')
                 valid_segments.append(seg)
                 feat_mtxs.append(feat_mtx)
 
-        if not feat_mtxs:
-            print('No known segments provided')
+        if len(valid_segments) < 2:
+            print('Unable to compare features for less than 2 known segments')
             return None
 
-        shared_mask = utils.bitmaps_get_same(feat_mtxs,\
-                                             length=self.num_feats())
-        shared_feats = self.seg_effective_features(valid_segments[0],\
-                                                   ef_mask = shared_mask)
-        print('Shared features computed for ' +\
-              ', '.join([f'[{seg}]' for seg in valid_segments]))
-        return shared_feats
+        ef_mask = utils.bitmaps_get_same(feat_mtxs, length=self.num_feats())\
+                  if show_shared\
+                  else utils.bitmaps_get_diff(feat_mtxs[0], feat_mtxs[1],\
+                                              length=self.num_feats())
+        ef_feats = self.seg_effective_features(valid_segments[1],\
+                                               ef_mask=ef_mask)
+        if show_shared:
+            print('Shared features computed for ' +\
+                  ', '.join([f'[{seg}]' for seg in valid_segments]))
+        else:
+            print(f'Changed features computed for [{valid_segments[0]}] -> \
+[{valid_segments[1]}]')
+        return ef_feats
+
+    def shared_features(self, segments_str):
+        return self.compare_seg_features(segments_str, True)
+
+    def changed_features(self, segment_pair_str):
+        return self.compare_seg_features(segment_pair_str, False)
 
 prof_lx301 = FeatureProfile('./lx301-base.csv')
 
