@@ -44,6 +44,9 @@ feature value currently cast to `-`')
     def num_feats(self):
         return self.ofsmaps.num_feats
 
+    def all_feats_mask(self):
+        return (0b1 << self.num_feats()) - 1
+
     # TODO
     def __str__(self):
         header = '[[Feature Profile]]'

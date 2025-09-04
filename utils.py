@@ -1,5 +1,3 @@
-import functools
-
 """
 Bitmap utilities are aimed at feature matrices in this project
 but can be generalized
@@ -8,7 +6,6 @@ but can be generalized
 """
 Return a mask for bits shared across a list of bitmaps (0/1 across all elements)
 """
-#TODO: try implementing with functools.reduce()
 def bitmaps_get_same(bitmap_list, length=32):
     if not bitmap_list:
         return 0b0
