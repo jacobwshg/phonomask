@@ -1,15 +1,15 @@
 import csv
 
-from seg_fm_maps import SFMaps
+from seg_fm_maps import SFMMaps
 from feat_ofs_maps import OfsMaps
 import utils
 
 # Manager
 class FeatureProfile:
-    def __init__(self, table_path, ofsmaps=OfsMaps(), sfmaps=SFMaps()):
+    def __init__(self, table_path, ofsmaps=OfsMaps(), sfmmaps=SFMMaps()):
         self.table_path = table_path
         self.ofsmaps = ofsmaps
-        self.sfmaps = sfmaps
+        self.sfmmaps = sfmmaps
         self.loaded = False
 
     def set_table_path(self, new_path):
@@ -19,7 +19,7 @@ class FeatureProfile:
     def load_table(self):
         if not self.loaded:
             self.ofsmaps = OfsMaps()
-            self.sfmaps = SFMaps()
+            self.sfmmaps = SFMMaps()
             with open(self.table_path, mode='r', encoding='utf-8') as table:
                 reader = csv.reader(table)
                 for rowno, row in enumerate(reader):
@@ -38,7 +38,7 @@ class FeatureProfile:
                             elif feat_val != '-':
                                 print(f'warning: {segment} nonbinary \
 feature value currently degraded to `-`')
-                        self.sfmaps.register(segment, feat_mtx)
+                        self.sfmmaps.register(segment, feat_mtx)
             self.loaded = True
 
     def num_feats(self):
@@ -51,7 +51,7 @@ feature value currently degraded to `-`')
     def __str__(self):
         header = '[[Feature Profile]]'
         fmlayout = self.ofsmaps.get_feat_mtx_layout()
-        seg_fm_list = self.sfmaps.to_list()
+        seg_fm_list = self.sfmmaps.to_list()
         seg_fm_str = '\n'.join([f'{seg}\t{fm:0>{self.num_feats()}b}'\
                                 for seg, fm in seg_fm_list])
         return '\n'.join([header, fmlayout, seg_fm_str, ])
@@ -63,7 +63,7 @@ feature value currently degraded to `-`')
     need to keep feature labels and layout, or else mappings meaningless
     '''
     def to_file(self, path):
-        seg_fm_list = self.sfmaps.to_list()
+        seg_fm_list = self.sfmmaps.to_list()
         with open(path, mode='w', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow([self.table_path])
@@ -94,7 +94,7 @@ feature value currently degraded to `-`')
         '''
         #ef_mask &= self.all_feats_mask()
         # Obtain feature matrix of segment
-        feat_mtx = self.sfmaps.feat_mtx_of(segment)
+        feat_mtx = self.sfmmaps.feat_mtx_of(segment)
         if feat_mtx is None:
             print(f'Segment [{segment}] not found in feature profile')
             return ''
@@ -128,7 +128,7 @@ feature value currently degraded to `-`')
         valid_segments = []
         feat_mtxs = []
         for seg in segments:
-            feat_mtx = self.sfmaps.feat_mtx_of(seg)
+            feat_mtx = self.sfmmaps.feat_mtx_of(seg)
             if feat_mtx == None:
                 print(f'Segment [{seg}] not found in feature profile')
             else:
