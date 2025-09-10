@@ -68,7 +68,8 @@ class OfsMaps:
         Feature matrix layout = son | syl | cons
         Feature matrix = 0b110
         String = '[-cons, +syl, +son]'
-    EFFECTIVE_MASK allows for selective emission of features
+    EFFECTIVE_MASK allows for selective emission of features, resulting in a 
+        feature bundle rather than a full feature matrix
     If POSITIVE_ONLY is True, only positive effective features are emitted 
     """
     def feat_mtx_string(self, feat_mtx, effective_mask, positive_only):

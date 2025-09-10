@@ -47,13 +47,23 @@ def word_to_seglist(word):
 
     return seglist
 
+def word_from_seglist(seglist):
+    return ''.join(seglist)
+
 def print_word_and_seglist(word):
     seglist = word_to_seglist(word)
     print(f'{word}\t{seglist}')
 
 if __name__ == '__main__':
+    '''
+    A stress test; we're not sure how much superscription 
+    to actually support
+    '''
     test = 't͡ʃʲʷiɖ͡ʐˠˤuðʰ'
-    print_word_and_seglist(test)
+    test_seglist = word_to_seglist(test)
+    print(f'Test word: {test}')
+    print(f'Segments list: {test_seglist}')
+    print(f'Reconstructed word: {word_from_seglist(test_seglist)}')
 
     for word in argv[1:]:
         print_word_and_seglist(word)

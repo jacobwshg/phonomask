@@ -37,7 +37,7 @@ class FeatureProfile:
                                 feat_mtx |= (0b1 << offset)
                             elif feat_val != '-':
                                 print(f'warning: {segment} nonbinary \
-feature value currently cast to `-`')
+feature value currently degraded to `-`')
                         self.sfmaps.register(segment, feat_mtx)
             self.loaded = True
 
@@ -110,6 +110,12 @@ feature value currently cast to `-`')
     def seg_positive_features(self, segment):
         return self.seg_effective_features(segment, pos_only=True)
 
+    """
+    Accepts a sequence of segments separated by space and compare their 
+    feature matrices
+    If SHOW_SHARED is True, return their shared feature bundle;
+        else return the changed feature bundle (between a pair of segments)
+    """
     def compare_seg_features(self, segments_str, show_shared):
         segments = segments_str.split(' ')
         if not segments:
@@ -147,11 +153,21 @@ feature value currently cast to `-`')
 [{valid_segments[1]}]')
         return ef_feats
 
+    """
+    Accept a sequence of segments separated by space
+    Return their shared feature bundle
+    """
     def shared_features(self, segments_str):
         return self.compare_seg_features(segments_str, True)
 
+    """
+    Accepts a pair of segments (exactly 2) separated by space
+    Return the feature bundle corresponding to the change from
+    the former to the latter
+    """
     def changed_features(self, segment_pair_str):
         return self.compare_seg_features(segment_pair_str, False)
+
 
 prof_lx301 = FeatureProfile('./lx301-base.csv')
 
