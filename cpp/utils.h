@@ -9,6 +9,9 @@ namespace Phmask
 {
     void
     fields_from_row(std::istream &, std::vector<std::string> &);
+
+    std::vector<std::string>
+    fields_from_row(std::istream &);
 }
 
 #endif

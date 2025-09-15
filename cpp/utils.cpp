@@ -39,7 +39,7 @@ Phmask::fields_from_row(std::istream &is, std::vector<std::string> &fields)
 }
 
 std::vector<std::string>
-fields_from_row(std::istream &is)
+Phmask::fields_from_row(std::istream &is)
 {
     std::vector<std::string> fields {};
     Phmask::fields_from_row(is, fields);
