@@ -4,9 +4,9 @@
 #include <iostream>
 #include <cstddef>
 
+void
 Phmask::
-SegFMMaps::SegFMMaps(std::istream &table_stream) :
-    seg_fm_map {}, fm_seg_map {}
+SegFMMaps::populate(std::istream &table_stream) 
 {
     /* Assume that the feature table's header row
        had been consumed to construct FeatOfsMaps

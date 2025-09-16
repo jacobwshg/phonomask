@@ -11,7 +11,8 @@ namespace Phmask
     class FeatOfsMaps
     {
     public:
-        FeatOfsMaps(std::vector<std::string>&);
+        FeatOfsMaps(void) = default;
+        void populate(std::vector<std::string>&);
         std::string str(void);
         std::string feature_layout_str(void);
     private:

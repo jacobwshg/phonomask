@@ -3,9 +3,9 @@
 #include <string>
 #include <sstream>
 
+void
 Phmask::
-FeatOfsMaps::FeatOfsMaps(std::vector<std::string>& header_row_fields) :
-    feat_ofs_map {}, ofs_feat_map {}
+FeatOfsMaps::populate(std::vector<std::string>& header_row_fields) 
 {
     for (std::size_t colno {0}; colno < header_row_fields.size();
              ++colno)
