@@ -1,10 +1,20 @@
 #include "utils.h"
+#include <memory>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 
+std::unique_ptr<std::istream>
+Phmask::
+table_stream_ptr(std::string &path)
+{
+    return std::make_unique<std::ifstream>(path);
+}
+
 void
-Phmask::fields_from_row(std::istream &is, std::vector<std::string> &fields)
+Phmask::
+fields_from_row(std::istream &is, std::vector<std::string> &fields)
 {
     fields.clear();
     std::string field {};
@@ -39,7 +49,8 @@ Phmask::fields_from_row(std::istream &is, std::vector<std::string> &fields)
 }
 
 std::vector<std::string>
-Phmask::fields_from_row(std::istream &is)
+Phmask::
+fields_from_row(std::istream &is)
 {
     std::vector<std::string> fields {};
     Phmask::fields_from_row(is, fields);

@@ -3,11 +3,8 @@
 #include <string>
 #include <sstream>
 
-//////////
-#include <iostream>
-
-Phmask::FeatOfsMaps::
-FeatOfsMaps(std::vector<std::string>& header_row_fields) :
+Phmask::
+FeatOfsMaps::FeatOfsMaps(std::vector<std::string>& header_row_fields) :
     feat_ofs_map {}, ofs_feat_map {}
 {
     for (std::size_t colno {0}; colno < header_row_fields.size();
@@ -26,7 +23,8 @@ FeatOfsMaps(std::vector<std::string>& header_row_fields) :
 }
 
 std::string
-Phmask::FeatOfsMaps::str(void)
+Phmask::
+FeatOfsMaps::str(void)
 {
     std::ostringstream sstrm {};
     sstrm << "Offset\tFeature\n";
@@ -38,7 +36,8 @@ Phmask::FeatOfsMaps::str(void)
 }
 
 std::string
-Phmask::FeatOfsMaps::feature_layout_str(void)
+Phmask::
+FeatOfsMaps::feature_layout_str(void)
 {
     std::ostringstream lay_strm {};
     std::size_t nfeats = ofs_feat_map.size();

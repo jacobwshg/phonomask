@@ -4,8 +4,8 @@
 #include <iostream>
 #include <cstddef>
 
-Phmask::SegFMMaps::
-SegFMMaps(std::istream &table_stream) :
+Phmask::
+SegFMMaps::SegFMMaps(std::istream &table_stream) :
     seg_fm_map {}, fm_seg_map {}
 {
     /* Assume that the feature table's header row
