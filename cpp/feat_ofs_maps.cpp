@@ -26,6 +26,18 @@ FeatOfsMaps(std::vector<std::string>& header_row_fields) :
 }
 
 std::string
+Phmask::FeatOfsMaps::str(void)
+{
+    std::ostringstream sstrm {};
+    sstrm << "Offset\tFeature\n";
+    for (std::size_t i {0}; i < ofs_feat_map.size(); ++i)
+    {
+        sstrm << i << "\t" << ofs_feat_map[i] << "\n";
+    }
+    return sstrm.str();
+}
+
+std::string
 Phmask::FeatOfsMaps::feature_layout_str(void)
 {
     std::ostringstream lay_strm {};

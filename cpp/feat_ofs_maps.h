@@ -12,6 +12,7 @@ namespace Phmask
     {
     public:
         FeatOfsMaps(std::vector<std::string>&);
+        std::string str(void);
         std::string feature_layout_str(void);
     private:
         std::unordered_map<std::string, std::size_t> feat_ofs_map;
