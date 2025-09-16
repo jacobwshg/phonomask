@@ -10,7 +10,7 @@ Phmask::FeatOfsMaps::
 FeatOfsMaps(std::vector<std::string>& header_row_fields) :
     feat_ofs_map {}, ofs_feat_map {}
 {
-    for (std::size_t colno = 0; colno < header_row_fields.size();
+    for (std::size_t colno {0}; colno < header_row_fields.size();
              ++colno)
     {
         if (colno == 0)
@@ -31,7 +31,7 @@ Phmask::FeatOfsMaps::feature_layout_str(void)
     std::ostringstream lay_strm {};
     std::size_t nfeats = ofs_feat_map.size();
 
-    for (std::size_t i = 0; i < nfeats; ++i)
+    for (std::size_t i {0}; i < nfeats; ++i)
     {
         lay_strm << ofs_feat_map[nfeats - 1 - i];
         if (i < nfeats - 1)
