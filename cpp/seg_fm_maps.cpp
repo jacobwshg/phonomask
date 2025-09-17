@@ -34,3 +34,17 @@ SegFMMaps::populate(std::istream &table_stream)
     }
 }
 
+Phmask::feat_mtx_t 
+Phmask::
+SegFMMaps::feat_mtx_of(const std::string &segment)
+{
+    return seg_fm_map[segment];
+}
+
+std::string 
+Phmask::
+SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx)
+{
+    return fm_seg_map[feat_mtx];
+}
+

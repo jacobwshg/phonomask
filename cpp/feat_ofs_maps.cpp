@@ -5,7 +5,7 @@
 
 void
 Phmask::
-FeatOfsMaps::populate(std::vector<std::string>& header_row_fields) 
+FeatOfsMaps::populate(const std::vector<std::string>& header_row_fields) 
 {
     for (std::size_t colno {0}; colno < header_row_fields.size();
              ++colno)
@@ -15,12 +15,27 @@ FeatOfsMaps::populate(std::vector<std::string>& header_row_fields)
             continue;
         }
 
-        std::string &feature = header_row_fields[colno];
+        const std::string &feature = header_row_fields[colno];
         std::size_t ofs = colno - 1;
         feat_ofs_map[feature] = ofs;
         ofs_feat_map.emplace_back(feature);
     }
 }
+
+std::string 
+Phmask::
+FeatOfsMaps::feature_at(const std::size_t offset)
+{
+    return ofs_feat_map[offset];
+}
+
+std::size_t 
+Phmask::
+FeatOfsMaps::offset_of(const std::string &feature)
+{
+    return feat_ofs_map[feature];
+}
+
 
 std::string
 Phmask::
