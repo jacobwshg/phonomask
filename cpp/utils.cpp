@@ -7,7 +7,7 @@
 
 std::unique_ptr<std::istream>
 Phmask::
-table_stream_ptr(std::string &path)
+table_stream_ptr(const std::string &path)
 {
     return std::make_unique<std::ifstream>(path);
 }

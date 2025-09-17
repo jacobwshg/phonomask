@@ -7,7 +7,7 @@
 #include <memory>
 
 Phmask::
-FeatureProfile::FeatureProfile(std::string &path):
+FeatureProfile::FeatureProfile(const std::string &path):
     num_feats {0}, feat_ofs_maps {}, seg_fm_maps {}
 {
     std::unique_ptr<std::istream> table_sp 
@@ -33,7 +33,7 @@ FeatureProfile::FeatureProfile(std::string &path):
 
 std::string 
 Phmask::
-FeatureProfile::seg_feat_mtx_str(std::string segment)
+FeatureProfile::seg_feat_mtx_str(const std::string segment)
 {
     std::ostringstream fm_sstrm {};
     fm_sstrm << "[";
