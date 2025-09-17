@@ -8,7 +8,7 @@
 
 Phmask::
 FeatureProfile::FeatureProfile(std::string &path):
-    num_feats {}, feat_ofs_maps {}, seg_fm_maps {}
+    num_feats {0}, feat_ofs_maps {}, seg_fm_maps {}
 {
     std::unique_ptr<std::istream> table_sp 
     { 
@@ -21,10 +21,10 @@ FeatureProfile::FeatureProfile(std::string &path):
         Phmask::fields_from_row(table_strm)
     };
 
-    num_feats = header_row_fields.size();
-    if (num_feats > 0)
+    std::size_t num_cols = header_row_fields.size();
+    if (num_cols > 1)
     {
-        --num_feats;
+        num_feats = num_cols - 1;
     }
 
     feat_ofs_maps.populate(header_row_fields);
