@@ -32,7 +32,7 @@ fields_from_row(std::istream &is, std::vector<std::string> &fields)
             field.clear();
             if (c == '\n')
             {
-                return;
+                goto done;
             }
             break;
         default:
@@ -40,9 +40,11 @@ fields_from_row(std::istream &is, std::vector<std::string> &fields)
             break;
         }
     }
-    // EOF
+
+    done:
     if (!field.empty())
     {
+        // EOF without trailing newline
         fields.emplace_back(field);
         field.clear();
     }

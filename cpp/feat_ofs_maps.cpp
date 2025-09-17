@@ -26,14 +26,14 @@ std::string
 Phmask::
 FeatOfsMaps::feature_at(const std::size_t offset)
 {
-    return ofs_feat_map[offset];
+    return ofs_feat_map.at(offset);
 }
 
 std::size_t 
 Phmask::
 FeatOfsMaps::offset_of(const std::string &feature)
 {
-    return feat_ofs_map[feature];
+    return feat_ofs_map.at(feature);
 }
 
 

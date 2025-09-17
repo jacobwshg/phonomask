@@ -13,7 +13,7 @@ namespace Phmask
         explicit FeatureProfile(std::string &);
         ~FeatureProfile(void) = default;
 
-        std::string seg_feat_mtx_str(std::string &);
+        std::string seg_feat_mtx_str(std::string);
     private:
         std::size_t num_feats;
         FeatOfsMaps feat_ofs_maps;
