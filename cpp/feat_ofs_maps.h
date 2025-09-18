@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <cstddef>
+#include <string_view>
 
 namespace Phmask
 {
@@ -18,7 +19,7 @@ namespace Phmask
         void populate(const std::vector<std::string>&);
 
         std::string &feature_at(const std::size_t);
-        std::size_t offset_of(const std::string &);
+        std::size_t offset_of(const std::string_view);
 
         std::string str(void);
         std::string feature_layout_str(void);

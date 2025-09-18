@@ -15,6 +15,7 @@ struct SvStrHash
 struct SvStrEq
 {
     using is_transparent = void;
+    bool operator()(const std::string_view, const std::string_view) const;
     bool operator()(const std::string_view, const std::string &) const;
     bool operator()(const std::string &, const std::string &) const;
 };

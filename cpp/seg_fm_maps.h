@@ -5,6 +5,7 @@
 #include "svutils.h"
 #include <unordered_map>
 #include <bitset>
+#include <string_view>
 
 namespace Phmask
 {
@@ -15,7 +16,7 @@ namespace Phmask
         ~SegFMMaps(void) = default;
         void populate(std::istream &);
 
-        feat_mtx_t feat_mtx_of(const std::string &);
+        feat_mtx_t feat_mtx_of(const std::string_view);
         std::string &segment_of(const feat_mtx_t);
     private:
         std::unordered_map<std::string, feat_mtx_t, SvStrHash, SvStrEq> seg_fm_map;

@@ -1,9 +1,11 @@
 #include "seg_fm_maps.h"
 #include "feat_mtx.h"
 #include "utils.h"
+#include "svutils.h"
 #include <iostream>
 #include <cstddef>
 #include <stdexcept>
+#include <string_view>
 
 void
 Phmask::
@@ -42,14 +44,17 @@ SegFMMaps::populate(std::istream &table_stream)
 
 Phmask::feat_mtx_t 
 Phmask::
-SegFMMaps::feat_mtx_of(const std::string &segment)
+SegFMMaps::feat_mtx_of(const std::string_view segment)
 {
     const auto &it = seg_fm_map.find(segment);
     if (it == seg_fm_map.end())
     {
         throw std::runtime_error("Segment not found\n");
     }
-    return it->second;
+    else 
+    {
+        return it->second;
+    }
 }
 
 std::string & 

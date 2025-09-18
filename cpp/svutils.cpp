@@ -16,6 +16,12 @@ SvStrHash::operator()(const std::string &str) const
 }
 
 bool 
+SvStrEq::operator()(const std::string_view sv1, const std::string_view sv2) const
+{
+    return sv1 == sv2;
+}
+
+bool 
 SvStrEq::operator()(const std::string_view sv, const std::string &str) const
 {
     return sv == str;

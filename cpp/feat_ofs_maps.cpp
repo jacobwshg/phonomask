@@ -1,7 +1,9 @@
 #include "feat_ofs_maps.h"
+#include "svutils.h"
 #include <vector>
 #include <string>
 #include <sstream>
+#include <string_view>
 
 void
 Phmask::
@@ -31,9 +33,17 @@ FeatOfsMaps::feature_at(const std::size_t offset)
 
 std::size_t 
 Phmask::
-FeatOfsMaps::offset_of(const std::string &feature)
+FeatOfsMaps::offset_of(const std::string_view feature)
 {
-    return feat_ofs_map.at(feature);
+    const auto &it = feat_ofs_map.find(feature);
+    if (it == feat_ofs_map.end())
+    {
+        throw std::runtime_error("Feature not found\n");
+    }
+    else
+    {
+        return it->second;
+    }
 }
 
 
