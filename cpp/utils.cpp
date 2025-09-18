@@ -59,3 +59,38 @@ fields_from_row(std::istream &is)
     return fields;
 }
 
+std::vector<std::string>
+Phmask::
+parse_feature_bundle_str(std::string &fb_str)
+{
+    std::vector<std::string> fb_toks {};
+    std::string tokbuf {};
+
+    for (const char &c : fb_str)
+    {
+        switch (c)
+        {
+        case '[':
+        case ']':
+            break;
+        case ',':
+        case ' ':
+            if (!tokbuf.empty())
+            {
+                fb_toks.emplace_back(tokbuf);
+                tokbuf.clear();
+            }
+            break;
+        default:
+            tokbuf += c;
+            break;
+        }
+    }
+    if (!tokbuf.empty())
+    {
+        fb_toks.emplace_back(tokbuf);
+    }
+
+    return fb_toks;
+}
+
