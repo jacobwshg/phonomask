@@ -3,6 +3,7 @@
 #include "utils.h"
 #include <iostream>
 #include <cstddef>
+#include <stdexcept>
 
 void
 Phmask::
@@ -43,7 +44,12 @@ Phmask::feat_mtx_t
 Phmask::
 SegFMMaps::feat_mtx_of(const std::string &segment)
 {
-    return seg_fm_map.at(segment);
+    const auto &it = seg_fm_map.find(segment);
+    if (it == seg_fm_map.end())
+    {
+        throw std::runtime_error("Segment not found\n");
+    }
+    return it->second;
 }
 
 std::string & 
