@@ -33,7 +33,7 @@ FeatureProfile::FeatureProfile(const std::string &path):
 
 std::string 
 Phmask::
-FeatureProfile::seg_feat_mtx_str(const std::string segment)
+FeatureProfile::seg_feat_mtx_str(const std::string &segment)
 {
     std::ostringstream fm_sstrm {};
     fm_sstrm << "[";
@@ -54,4 +54,5 @@ FeatureProfile::seg_feat_mtx_str(const std::string segment)
     fm_sstrm << "]";
     return fm_sstrm.str();
 }
+
 
