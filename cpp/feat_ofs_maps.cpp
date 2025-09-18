@@ -22,7 +22,7 @@ FeatOfsMaps::populate(const std::vector<std::string>& header_row_fields)
     }
 }
 
-std::string 
+std::string &
 Phmask::
 FeatOfsMaps::feature_at(const std::size_t offset)
 {

@@ -31,28 +31,44 @@ FeatureProfile::FeatureProfile(const std::string &path):
     seg_fm_maps.populate(table_strm);
 }
 
-std::string 
+std::string
+Phmask::
+FeatureProfile::seg_effective_feats_str(const std::string &segment, 
+                                        feat_mtx_t ef_mask)
+{
+    std::string ef_feats_str {"["};
+
+    feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
+    for (std::size_t ofs = 0; ofs < num_feats; ++ofs)
+    {
+        if (ef_mask.test(ofs))
+        // Feature at OFS is effective
+        {
+            ef_feats_str += (feat_mtx.test(ofs) ? "+" : "-");
+            std::string &feature {feat_ofs_maps.feature_at(ofs)};
+            ef_feats_str += feature;
+            ef_feats_str += ", ";
+        }
+    }
+    ef_feats_str += "]";
+    return ef_feats_str;
+}
+
+std::string
+Phmask::
+FeatureProfile::seg_positive_feats_str(const std::string &segment)
+{
+    return seg_effective_feats_str(segment, seg_fm_maps.feat_mtx_of(segment));
+}
+
+std::string
 Phmask::
 FeatureProfile::seg_feat_mtx_str(const std::string &segment)
 {
-    std::ostringstream fm_sstrm {};
-    fm_sstrm << "[";
+    feat_mtx_t all_feats_mask {};
+    all_feats_mask.set();
+    all_feats_mask = ~(all_feats_mask << num_feats);
 
-    feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
-
-    for (std::size_t ofs = 0; ofs < num_feats; ++ofs)
-    {
-        std::string feature {feat_ofs_maps.feature_at(ofs)};
-        fm_sstrm << (feat_mtx.test(ofs) ? "+" : "-");
-        fm_sstrm << feature;
-        if (ofs < num_feats - 1)
-        {
-            fm_sstrm << ", ";
-        }
-    }
-
-    fm_sstrm << "]";
-    return fm_sstrm.str();
+    return seg_effective_feats_str(segment, all_feats_mask);
 }
-
 

@@ -46,7 +46,7 @@ SegFMMaps::feat_mtx_of(const std::string &segment)
     return seg_fm_map.at(segment);
 }
 
-std::string 
+std::string & 
 Phmask::
 SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx)
 {

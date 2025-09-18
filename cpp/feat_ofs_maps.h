@@ -16,7 +16,7 @@ namespace Phmask
 
         void populate(const std::vector<std::string>&);
 
-        std::string feature_at(const std::size_t);
+        std::string &feature_at(const std::size_t);
         std::size_t offset_of(const std::string &);
 
         std::string str(void);

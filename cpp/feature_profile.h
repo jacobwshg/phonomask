@@ -10,14 +10,19 @@ namespace Phmask
     class FeatureProfile
     {
     public:
+        std::size_t num_feats;
+
         explicit FeatureProfile(const std::string &);
         ~FeatureProfile(void) = default;
 
+        std::string seg_positive_feats_str(const std::string &);
         std::string seg_feat_mtx_str(const std::string &);
     private:
-        std::size_t num_feats;
         FeatOfsMaps feat_ofs_maps;
         SegFMMaps seg_fm_maps;
+
+        std::string 
+        seg_effective_feats_str(const std::string &, feat_mtx_t);
     };
 }
 
