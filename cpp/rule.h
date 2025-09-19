@@ -28,7 +28,7 @@ namespace Phmask
     {
     public:
         Rule(void) = default;
-        Rule(const std::string &);
+        Rule(const std::string_view);
         ~Rule(void) = default;
     private:
         Phmask::FeatureBundleMasks A;

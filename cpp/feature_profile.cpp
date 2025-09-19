@@ -1,6 +1,9 @@
 #include "feature_profile.h"
 #include "feat_ofs_maps.h"
 #include "seg_fm_maps.h"
+#include "feat_mtx.h"
+#include "rule.h"
+#include "masks.h"
 #include "utils.h"
 #include <string>
 #include <sstream>
@@ -34,11 +37,11 @@ FeatureProfile::FeatureProfile(const std::string &path):
 std::string
 Phmask::
 FeatureProfile::seg_effective_feats_str(const std::string &segment, 
-                                        feat_mtx_t ef_mask)
+                                        Phmask::feat_mtx_t ef_mask)
 {
     std::string ef_feats_str {"["};
 
-    feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
+    Phmask::feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
     for (std::size_t ofs = 0; ofs < num_feats; ++ofs)
     {
         if (ef_mask.test(ofs))
@@ -54,6 +57,16 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
     return ef_feats_str;
 }
 
+inline Phmask::feat_mtx_t
+Phmask::
+FeatureProfile::all_feats_mask(void)
+{
+    Phmask::feat_mtx_t all_feats_mask {0u};
+    all_feats_mask.set();
+    all_feats_mask = ~(all_feats_mask << num_feats);
+    return all_feats_mask;
+}
+
 std::string
 Phmask::
 FeatureProfile::seg_positive_feats_str(const std::string &segment)
@@ -65,10 +78,52 @@ std::string
 Phmask::
 FeatureProfile::seg_feat_mtx_str(const std::string &segment)
 {
-    feat_mtx_t all_feats_mask {};
-    all_feats_mask.set();
-    all_feats_mask = ~(all_feats_mask << num_feats);
+    return seg_effective_feats_str(segment, all_feats_mask());
+}
 
-    return seg_effective_feats_str(segment, all_feats_mask);
+Phmask::FeatureBundleMasks 
+Phmask::
+FeatureProfile::segment_to_masks(std::string_view segment)
+{
+    return 
+        Phmask::FeatureBundleMasks 
+        {
+            all_feats_mask(),
+            seg_fm_maps.feat_mtx_of(segment)
+        };
+}
+
+Phmask::FeatureBundleMasks
+Phmask::
+FeatureProfile::feat_bundle_str_to_masks (const std::string_view fb_str)
+{
+    Phmask::FeatureBundleMasks masks {};
+    std::vector<std::string_view> fb_toks
+    {
+        Phmask::parse_feature_bundle_str(fb_str)
+    };
+    for (const std::string_view &tok : fb_toks)
+    {
+        std::size_t tok_len {tok.size()};
+        std::string_view value {tok}, feature {tok};
+        value.remove_suffix(tok_len - 1);
+        feature.remove_prefix(1);
+
+        std::size_t feature_offset {feat_ofs_maps.offset_of(feature)};
+
+        switch(value[0])
+        {
+        case '+':
+            masks.add_positive(feature_offset);
+            break;
+        case '-':
+            masks.add_negative(feature_offset);
+            break;
+        default:
+            throw std::runtime_error("Feature bundle format not yet supported\n");
+            break;
+        }
+    }
+    return masks;
 }
 
