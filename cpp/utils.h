@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <string_view>
 
 namespace Phmask
 {
@@ -16,9 +17,6 @@ namespace Phmask
 
     std::vector<std::string>
     fields_from_row(std::istream &);
-
-    std::vector<std::string>
-    parse_feature_bundle_str(std::string &);
 }
 
 #endif
