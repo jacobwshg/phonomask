@@ -5,16 +5,24 @@
 #include <string>
 #include <string_view>
 
+/* 
+
+ IMPORTANT
+ A RuleParts object must be outlived by the relevant rule string
+
+ */
+
 namespace Phmask
 {
     struct RuleParts
     {
         std::string_view A;
         std::string_view B;
-        std::string_view X;
-        std::string_view Y;
+        std::vector<std::string_view> X;
+        std::vector<std::string_view> Y;
 
-        RuleParts(const std::string &);
+        explicit RuleParts(const std::string &);
+        std::string str(void);
     };
 
     class Rule
