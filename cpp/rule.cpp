@@ -7,9 +7,6 @@
 #include <unordered_set>
 #include <sstream>
 
-////////
-#include <iostream>
-
 std::vector<std::string_view>
 Phmask::
 rule_str_to_large_toks(const std::string &rule_str)
@@ -191,7 +188,7 @@ parse_feature_bundle_str(std::string_view fb_str)
 
 std::vector<std::string_view>
 Phmask::
-parse_feature_bundle_str(std::string_view fb_str)
+parse_feature_bundle_str(const std::string_view fb_str)
 {
     std::vector<std::string_view> toks {};
     std::size_t fb_len {fb_str.size()};
@@ -220,5 +217,11 @@ parse_feature_bundle_str(std::string_view fb_str)
         }
     }
     return toks;
+}
+
+Phmask::
+Rule::Rule(const std::string &rule_str)
+{
+
 }
 

@@ -1,16 +1,15 @@
 #ifndef PHMASK_RULE_H
 #define PHMASK_RULE_H
 
+#include "masks.h"
 #include <vector>
 #include <string>
 #include <string_view>
 
-/* 
-
+/********************
  IMPORTANT
- A RuleParts object must be outlived by the relevant rule string
-
- */
+     A RuleParts object must be outlived by the relevant rule string
+ ********************/
 
 namespace Phmask
 {
@@ -29,7 +28,13 @@ namespace Phmask
     {
     public:
         Rule(void) = default;
+        Rule(const std::string &);
         ~Rule(void) = default;
+    private:
+        Phmask::FeatureBundleMasks A;
+        Phmask::FeatureBundleMasks B;
+        std::vector<Phmask::FeatureBundleMasks> X;
+        std::vector<Phmask::FeatureBundleMasks> Y;
     };
 
     std::vector<std::string_view>
@@ -41,7 +46,7 @@ namespace Phmask
 */
 
     std::vector<std::string_view>
-    parse_feature_bundle_str(std::string_view);
+    parse_feature_bundle_str(const std::string_view);
 }
 
 #endif

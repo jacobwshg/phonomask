@@ -2,6 +2,7 @@
 #define FEAT_OFS_MAPS_H
 
 #include "svutils.h"
+#include "masks.h"
 #include <unordered_map>
 #include <vector>
 #include <string>
@@ -23,6 +24,10 @@ namespace Phmask
 
         std::string str(void);
         std::string feature_layout_str(void);
+
+        Phmask::FeatureBundleMasks
+        feat_bundle_str_to_masks(const std::string_view);
+
     private:
         std::unordered_map<std::string, std::size_t, SvStrHash, SvStrEq> feat_ofs_map;
         std::vector<std::string> ofs_feat_map;
