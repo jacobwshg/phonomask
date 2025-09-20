@@ -26,6 +26,9 @@ namespace Phmask
         FeatureBundleMasks 
         feat_bundle_str_to_masks(const std::string_view) const;
 
+        FeatureBundleMasks
+        rule_tok_to_masks(const std::string_view) const;
+
         Rule rule_from_str(const std::string &rule_str) const;
 
         FeatOfsMaps feat_ofs_maps;

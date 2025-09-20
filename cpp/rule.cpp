@@ -9,14 +9,14 @@
 
 std::vector<std::string_view>
 Phmask::
-rule_str_to_large_toks(const std::string &rule_str)
+rule_str_toks(const std::string &rule_str)
 {
-    std::vector<std::string_view> large_toks {};
+    std::vector<std::string_view> rule_toks {};
     std::size_t r_len {rule_str.size()};
 
     std::string_view tok {""};
-    std::size_t tok_begin {0}, // Initial pos in large token
-                tok_end {0};   // Pos after large token
+    std::size_t tok_begin {0}, // Initial pos in rule token
+                tok_end {0};   // Pos after rule token
 
     bool in_feat_bdl {false};  // Whether current pos in feature bundle
 
@@ -33,7 +33,7 @@ rule_str_to_large_toks(const std::string &rule_str)
                     tok = rule_str;
                     tok.remove_prefix(tok_begin); 
                     tok.remove_suffix(r_len - tok_end);
-                    large_toks.emplace_back(tok);
+                    rule_toks.emplace_back(tok);
                 }
                 tok_end = (tok_begin = i + 1);
                 continue;
@@ -57,10 +57,10 @@ rule_str_to_large_toks(const std::string &rule_str)
         tok = rule_str; 
         tok.remove_prefix(tok_begin); 
         tok.remove_suffix(r_len - tok_end);
-        large_toks.emplace_back(tok);
+        rule_toks.emplace_back(tok);
     }
 
-    return large_toks;
+    return rule_toks;
 }
 
 Phmask::
@@ -73,9 +73,9 @@ RuleParts::RuleParts(const std::string &rule_str) :
         "→", "->", ">",
     };
 
-    std::vector<std::string_view> large_toks
+    std::vector<std::string_view> rule_toks
     {
-        Phmask::rule_str_to_large_toks(rule_str)
+        Phmask::rule_str_toks(rule_str)
     };
 
     enum class State
@@ -84,42 +84,42 @@ RuleParts::RuleParts(const std::string &rule_str) :
     }
     parser_state {State::A};
 
-    for (std::string_view &large_tok : large_toks)
+    for (std::string_view &tok : rule_toks)
     {
         switch (parser_state)
         {
         case State::A:
-            if (arrows.find(large_tok) != arrows.end())
+            if (arrows.find(tok) != arrows.end())
             {
                 parser_state = State::B;
             }
             else
             {
-                A = large_tok;
+                A = tok;
             }
             break;
         case State::B:
-            if (large_tok == "/")
+            if (tok == "/")
             {
                 parser_state = State::X;
             }
             else
             {
-                B = large_tok;
+                B = tok;
             }
             break;
         case State::X:
-            if (large_tok == "_")
+            if (tok == "_")
             {
                 parser_state = State::Y;
             }
             else
             { 
-                X.emplace_back(large_tok);
+                X.emplace_back(tok);
             }
             break;
         case State::Y:
-            Y.emplace_back(large_tok);
+            Y.emplace_back(tok);
             break;
         default:
             break;
@@ -182,5 +182,4 @@ parse_feature_bundle_str(const std::string_view fb_str)
     }
     return toks;
 }
-
 

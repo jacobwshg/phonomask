@@ -11,6 +11,7 @@
 #include <sstream>
 #include <memory>
 #include <stdexcept>
+#include <unordered_set>
 
 Phmask::
 FeatureProfile::FeatureProfile(const std::string &path):
@@ -132,14 +133,85 @@ FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str) const
     return masks;
 }
 
+Phmask::FeatureBundleMasks
+Phmask::
+FeatureProfile::rule_tok_to_masks(const std::string_view tok) const
+{
+    if (tok.find('[') != std::string::npos)
+    {
+        // Assume the token is a feature bundle
+        return feat_bundle_str_to_masks(tok);
+    }
+    else
+    {
+        return segment_to_masks(tok);
+    }
+}
+
 Phmask::Rule
 Phmask::
 FeatureProfile::rule_from_str(const std::string &rule_str) const
 {
-    Rule rule {};
-    RuleParts rule_parts {rule_str};
-    //TODO
+    const static std::unordered_set<std::string, SvStrHash, SvStrEq> 
+        arrows
+    {
+        "→", "->", ">",
+    };
 
+    std::vector<std::string_view> rule_toks
+    {
+        Phmask::rule_str_toks(rule_str)
+    };
+
+    Rule rule {};
+
+    enum class State
+    {
+        A, B, X, Y,
+    }
+    parser_state {State::A};
+
+    for (std::string_view &tok : rule_toks)
+    {
+        switch (parser_state)
+        {
+        case State::A:
+            if (arrows.find(tok) != arrows.end())
+            {
+                parser_state = State::B;
+            }
+            else
+            {
+                rule.A = rule_tok_to_masks(tok);
+            }
+            break;
+        case State::B:
+            if (tok == "/")
+            {
+                parser_state = State::X;
+            }
+            else
+            {
+                rule.B = rule_tok_to_masks(tok);
+            }
+            break;
+        case State::X:
+            if (tok == "_")
+            {
+                parser_state = State::Y;
+            }
+            else
+            { 
+                rule.X.emplace_back(rule_tok_to_masks(tok));
+            }
+            break;
+        case State::Y:
+            rule.Y.emplace_back(rule_tok_to_masks(tok));
+            break;
+        default:
+            break;
+        }
+    }
     return rule;
 }
 
