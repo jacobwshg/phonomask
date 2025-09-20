@@ -14,6 +14,8 @@ namespace Phmask
     {
     public:
         std::size_t num_feats;
+        FeatOfsMaps feat_ofs_maps;
+        SegFMMaps seg_fm_maps;
 
         explicit FeatureProfile(const std::string &);
 
@@ -31,9 +33,7 @@ namespace Phmask
 
         Rule rule_from_str(const std::string &rule_str) const;
 
-        FeatOfsMaps feat_ofs_maps;
-        SegFMMaps seg_fm_maps;
-
+        std::string rule_masks_str(const Rule &);
     private:
         std::string 
         seg_effective_feats_str(const std::string &, Phmask::feat_mtx_t) const;

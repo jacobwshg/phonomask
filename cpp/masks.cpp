@@ -20,36 +20,3 @@ FeatureBundleMasks::str(void) const
     return ms_sstrm.str();
 }
 
-//inline 
-void
-Phmask::
-FeatureBundleMasks::add_positive(const std::size_t feature_offset)
-{
-    sel_mask.set(feature_offset);
-    val_mask.set(feature_offset);
-}
-
-//inline 
-void 
-Phmask::
-FeatureBundleMasks::add_negative(const std::size_t feature_offset)
-{
-    sel_mask.set(feature_offset);
-}
-
-//inline 
-bool 
-Phmask::
-FeatureBundleMasks::test(const Phmask::feat_mtx_t original) const
-{
-    return (original & sel_mask) == val_mask;
-}
-
-//inline 
-Phmask::feat_mtx_t 
-Phmask::
-FeatureBundleMasks::set(const Phmask::feat_mtx_t original) const
-{
-    return (original & ~sel_mask) | val_mask;
-}
-

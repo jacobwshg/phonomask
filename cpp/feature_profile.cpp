@@ -215,3 +215,25 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
     return rule;
 }
 
+std::string
+Phmask::
+FeatureProfile::rule_masks_str(const Rule &rule)
+{
+    std::ostringstream rule_sstrm {};
+    rule_sstrm 
+        << "Rule\n" 
+        << "A:\n" << rule.A.str()
+        << "B:\n" << rule.B.str()
+        << "X:\n";
+    for (const FeatureBundleMasks &ms : rule.X)
+    {
+        rule_sstrm << ms.str();
+    }
+    rule_sstrm << "Y:\n";
+    for (const FeatureBundleMasks &ms : rule.Y)
+    {
+        rule_sstrm << ms.str();
+    }
+    return rule_sstrm.str();
+}
+
