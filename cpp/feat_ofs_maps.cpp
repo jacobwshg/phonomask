@@ -19,8 +19,8 @@ FeatOfsMaps::populate(const std::vector<std::string>& header_row_fields)
             continue;
         }
 
-        const std::string &feature = header_row_fields[colno];
-        std::size_t ofs = colno - 1;
+        const std::string &feature {header_row_fields[colno]};
+        std::size_t ofs {colno - 1};
         feat_ofs_map[feature] = ofs;
         ofs_feat_map.emplace_back(feature);
     }
@@ -37,7 +37,7 @@ std::size_t
 Phmask::
 FeatOfsMaps::offset_of(const std::string_view feature)
 {
-    const auto &it = feat_ofs_map.find(feature);
+    const auto &it {feat_ofs_map.find(feature)};
     if (it == feat_ofs_map.end())
     {
         throw std::runtime_error("Feature not found\n");
@@ -66,17 +66,17 @@ std::string
 Phmask::
 FeatOfsMaps::feature_layout_str(void)
 {
-    std::ostringstream lay_strm {};
-    std::size_t nfeats = ofs_feat_map.size();
+    std::ostringstream lay_sstrm {};
+    std::size_t nfeats {ofs_feat_map.size()};
 
     for (std::size_t i {0}; i < nfeats; ++i)
     {
-        lay_strm << ofs_feat_map[nfeats - 1 - i];
+        lay_sstrm << ofs_feat_map[nfeats - 1 - i];
         if (i < nfeats - 1)
         {
-            lay_strm << " | ";
+            lay_sstrm << " | ";
         }
     }
-    return lay_strm.str();
+    return lay_sstrm.str();
 }
 

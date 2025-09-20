@@ -40,11 +40,6 @@ namespace Phmask
     std::vector<std::string_view>
     rule_str_to_large_toks(const std::string &rule_str);
 
-/*
-    std::vector<std::string>
-    parse_feature_bundle_str(std::string_view);
-*/
-
     std::vector<std::string_view>
     parse_feature_bundle_str(const std::string_view);
 }

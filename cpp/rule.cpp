@@ -149,50 +149,14 @@ RuleParts::str(void)
     return rp_sstrm.str();
 }
 
-/*
-std::vector<std::string>
-Phmask::
-parse_feature_bundle_str(std::string_view fb_str)
-{
-    std::vector<std::string> fb_toks {};
-    std::string tokbuf {};
-
-    for (const char &c : fb_str)
-    {
-        switch (c)
-        {
-        case '[':
-        case ']':
-            break;
-        case ',':
-        case ' ':
-            if (!tokbuf.empty())
-            {
-                fb_toks.emplace_back(tokbuf);
-                tokbuf.clear();
-            }
-            break;
-        default:
-            tokbuf += c;
-            break;
-        }
-    }
-    if (!tokbuf.empty())
-    {
-        fb_toks.emplace_back(tokbuf);
-    }
-
-    return fb_toks;
-}
-*/
-
 std::vector<std::string_view>
 Phmask::
 parse_feature_bundle_str(const std::string_view fb_str)
 {
     std::vector<std::string_view> toks {};
     std::size_t fb_len {fb_str.size()};
-    std::size_t tok_begin {0}, tok_end {0};
+    std::size_t tok_begin {0},
+                tok_end {0};
     for (std::size_t i {0}; i < fb_len; ++i)
     {
         char c {fb_str[i]};
@@ -218,12 +182,4 @@ parse_feature_bundle_str(const std::string_view fb_str)
     }
     return toks;
 }
-
-/*
-Phmask::
-Rule::Rule(const std::string_view rule_str)
-{
-
-}
-*/
 

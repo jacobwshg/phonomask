@@ -25,7 +25,7 @@ SegFMMaps::populate(std::istream &table_stream)
         {
             return;
         }
-        std::string &segment = seg_entry_fields[0];
+        std::string &segment {seg_entry_fields[0]};
         feat_mtx_t feat_mtx {0};
         for (std::size_t colno {1}; colno < seg_entry_fields.size(); ++colno)
         {
@@ -46,7 +46,7 @@ Phmask::feat_mtx_t
 Phmask::
 SegFMMaps::feat_mtx_of(const std::string_view segment)
 {
-    const auto &it = seg_fm_map.find(segment);
+    const auto &it {seg_fm_map.find(segment)};
     if (it == seg_fm_map.end())
     {
         throw std::runtime_error("Segment not found\n");

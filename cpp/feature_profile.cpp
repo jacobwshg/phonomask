@@ -24,7 +24,7 @@ FeatureProfile::FeatureProfile(const std::string &path):
         Phmask::fields_from_row(table_strm)
     };
 
-    std::size_t num_cols = header_row_fields.size();
+    std::size_t num_cols {header_row_fields.size()};
     if (num_cols > 1)
     {
         num_feats = num_cols - 1;
@@ -42,7 +42,7 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
     std::string ef_feats_str {"["};
 
     Phmask::feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
-    for (std::size_t ofs = 0; ofs < num_feats; ++ofs)
+    for (std::size_t ofs {0}; ofs < num_feats; ++ofs)
     {
         if (ef_mask.test(ofs))
         // Feature at OFS is effective
@@ -71,7 +71,8 @@ std::string
 Phmask::
 FeatureProfile::seg_positive_feats_str(const std::string &segment)
 {
-    return seg_effective_feats_str(segment, seg_fm_maps.feat_mtx_of(segment));
+    return seg_effective_feats_str(segment,
+                                   seg_fm_maps.feat_mtx_of(segment));
 }
 
 std::string
@@ -95,7 +96,7 @@ FeatureProfile::segment_to_masks(std::string_view segment)
 
 Phmask::FeatureBundleMasks
 Phmask::
-FeatureProfile::feat_bundle_str_to_masks (const std::string_view fb_str)
+FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str)
 {
     Phmask::FeatureBundleMasks masks {};
     std::vector<std::string_view> fb_toks
@@ -105,7 +106,8 @@ FeatureProfile::feat_bundle_str_to_masks (const std::string_view fb_str)
     for (const std::string_view &tok : fb_toks)
     {
         std::size_t tok_len {tok.size()};
-        std::string_view value {tok}, feature {tok};
+        std::string_view value {tok},  
+                         feature {tok};
         value.remove_suffix(tok_len - 1);
         feature.remove_prefix(1);
 
