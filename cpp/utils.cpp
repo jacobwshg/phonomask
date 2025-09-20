@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <stdexcept>
 
 std::unique_ptr<std::istream>
 Phmask::

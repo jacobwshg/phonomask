@@ -12,7 +12,7 @@ Phmask::FeatureBundleMasks::FeatureBundleMasks(Phmask::feat_mtx_t smask,
 
 std::string
 Phmask::
-FeatureBundleMasks::str(void)
+FeatureBundleMasks::str(void) const
 {
     std::ostringstream ms_sstrm {};
     ms_sstrm << "Selection mask: " << sel_mask << "\n";
@@ -40,7 +40,7 @@ FeatureBundleMasks::add_negative(const std::size_t feature_offset)
 //inline 
 bool 
 Phmask::
-FeatureBundleMasks::test(const Phmask::feat_mtx_t original)
+FeatureBundleMasks::test(const Phmask::feat_mtx_t original) const
 {
     return (original & sel_mask) == val_mask;
 }
@@ -48,7 +48,7 @@ FeatureBundleMasks::test(const Phmask::feat_mtx_t original)
 //inline 
 Phmask::feat_mtx_t 
 Phmask::
-FeatureBundleMasks::set(const Phmask::feat_mtx_t original)
+FeatureBundleMasks::set(const Phmask::feat_mtx_t original) const
 {
     return (original & ~sel_mask) | val_mask;
 }

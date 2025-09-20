@@ -129,7 +129,7 @@ RuleParts::RuleParts(const std::string &rule_str) :
 
 std::string 
 Phmask::
-RuleParts::str(void)
+RuleParts::str(void) const
 {
     std::ostringstream rp_sstrm {};
     rp_sstrm 
@@ -182,4 +182,5 @@ parse_feature_bundle_str(const std::string_view fb_str)
     }
     return toks;
 }
+
 

@@ -1,11 +1,6 @@
 #include "feat_ofs_maps.h"
-#include "svutils.h"
-#include "masks.h"
-#include <vector>
-#include <string>
+#include "utils.h"
 #include <sstream>
-#include <string_view>
-#include <stdexcept>
 
 void
 Phmask::
@@ -26,32 +21,32 @@ FeatOfsMaps::populate(const std::vector<std::string>& header_row_fields)
     }
 }
 
-std::string &
+const std::string &
 Phmask::
-FeatOfsMaps::feature_at(const std::size_t offset)
+FeatOfsMaps::feature_at(const std::size_t offset) const
 {
-    return ofs_feat_map.at(offset);
+    if (offset < ofs_feat_map.size())
+    {
+        return ofs_feat_map[offset];
+    }
+    else 
+    {
+        throw std::runtime_error("Not enough features\n");
+    }
 }
 
 std::size_t 
 Phmask::
-FeatOfsMaps::offset_of(const std::string_view feature)
+FeatOfsMaps::offset_of(const std::string_view feature) const
 {
-    const auto &it {feat_ofs_map.find(feature)};
-    if (it == feat_ofs_map.end())
-    {
-        throw std::runtime_error("Feature not found\n");
-    }
-    else
-    {
-        return it->second;
-    }
+    return Phmask::map_find_const(feat_ofs_map, 
+                                  feature, 
+                                  "Feature not found\n");
 }
-
 
 std::string
 Phmask::
-FeatOfsMaps::str(void)
+FeatOfsMaps::str(void) const
 {
     std::ostringstream sstrm {};
     sstrm << "Offset\tFeature\n";
@@ -64,7 +59,7 @@ FeatOfsMaps::str(void)
 
 std::string
 Phmask::
-FeatOfsMaps::feature_layout_str(void)
+FeatOfsMaps::feature_layout_str(void) const
 {
     std::ostringstream lay_sstrm {};
     std::size_t nfeats {ofs_feat_map.size()};

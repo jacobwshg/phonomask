@@ -21,16 +21,11 @@ namespace Phmask
         std::vector<std::string_view> Y;
 
         explicit RuleParts(const std::string &);
-        std::string str(void);
+        std::string str(void) const;
     };
 
-    class Rule
+    struct Rule
     {
-    public:
-        Rule(void) = default;
-        Rule(const std::string_view);
-        ~Rule(void) = default;
-    private:
         Phmask::FeatureBundleMasks A;
         Phmask::FeatureBundleMasks B;
         std::vector<Phmask::FeatureBundleMasks> X;

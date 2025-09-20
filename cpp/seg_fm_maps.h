@@ -4,20 +4,16 @@
 #include "feat_mtx.h"
 #include "svutils.h"
 #include <unordered_map>
-#include <bitset>
-#include <string_view>
 
 namespace Phmask
 {
     class SegFMMaps 
     {
     public:
-        SegFMMaps(void) = default;
-        ~SegFMMaps(void) = default;
         void populate(std::istream &);
 
-        feat_mtx_t feat_mtx_of(const std::string_view);
-        std::string &segment_of(const feat_mtx_t);
+        feat_mtx_t feat_mtx_of(const std::string_view) const;
+        const std::string &segment_of(const feat_mtx_t) const;
     private:
         std::unordered_map<std::string, feat_mtx_t, SvStrHash, SvStrEq> seg_fm_map;
         std::unordered_map<feat_mtx_t, std::string, std::hash<feat_mtx_t>> 

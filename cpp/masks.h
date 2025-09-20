@@ -14,9 +14,8 @@ namespace Phmask
         feat_mtx_t val_mask; // 1 if present feature is positive
 
         FeatureBundleMasks(feat_mtx_t = {0u}, feat_mtx_t = {0u});
-        ~FeatureBundleMasks(void) = default;
 
-        std::string str(void);
+        std::string str(void) const;
 
         //inline 
         void add_positive(const std::size_t);
@@ -24,9 +23,9 @@ namespace Phmask
         void add_negative(const std::size_t);
 
         //inline 
-        bool test(const feat_mtx_t);
+        bool test(const feat_mtx_t) const;
         //inline 
-        feat_mtx_t set(const feat_mtx_t);
+        feat_mtx_t set(const feat_mtx_t) const;
     };
 }
 

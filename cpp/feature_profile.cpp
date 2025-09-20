@@ -5,9 +5,12 @@
 #include "rule.h"
 #include "masks.h"
 #include "utils.h"
+#include <vector>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <memory>
+#include <stdexcept>
 
 Phmask::
 FeatureProfile::FeatureProfile(const std::string &path):
@@ -37,7 +40,7 @@ FeatureProfile::FeatureProfile(const std::string &path):
 std::string
 Phmask::
 FeatureProfile::seg_effective_feats_str(const std::string &segment, 
-                                        Phmask::feat_mtx_t ef_mask)
+                                        Phmask::feat_mtx_t ef_mask) const
 {
     std::string ef_feats_str {"["};
 
@@ -48,7 +51,7 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
         // Feature at OFS is effective
         {
             ef_feats_str += (feat_mtx.test(ofs) ? "+" : "-");
-            std::string &feature {feat_ofs_maps.feature_at(ofs)};
+            const std::string &feature {feat_ofs_maps.feature_at(ofs)};
             ef_feats_str += feature;
             ef_feats_str += ", ";
         }
@@ -59,7 +62,7 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
 
 inline Phmask::feat_mtx_t
 Phmask::
-FeatureProfile::all_feats_mask(void)
+FeatureProfile::all_feats_mask(void) const
 {
     Phmask::feat_mtx_t all_feats_mask {0u};
     all_feats_mask.set();
@@ -69,7 +72,7 @@ FeatureProfile::all_feats_mask(void)
 
 std::string
 Phmask::
-FeatureProfile::seg_positive_feats_str(const std::string &segment)
+FeatureProfile::seg_positive_feats_str(const std::string &segment) const
 {
     return seg_effective_feats_str(segment,
                                    seg_fm_maps.feat_mtx_of(segment));
@@ -77,14 +80,14 @@ FeatureProfile::seg_positive_feats_str(const std::string &segment)
 
 std::string
 Phmask::
-FeatureProfile::seg_feat_mtx_str(const std::string &segment)
+FeatureProfile::seg_feat_mtx_str(const std::string &segment) const
 {
     return seg_effective_feats_str(segment, all_feats_mask());
 }
 
 Phmask::FeatureBundleMasks 
 Phmask::
-FeatureProfile::segment_to_masks(std::string_view segment)
+FeatureProfile::segment_to_masks(std::string_view segment) const
 {
     return 
         Phmask::FeatureBundleMasks 
@@ -96,7 +99,7 @@ FeatureProfile::segment_to_masks(std::string_view segment)
 
 Phmask::FeatureBundleMasks
 Phmask::
-FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str)
+FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str) const
 {
     Phmask::FeatureBundleMasks masks {};
     std::vector<std::string_view> fb_toks
@@ -127,5 +130,16 @@ FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str)
         }
     }
     return masks;
+}
+
+Phmask::Rule
+Phmask::
+FeatureProfile::rule_from_str(const std::string &rule_str) const
+{
+    Rule rule {};
+    RuleParts rule_parts {rule_str};
+    //TODO
+
+    return rule;
 }
 

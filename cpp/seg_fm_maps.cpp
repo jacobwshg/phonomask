@@ -1,10 +1,7 @@
 #include "seg_fm_maps.h"
 #include "feat_mtx.h"
 #include "utils.h"
-#include "svutils.h"
-#include <iostream>
 #include <cstddef>
-#include <stdexcept>
 #include <string_view>
 
 void
@@ -44,23 +41,19 @@ SegFMMaps::populate(std::istream &table_stream)
 
 Phmask::feat_mtx_t 
 Phmask::
-SegFMMaps::feat_mtx_of(const std::string_view segment)
+SegFMMaps::feat_mtx_of(const std::string_view segment) const
 {
-    const auto &it {seg_fm_map.find(segment)};
-    if (it == seg_fm_map.end())
-    {
-        throw std::runtime_error("Segment not found\n");
-    }
-    else 
-    {
-        return it->second;
-    }
+    return Phmask::map_find_const(seg_fm_map, 
+                                  segment, 
+                                  "Segment not found\n");
 }
 
-std::string & 
+const std::string & 
 Phmask::
-SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx)
+SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx) const
 {
-    return fm_seg_map.at(feat_mtx);
+    return Phmask::map_find_const(fm_seg_map, 
+                                  feat_mtx, 
+                                  "No known segment for feature matrix\n");
 }
 
