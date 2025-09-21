@@ -10,6 +10,8 @@
 
 namespace Phmask
 {
+    struct Rule;
+
     class FeatureProfile
     {
     public:
@@ -31,9 +33,7 @@ namespace Phmask
         FeatureBundleMasks
         rule_tok_to_masks(const std::string_view) const;
 
-        Rule rule_from_str(const std::string &rule_str) const;
-
-        std::string rule_masks_str(const Rule &);
+        //std::string rule_from_str(const std::string &);
     private:
         std::string 
         seg_effective_feats_str(const std::string &, Phmask::feat_mtx_t) const;

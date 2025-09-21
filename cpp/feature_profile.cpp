@@ -148,92 +148,12 @@ FeatureProfile::rule_tok_to_masks(const std::string_view tok) const
     }
 }
 
+/*
 Phmask::Rule
 Phmask::
 FeatureProfile::rule_from_str(const std::string &rule_str) const
 {
-    const static std::unordered_set<std::string, SvStrHash, SvStrEq> 
-        arrows
-    {
-        "→", "->", ">",
-    };
-
-    std::vector<std::string_view> rule_toks
-    {
-        Phmask::rule_str_toks(rule_str)
-    };
-
-    Rule rule {};
-
-    enum class State
-    {
-        A, B, X, Y,
-    }
-    parser_state {State::A};
-
-    for (std::string_view &tok : rule_toks)
-    {
-        switch (parser_state)
-        {
-        case State::A:
-            if (arrows.find(tok) != arrows.end())
-            {
-                parser_state = State::B;
-            }
-            else
-            {
-                rule.A = rule_tok_to_masks(tok);
-            }
-            break;
-        case State::B:
-            if (tok == "/")
-            {
-                parser_state = State::X;
-            }
-            else
-            {
-                rule.B = rule_tok_to_masks(tok);
-            }
-            break;
-        case State::X:
-            if (tok == "_")
-            {
-                parser_state = State::Y;
-            }
-            else
-            { 
-                rule.X.emplace_back(rule_tok_to_masks(tok));
-            }
-            break;
-        case State::Y:
-            rule.Y.emplace_back(rule_tok_to_masks(tok));
-            break;
-        default:
-            break;
-        }
-    }
-    return rule;
+    return Rule {*this, rule_str};
 }
-
-std::string
-Phmask::
-FeatureProfile::rule_masks_str(const Rule &rule)
-{
-    std::ostringstream rule_sstrm {};
-    rule_sstrm 
-        << "Rule\n" 
-        << "A:\n" << rule.A.str()
-        << "B:\n" << rule.B.str()
-        << "X:\n";
-    for (const FeatureBundleMasks &ms : rule.X)
-    {
-        rule_sstrm << ms.str();
-    }
-    rule_sstrm << "Y:\n";
-    for (const FeatureBundleMasks &ms : rule.Y)
-    {
-        rule_sstrm << ms.str();
-    }
-    return rule_sstrm.str();
-}
+*/
 

@@ -2,6 +2,7 @@
 #define PHMASK_RULE_H
 
 #include "masks.h"
+#include "feature_profile.h"
 #include <vector>
 #include <string>
 #include <string_view>
@@ -13,6 +14,8 @@
 
 namespace Phmask
 {
+    class FeatureProfile;
+
     struct RuleParts
     {
         std::string_view A;
@@ -30,6 +33,10 @@ namespace Phmask
         Phmask::FeatureBundleMasks B;
         std::vector<Phmask::FeatureBundleMasks> X;
         std::vector<Phmask::FeatureBundleMasks> Y;
+
+        Rule(const Phmask::FeatureProfile &profile, const std::string &rule_str);
+
+        std::string masks_str(void) const;
     };
 
     std::vector<std::string_view>

@@ -183,3 +183,90 @@ parse_feature_bundle_str(const std::string_view fb_str)
     return toks;
 }
 
+Phmask::
+Rule::Rule(const Phmask::FeatureProfile &profile, 
+           const std::string &rule_str) :
+    A {}, B {}, X {}, Y {}
+{
+    const static std::unordered_set<std::string, SvStrHash, SvStrEq> 
+        arrows
+    {
+        "→", "->", ">",
+    };
+
+    std::vector<std::string_view> rule_toks
+    {
+        Phmask::rule_str_toks(rule_str)
+    };
+
+    enum class State
+    {
+        A, B, X, Y,
+    }
+    parser_state {State::A};
+
+    for (std::string_view &tok : rule_toks)
+    {
+        switch (parser_state)
+        {
+        case State::A:
+            if (arrows.find(tok) != arrows.end())
+            {
+                parser_state = State::B;
+            }
+            else
+            {
+                A = profile.rule_tok_to_masks(tok);
+            }
+            break;
+        case State::B:
+            if (tok == "/")
+            {
+                parser_state = State::X;
+            }
+            else
+            {
+                B = profile.rule_tok_to_masks(tok);
+            }
+            break;
+        case State::X:
+            if (tok == "_")
+            {
+                parser_state = State::Y;
+            }
+            else
+            { 
+                X.emplace_back(profile.rule_tok_to_masks(tok));
+            }
+            break;
+        case State::Y:
+            Y.emplace_back(profile.rule_tok_to_masks(tok));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+std::string
+Phmask::
+Rule::masks_str(void) const
+{
+    std::ostringstream rule_sstrm {};
+    rule_sstrm 
+        << "Rule\n" 
+        << "A:\n" << A.str()
+        << "B:\n" << B.str()
+        << "X:\n";
+    for (const FeatureBundleMasks &ms : X)
+    {
+        rule_sstrm << ms.str();
+    }
+    rule_sstrm << "Y:\n";
+    for (const FeatureBundleMasks &ms : Y)
+    {
+        rule_sstrm << ms.str();
+    }
+    return rule_sstrm.str();
+}
+
