@@ -7,25 +7,9 @@
 #include <string>
 #include <string_view>
 
-/********************
- IMPORTANT
-     A RuleParts object must be outlived by the relevant rule string
- ********************/
-
 namespace Phmask
 {
     class FeatureProfile;
-
-    struct RuleParts
-    {
-        std::string_view A;
-        std::string_view B;
-        std::vector<std::string_view> X;
-        std::vector<std::string_view> Y;
-
-        explicit RuleParts(const std::string &);
-        std::string str(void) const;
-    };
 
     struct Rule
     {
