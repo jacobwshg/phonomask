@@ -46,6 +46,16 @@ word_to_segments(const std::string &word)
             ccateg = static_cast<UCharCategory>(u_charType(c));
             switch (ccateg)
             {
+            /*
+               If a full character is encountered, in order for it to be 
+               recorded into a segment, it must be at the start of the segment               or else be tied to the previous full character 
+               (plus possible marks and modifiers, which are simply 
+               appended to that character).
+               In all other cases, the full character belongs to the 
+               next segment; flush the currently recorded characters.
+               `U_LOWERCASE_LETTER` captures non-clicks and the bilabial 
+               clicks, and `U_OTHER_LETTER` captures the remaining clicks.
+             */
             case U_LOWERCASE_LETTER:
             case U_OTHER_LETTER:
                 if (u_segbuf.isEmpty() || tied)
@@ -61,8 +71,11 @@ word_to_segments(const std::string &word)
                     u_segbuf = c; 
                 }
                 break;
+            case U_NON_SPACING_MARK:
+            case U_MODIFIER_LETTER:
+                u_segbuf += c; 
+                break;
             default:
-                u_segbuf += c;
                 break;
             }
             break;
@@ -77,5 +90,4 @@ word_to_segments(const std::string &word)
     
     return segments;
 }
-
 
