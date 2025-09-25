@@ -15,12 +15,13 @@ Phmask::
 word_to_segments(const std::string &word)
 {
     std::vector<std::string> segments {};
+    //std::vector<std::string> segments { "#", };
     std::string segbuf {}; 
     UNISTR u_segbuf {};
     bool tied {false};
 
     UNISTR u_word {UNISTR::fromUTF8(word)};
-    int32_t uwlen {u_word.length()};
+    std::int32_t uwlen {u_word.length()};
     for (std::int32_t i {0}; i < uwlen; ++i)
     {
         UChar32 c {u_word.char32At(i)};
@@ -30,12 +31,13 @@ word_to_segments(const std::string &word)
         case U'(':
         case U')':
             break;
-        // TODO: stress
         case U'ˈ':
-        case U'ˌ': // " ˌ "
-            break;
-        // TODO: syllable
+        case U'ˌ':
+            // TODO: stress
+            [[fallthrough]];
         case U'.':
+            // TODO: syllable
+            //segments.emplace_back("$");
             break;
         case U'͡':
         case U'͜':
@@ -87,6 +89,8 @@ word_to_segments(const std::string &word)
         u_segbuf.toUTF8String(segbuf);
         segments.emplace_back(segbuf);
     }
+
+    // segments.emplace_back("#");
     
     return segments;
 }
