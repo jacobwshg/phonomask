@@ -42,6 +42,15 @@ namespace Phmask
             return (original & ~sel_mask) | val_mask;
         }
     };
+
+    FeatureBundleMasks
+    masks_from_segment(const FeatureProfile &, const std::string_view);
+
+    FeatureBundleMasks
+    masks_from_feat_bundle_str(const FeatureProfile &, const std::string_view);
+
+    FeatureBundleMasks
+    masks_from_rule_tok(const FeatureProfile &, const std::string_view);
 }
 
 #endif

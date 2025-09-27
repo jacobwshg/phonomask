@@ -50,7 +50,8 @@ word_to_segments(const std::string &word)
             {
             /*
                If a full character is encountered, in order for it to be 
-               recorded into a segment, it must be at the start of the segment               or else be tied to the previous full character 
+               recorded into a segment, it must be at the start of the segment 
+               or else be tied to the previous full character 
                (plus possible marks and modifiers, which are simply 
                appended to that character).
                In all other cases, the full character belongs to the 
@@ -94,4 +95,21 @@ word_to_segments(const std::string &word)
     
     return segments;
 }
+
+/*
+std::vector<Phmask::feat_mtx_t> 
+Phmask::
+segments_to_feat_mtxs(const std::vector<std::string> &segments, 
+                      const Phmask::FeatureProfile &profile)
+{
+    std::size_t nsegs {segments.size()};
+    std::vector<feat_mtx_t> feat_mtxs {nsegs};
+    for (std::size_t i {0}; i < nsegs; ++i)
+    {
+        feat_mtxs[i] = 
+    }
+}
+
+    std::string feat_mtxs_to_word(const std::vector<feat_mtx_t> &);
+*/
 

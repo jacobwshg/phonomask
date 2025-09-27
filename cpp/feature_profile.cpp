@@ -104,6 +104,7 @@ FeatureProfile::seg_positive_feats_str(const std::string &segment) const
                                    seg_fm_maps.feat_mtx_of(segment));
 }
 
+/*
 Phmask::FeatureBundleMasks 
 Phmask::
 FeatureProfile::segment_to_masks(std::string_view segment) const
@@ -165,6 +166,8 @@ FeatureProfile::rule_tok_to_masks(const std::string_view tok) const
         return segment_to_masks(tok);
     }
 }
+
+*/
 
 /*
 Phmask::Rule

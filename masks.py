@@ -9,9 +9,9 @@ class Tester:
         Test relevant features from the segment.
 
     Examples
-        'syl' offset 0
-        'cons' offset 1 
-        'son' offset 2
+        'syl' index 0
+        'cons' index 1 
+        'son' index 2
 
       [-syl] 
           andmask = 0b001 
@@ -25,24 +25,24 @@ class Tester:
 
     """
 
-    def __init__(self, fvtups, ofsmap):
+    def __init__(self, fvtups, feat_idx_map):
         andmask = 0b0
         xormask = 0b0
 
         # 'Push' feature-value tuples into mask for feature bundle
         for t in fvtups:
             feature = t.feature
-            offset = ofsmap[feature]
+            index = feat_idx_map[feature]
             value = t.value
 
-            feature_flag = 0b1 << offset
+            feature_flag = 0b1 << index
             andmask |= feature_flag
             if value:
                 xormask |= feature_flag
         
         self.andmask = andmask
         self.xormask = xormask
-        self.nfeats = len(ofsmap)
+        self.nfeats = len(feat_idx_map)
     
     def __repr__(self):
         return f'Tester(andmask = {self.andmask:0>{self.nfeats}b}, \
@@ -61,9 +61,9 @@ class Setter:
         Set relevant features in the segment to new values.
 
     Examples
-        'syl' offset 0
-        'cons' offset 1 
-        'son' offset 2
+        'syl' index 0
+        'cons' index 1 
+        'son' index 2
 
       [-syl] 
           andmask = 0b110
@@ -77,22 +77,22 @@ class Setter:
 
     """
 
-    def __init__(self, fvtups, ofsmap):
+    def __init__(self, fvtups, feat_idx_map):
         andmask = 0b0
         ormask = 0b0
 
         for t in fvtups:
             feature = t.feature
-            offset = ofsmap[feature]
+            index = feat_idx_map[feature]
             value = t.value
 
-            feature_flag = 0b1 << offset 
+            feature_flag = 0b1 << index 
             andmask |= feature_flag
             if value:
                 ormask |= feature_flag
 
         # Total number of features in the active feature profile
-        num_total_feats = len(ofsmap)
+        num_total_feats = len(feat_idx_map)
         feat_mtx_mask =  (0b1 << num_total_feats) - 1
         '''
         Make andmask into its 'negative film' in order to clear 

@@ -1,6 +1,6 @@
 # A pair of global maps (dicts) 
 # between IPA segments and feature matrices
-class SFMMaps:
+class SegFMMaps:
     def __init__(self):
         self.seg_fm_map = {}
         self.fm_seg_map = {}
@@ -20,5 +20,5 @@ class SFMMaps:
     def segment_of(self, feat_mtx):
         return self.fm_seg_map.get(feat_mtx)
 
-__all__ = [ 'SFMMaps', ]
+__all__ = [ 'SegFMMaps', ]
 
