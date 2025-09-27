@@ -3,6 +3,7 @@
 #include "utils.h"
 #include <cstddef>
 #include <string_view>
+#include <sstream>
 
 void
 Phmask::
@@ -39,6 +40,14 @@ SegFMMaps::populate(std::istream &table_stream)
     }
 }
 
+void
+Phmask::
+SegFMMaps::add(const std::string &segment, const Phmask::feat_mtx_t &feat_mtx)
+{
+    seg_fm_map.try_emplace(segment, feat_mtx);
+    fm_seg_map.try_emplace(feat_mtx, segment);
+}
+
 Phmask::feat_mtx_t 
 Phmask::
 SegFMMaps::feat_mtx_of(const std::string_view segment) const
@@ -55,5 +64,17 @@ SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx) const
     return Phmask::map_find_const(fm_seg_map, 
                                   feat_mtx, 
                                   "No known segment for feature matrix\n");
+}
+
+std::string
+Phmask::
+SegFMMaps::str(void) const
+{
+    std::ostringstream sstrm {};
+    for (const auto &[segment, feat_mtx] : seg_fm_map)
+    {
+        sstrm << segment << "\t" << feat_mtx << "\n";
+    }
+    return sstrm.str();
 }
 

@@ -6,7 +6,7 @@
 
 namespace Phmask
 {
-    using feat_mtx_t = std::bitset<40>;
+    using feat_mtx_t = std::bitset<48>;
 }
 
 #endif

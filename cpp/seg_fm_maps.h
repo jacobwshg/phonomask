@@ -12,8 +12,12 @@ namespace Phmask
     public:
         void populate(std::istream &);
 
+        void add(const std::string &, const feat_mtx_t &);
+
         feat_mtx_t feat_mtx_of(const std::string_view) const;
         const std::string &segment_of(const feat_mtx_t) const;
+
+        std::string str(void) const;
     private:
         std::unordered_map<std::string, feat_mtx_t, SvStrHash, SvStrEq> seg_fm_map;
         std::unordered_map<feat_mtx_t, std::string, std::hash<feat_mtx_t>> 

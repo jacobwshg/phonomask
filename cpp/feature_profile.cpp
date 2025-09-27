@@ -36,6 +36,14 @@ FeatureProfile::FeatureProfile(const std::string &path):
 
     feat_idx_maps.populate(header_row_fields);
     seg_fm_maps.populate(table_strm);
+
+    // Add reserved symbols
+    // syllable boundary
+    seg_fm_maps.add("$", feat_mtx_t {1u << num_feats});
+    // word boundary
+    seg_fm_maps.add("#", feat_mtx_t {(1u << num_feats) << 1});
+    // null segment
+    seg_fm_maps.add("∅", feat_mtx_t {(1u << num_feats) << 2});
 }
 
 std::string
