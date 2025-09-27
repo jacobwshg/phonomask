@@ -1,5 +1,5 @@
 #include "feature_profile.h"
-#include "feat_ofs_maps.h"
+#include "feat_idx_maps.h"
 #include "seg_fm_maps.h"
 #include "feat_mtx.h"
 #include "rule.h"
@@ -15,7 +15,7 @@
 
 Phmask::
 FeatureProfile::FeatureProfile(const std::string &path):
-    num_feats {0}, feat_ofs_maps {}, seg_fm_maps {}
+    num_feats {0}, feat_idx_maps {}, seg_fm_maps {}
 {
     std::unique_ptr<std::istream> table_sp 
     { 
@@ -34,7 +34,7 @@ FeatureProfile::FeatureProfile(const std::string &path):
         num_feats = num_cols - 1;
     }
 
-    feat_ofs_maps.populate(header_row_fields);
+    feat_idx_maps.populate(header_row_fields);
     seg_fm_maps.populate(table_strm);
 }
 
@@ -46,13 +46,13 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
     std::string ef_feats_str {"["};
 
     Phmask::feat_mtx_t feat_mtx {seg_fm_maps.feat_mtx_of(segment)};
-    for (std::size_t ofs {0}; ofs < num_feats; ++ofs)
+    for (std::size_t idx {0}; idx < num_feats; ++idx)
     {
-        if (ef_mask.test(ofs))
-        // Feature at OFS is effective
+        if (ef_mask.test(idx))
+        // Feature at IDX is effective
         {
-            ef_feats_str += (feat_mtx.test(ofs) ? "+" : "-");
-            const std::string &feature {feat_ofs_maps.feature_at(ofs)};
+            ef_feats_str += (feat_mtx.test(idx) ? "+" : "-");
+            const std::string &feature {feat_idx_maps.feature_at(idx)};
             ef_feats_str += feature;
             ef_feats_str += ", ";
         }
@@ -63,16 +63,16 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
 
 const std::string &
 Phmask::
-FeatureProfile::feature_at(const std::size_t offset) const
+FeatureProfile::feature_at(const std::size_t index) const
 {
-    return feat_ofs_maps.feature_at(offset);
+    return feat_idx_maps.feature_at(index);
 }
 
 std::size_t 
 Phmask::
-FeatureProfile::offset_of(const std::string_view feature) const
+FeatureProfile::index_of(const std::string_view feature) const
 {
-    return feat_ofs_maps.offset_of(feature);
+    return feat_idx_maps.index_of(feature);
 }
 
 Phmask::feat_mtx_t 
@@ -104,7 +104,6 @@ FeatureProfile::seg_positive_feats_str(const std::string &segment) const
                                    seg_fm_maps.feat_mtx_of(segment));
 }
 
-/*
 Phmask::FeatureBundleMasks 
 Phmask::
 FeatureProfile::segment_to_masks(std::string_view segment) const
@@ -134,15 +133,15 @@ FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str) const
         value.remove_suffix(tok_len - 1);
         feature.remove_prefix(1);
 
-        std::size_t feature_offset {feat_ofs_maps.offset_of(feature)};
+        std::size_t feature_index {feat_idx_maps.index_of(feature)};
 
         switch(value[0])
         {
         case '+':
-            masks.add_positive(feature_offset);
+            masks.add_positive(feature_index);
             break;
         case '-':
-            masks.add_negative(feature_offset);
+            masks.add_negative(feature_index);
             break;
         default:
             throw std::runtime_error("Feature bundle format not yet supported\n");
@@ -167,14 +166,72 @@ FeatureProfile::rule_tok_to_masks(const std::string_view tok) const
     }
 }
 
-*/
-
-/*
 Phmask::Rule
 Phmask::
 FeatureProfile::rule_from_str(const std::string &rule_str) const
 {
-    return Rule {*this, rule_str};
+    const static std::unordered_set<std::string, SvStrHash, SvStrEq> 
+        arrows
+    {
+        "→", "->", ">",
+    };
+
+    std::vector<std::string_view> rule_toks
+    {
+        Phmask::rule_str_toks(rule_str)
+    };
+
+    enum class State
+    {
+        A, B, X, Y,
+    }
+    parser_state {State::A};
+
+    Rule rule {};
+
+    for (std::string_view &tok : rule_toks)
+    {
+        switch (parser_state)
+        {
+        case State::A:
+            if (arrows.find(tok) != arrows.end())
+            {
+                parser_state = State::B;
+            }
+            else
+            {
+                rule.A = rule_tok_to_masks(tok);
+            }
+            break;
+        case State::B:
+
+            if (tok == "/")
+            {
+                parser_state = State::X;
+            }
+            else
+            {
+                rule.B = rule_tok_to_masks(tok);
+            }
+            break;
+        case State::X:
+            if (tok == "_")
+            {
+                parser_state = State::Y;
+            }
+            else
+            { 
+                rule.X.emplace_back(rule_tok_to_masks(tok));
+            }
+            break;
+        case State::Y:
+            rule.Y.emplace_back(rule_tok_to_masks(tok));
+            break;
+        default:
+            break;
+        }
+    }
+
+    return rule;
 }
-*/
 

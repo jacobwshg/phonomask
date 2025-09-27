@@ -21,6 +21,7 @@ FeatureBundleMasks::str(void) const
     return ms_sstrm.str();
 }
 
+/*
 Phmask::FeatureBundleMasks 
 Phmask::
 masks_from_segment(const Phmask::FeatureProfile &profile, 
@@ -29,7 +30,7 @@ masks_from_segment(const Phmask::FeatureProfile &profile,
     return 
         Phmask::FeatureBundleMasks 
         {
-            all_feats_mask(),
+            profile.all_feats_mask(),
             profile.feat_mtx_of(segment)
         };
 }
@@ -52,15 +53,15 @@ masks_from_feat_bundle_str(const Phmask::FeatureProfile &profile,
         value.remove_suffix(tok_len - 1);
         feature.remove_prefix(1);
 
-        std::size_t feature_offset {profile.offset_of(feature)};
+        std::size_t feature_index {profile.index_of(feature)};
 
         switch(value[0])
         {
         case '+':
-            masks.add_positive(feature_offset);
+            masks.add_positive(feature_index);
             break;
         case '-':
-            masks.add_negative(feature_offset);
+            masks.add_negative(feature_index);
             break;
         default:
             throw std::runtime_error("Feature bundle format not yet supported\n");
@@ -72,16 +73,18 @@ masks_from_feat_bundle_str(const Phmask::FeatureProfile &profile,
 
 Phmask::FeatureBundleMasks
 Phmask::
-masks_from_rule_tok(const std::string_view r_tok)
+masks_from_rule_tok(const Phmask::FeatureProfile &profile,
+                    const std::string_view r_tok)
 {
     if (r_tok.find('[') != std::string::npos)
     {
         // Assume the token is a feature bundle
-        return feat_bundle_str_to_masks(r_tok);
+        return masks_from_feat_bundle_str(profile, r_tok);
     }
     else
     {
-        return segment_to_masks(r_tok);
+        return masks_from_segment(profile, r_tok);
     }
 }
+*/
 

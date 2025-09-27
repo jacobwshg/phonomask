@@ -96,7 +96,7 @@ parse_feature_bundle_str(const std::string_view fb_str)
     }
     return toks;
 }
-
+/*
 Phmask::
 Rule::Rule(const Phmask::FeatureProfile &profile, 
            const std::string &rule_str) :
@@ -161,7 +161,7 @@ Rule::Rule(const Phmask::FeatureProfile &profile,
         }
     }
 }
-
+*/
 std::string
 Phmask::
 Rule::masks_str(void) const

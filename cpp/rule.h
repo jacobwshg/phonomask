@@ -1,24 +1,23 @@
 #ifndef PHMASK_RULE_H
 #define PHMASK_RULE_H
 
+//#include "feature_profile.h"
 #include "masks.h"
-#include "feature_profile.h"
 #include <vector>
 #include <string>
 #include <string_view>
 
 namespace Phmask
 {
-    class FeatureProfile;
 
     struct Rule
     {
-        Phmask::FeatureBundleMasks A;
-        Phmask::FeatureBundleMasks B;
-        std::vector<Phmask::FeatureBundleMasks> X;
-        std::vector<Phmask::FeatureBundleMasks> Y;
+        FeatureBundleMasks A;
+        FeatureBundleMasks B;
+        std::vector<FeatureBundleMasks> X;
+        std::vector<FeatureBundleMasks> Y;
 
-        Rule(const Phmask::FeatureProfile &profile, const std::string &rule_str);
+        //Rule(const FeatureProfile &profile, const std::string &rule_str);
 
         std::string masks_str(void) const;
     };

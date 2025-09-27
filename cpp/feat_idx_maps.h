@@ -1,5 +1,5 @@
-#ifndef FEAT_OFS_MAPS_H
-#define FEAT_OFS_MAPS_H
+#ifndef FEAT_IDX_MAPS_H
+#define FEAT_IDX_MAPS_H
 
 #include "svutils.h"
 #include <unordered_map>
@@ -9,13 +9,13 @@
 
 namespace Phmask
 {
-    class FeatOfsMaps
+    class FeatIdxMaps
     {
     public:
         void populate(const std::vector<std::string>&);
 
         const std::string &feature_at(const std::size_t) const;
-        std::size_t offset_of(const std::string_view) const;
+        std::size_t index_of(const std::string_view) const;
 
         std::string str(void) const;
         std::string feature_layout_str(void) const;
@@ -24,8 +24,8 @@ namespace Phmask
         std::unordered_map<std::string,
                            std::size_t,
                            SvStrHash,
-                           SvStrEq> feat_ofs_map;
-        std::vector<std::string> ofs_feat_map;
+                           SvStrEq> feat_idx_map;
+        std::vector<std::string> idx_feat_map;
     };
 }
 

@@ -1,22 +1,24 @@
 #ifndef FEATURE_PROFILE_H
 #define FEATURE_PROFILE_H
 
-#include "feat_ofs_maps.h"
+#include "feat_idx_maps.h"
 #include "seg_fm_maps.h"
 #include "feat_mtx.h"
 #include "rule.h"
+#include "masks.h"
 #include <cstddef>
 #include <string_view>
 
 namespace Phmask
 {
     struct Rule;
+    struct FeatureBundleMasks;
 
     class FeatureProfile
     {
     public:
         std::size_t num_feats;
-        FeatOfsMaps feat_ofs_maps;
+        FeatIdxMaps feat_idx_maps;
         SegFMMaps seg_fm_maps;
 
         explicit FeatureProfile(const std::string &);
@@ -30,21 +32,21 @@ namespace Phmask
         }
 
         const std::string &feature_at(const std::size_t) const;
-        std::size_t offset_of(const std::string_view) const;
+        std::size_t index_of(const std::string_view) const;
         feat_mtx_t feat_mtx_of(const std::string_view) const;
         const std::string &segment_of(const feat_mtx_t) const;
 
         std::string seg_feat_mtx_str(const std::string &) const;
         std::string seg_positive_feats_str(const std::string &) const;
-/*
+
         FeatureBundleMasks segment_to_masks(std::string_view) const;
         FeatureBundleMasks 
         feat_bundle_str_to_masks(const std::string_view) const;
 
         FeatureBundleMasks
         rule_tok_to_masks(const std::string_view) const;
-*/
-        //std::string rule_from_str(const std::string &);
+
+        Rule rule_from_str(const std::string &) const;
 
 
     private:
