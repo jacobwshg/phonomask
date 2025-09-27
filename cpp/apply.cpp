@@ -4,7 +4,9 @@
 #include <vector>
 #include <cstddef>
 
-void apply(const Phmask::Rule &rule, std::vector<Phmask::feat_mtx_t> &word_fms)
+void 
+Phmask::
+apply(const Phmask::Rule &rule, std::vector<Phmask::feat_mtx_t> &word_fms)
 {
     std::size_t wordlen {word_fms.size()},
                 xlen {rule.X.size()},

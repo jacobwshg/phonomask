@@ -61,14 +61,39 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
     return ef_feats_str;
 }
 
-inline Phmask::feat_mtx_t
+const std::string &
 Phmask::
-FeatureProfile::all_feats_mask(void) const
+FeatureProfile::feature_at(const std::size_t offset) const
 {
-    Phmask::feat_mtx_t all_feats_mask {0u};
-    all_feats_mask.set();
-    all_feats_mask = ~(all_feats_mask << num_feats);
-    return all_feats_mask;
+    return feat_ofs_maps.feature_at(offset);
+}
+
+std::size_t 
+Phmask::
+FeatureProfile::offset_of(const std::string_view feature) const
+{
+    return feat_ofs_maps.offset_of(feature);
+}
+
+Phmask::feat_mtx_t 
+Phmask::
+FeatureProfile::feat_mtx_of(const std::string_view segment) const
+{
+    return seg_fm_maps.feat_mtx_of(segment);
+}
+
+const std::string &
+Phmask::
+FeatureProfile::segment_of(const feat_mtx_t feat_mtx) const
+{
+    return seg_fm_maps.segment_of(feat_mtx);
+}
+
+std::string
+Phmask::
+FeatureProfile::seg_feat_mtx_str(const std::string &segment) const
+{
+    return seg_effective_feats_str(segment, all_feats_mask());
 }
 
 std::string
@@ -77,13 +102,6 @@ FeatureProfile::seg_positive_feats_str(const std::string &segment) const
 {
     return seg_effective_feats_str(segment,
                                    seg_fm_maps.feat_mtx_of(segment));
-}
-
-std::string
-Phmask::
-FeatureProfile::seg_feat_mtx_str(const std::string &segment) const
-{
-    return seg_effective_feats_str(segment, all_feats_mask());
 }
 
 Phmask::FeatureBundleMasks 

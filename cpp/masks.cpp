@@ -4,8 +4,9 @@
 #include <string>
 #include <sstream>
 
-Phmask::FeatureBundleMasks::FeatureBundleMasks(Phmask::feat_mtx_t smask, 
-                                               Phmask::feat_mtx_t vmask) :
+Phmask::
+FeatureBundleMasks::FeatureBundleMasks(Phmask::feat_mtx_t smask, 
+                                       Phmask::feat_mtx_t vmask) :
     sel_mask {smask}, val_mask {vmask}
 {
 }
