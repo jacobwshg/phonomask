@@ -20,26 +20,28 @@ namespace Phmask
 
         std::string str(void) const;
 
-        inline void 
+        FeatureBundleMasks &
         add_positive(const std::size_t feature_index)
         {
             sel_mask.set(feature_index);
             val_mask.set(feature_index);
+            return *this;
         }
 
-        inline void 
+        FeatureBundleMasks &
         add_negative(const std::size_t feature_index)
         {
             sel_mask.set(feature_index);
+            return *this;
         }
 
-        inline bool 
+        bool
         test(const Phmask::feat_mtx_t original) const
         {
             return (original & sel_mask) == val_mask;
         }
 
-        inline feat_mtx_t 
+        feat_mtx_t
         set(const Phmask::feat_mtx_t original) const
         {
             return (original & ~sel_mask) | val_mask;

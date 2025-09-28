@@ -13,6 +13,37 @@
 #include <stdexcept>
 #include <unordered_set>
 
+void
+Phmask::
+FeatureProfile::add_reserved(void)
+{
+    // Add reserved symbols
+    std::size_t 
+        // 1 if null segment symbol
+        null_bit     {num_feats},
+        // 1 if word boundary symbol
+        wb_bit       {num_feats + 1},
+        // 1 if syllable boundary symbol
+        sb_bit       {num_feats + 2},
+        // 1 if <$> or <.>, 0 if <ˈ> or <ˌ>
+        sb_ascii_bit {num_feats + 3},
+        // "significant" - 1 if <.> or <ˈ>, 0 if <$> or <ˌ>
+        sb_sig_bit   {num_feats + 4};
+    seg_fm_maps
+        // null segment
+        .add("∅", feat_mtx_t{0u}.set(null_bit))
+        // word boundary
+        .add("#", feat_mtx_t{0u}.set(wb_bit))
+        // syllable boundary (rule)
+        .add("$", feat_mtx_t{0u}.set(sb_bit).set(sb_ascii_bit))
+        // syllable boundary (data, unstressed)
+        .add(".", feat_mtx_t{0u}.set(sb_bit).set(sb_ascii_bit).set(sb_sig_bit))
+        // syllable boundary (primary stress)
+        .add("ˈ", feat_mtx_t{0u}.set(sb_bit).set(sb_sig_bit))
+        // syllable boundary (secondary stress)
+        .add("ˌ", feat_mtx_t{0u}.set(sb_bit));
+}
+
 Phmask::
 FeatureProfile::FeatureProfile(const std::string &path):
     num_feats {0}, feat_idx_maps {}, seg_fm_maps {}
@@ -37,13 +68,7 @@ FeatureProfile::FeatureProfile(const std::string &path):
     feat_idx_maps.populate(header_row_fields);
     seg_fm_maps.populate(table_strm);
 
-    // Add reserved symbols
-    // syllable boundary
-    seg_fm_maps.add("$", feat_mtx_t {1u << num_feats});
-    // word boundary
-    seg_fm_maps.add("#", feat_mtx_t {(1u << num_feats) << 1});
-    // null segment
-    seg_fm_maps.add("∅", feat_mtx_t {(1u << num_feats) << 2});
+    add_reserved();
 }
 
 std::string

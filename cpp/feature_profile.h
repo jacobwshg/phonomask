@@ -21,9 +21,12 @@ namespace Phmask
         FeatIdxMaps feat_idx_maps;
         SegFMMaps seg_fm_maps;
 
+        // Add reserved symbols
+        void add_reserved(void);
+
         explicit FeatureProfile(const std::string &);
 
-        inline feat_mtx_t all_feats_mask(void) const
+        feat_mtx_t all_feats_mask(void) const
         {
             feat_mtx_t all_feats_mask {0u};
             all_feats_mask.set();

@@ -40,13 +40,28 @@ SegFMMaps::populate(std::istream &table_stream)
     }
 }
 
-void
+Phmask::SegFMMaps &
 Phmask::
 SegFMMaps::add(const std::string &segment, const Phmask::feat_mtx_t &feat_mtx)
 {
     seg_fm_map.try_emplace(segment, feat_mtx);
     fm_seg_map.try_emplace(feat_mtx, segment);
+    return *this;
 }
+
+Phmask::SegFMMaps &
+Phmask::
+SegFMMaps::add_seg_alias(const std::string &alias, const std::string &original)
+{
+    const auto &it {seg_fm_map.find(original)};
+    if (it != seg_fm_map.end())
+    // Segment being aliased indeed exists
+    {
+        seg_fm_map.try_emplace(alias, it->second);
+    }
+    return *this;
+}
+
 
 Phmask::feat_mtx_t 
 Phmask::

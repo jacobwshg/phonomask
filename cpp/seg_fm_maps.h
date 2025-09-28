@@ -12,7 +12,8 @@ namespace Phmask
     public:
         void populate(std::istream &);
 
-        void add(const std::string &, const feat_mtx_t &);
+        SegFMMaps &add(const std::string &, const feat_mtx_t &);
+        SegFMMaps &add_seg_alias(const std::string &, const std::string &);
 
         feat_mtx_t feat_mtx_of(const std::string_view) const;
         const std::string &segment_of(const feat_mtx_t) const;
