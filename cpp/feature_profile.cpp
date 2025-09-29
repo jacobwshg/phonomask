@@ -4,6 +4,7 @@
 #include "feat_mtx.h"
 #include "rule.h"
 #include "masks.h"
+#include "word.h"
 #include "utils.h"
 #include <vector>
 #include <string>
@@ -12,6 +13,7 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_set>
+#include <cstddef>
 
 void
 Phmask::
@@ -20,15 +22,18 @@ FeatureProfile::add_reserved(void)
     // Add reserved symbols
     std::size_t 
         // 1 if null segment symbol
-        null_bit     {num_feats},
+        null_bit {num_feats},
         // 1 if word boundary symbol
-        wb_bit       {num_feats + 1},
+        wb_bit {null_bit + 1},
         // 1 if syllable boundary symbol
-        sb_bit       {num_feats + 2},
+        sb_bit {wb_bit + 1},
         // 1 if <$> or <.>, 0 if <ˈ> or <ˌ>
-        sb_ascii_bit {num_feats + 3},
+        sb_ascii_bit {sb_bit + 1},
         // "significant" - 1 if <.> or <ˈ>, 0 if <$> or <ˌ>
-        sb_sig_bit   {num_feats + 4};
+        sb_sig_bit {sb_ascii_bit + 1};
+    this->null_bit = null_bit;
+    this->wb_bit = wb_bit;
+    this->sb_bit = sb_bit;
     seg_fm_maps
         // null segment
         .add("∅", feat_mtx_t{0u}.set(null_bit))
@@ -46,7 +51,8 @@ FeatureProfile::add_reserved(void)
 
 Phmask::
 FeatureProfile::FeatureProfile(const std::string &path):
-    num_feats {0}, feat_idx_maps {}, seg_fm_maps {}
+    num_feats {0}, feat_idx_maps {}, seg_fm_maps {}, 
+    null_bit {}, wb_bit {}, sb_bit {}
 {
     std::unique_ptr<std::istream> table_sp 
     { 
@@ -63,6 +69,10 @@ FeatureProfile::FeatureProfile(const std::string &path):
     if (num_cols > 1)
     {
         num_feats = num_cols - 1;
+    }
+    if (num_feats > 40)
+    {
+        throw std::runtime_error("Currently supporting up to 40 features\n");
     }
 
     feat_idx_maps.populate(header_row_fields);
@@ -137,21 +147,29 @@ FeatureProfile::seg_positive_feats_str(const std::string &segment) const
                                    seg_fm_maps.feat_mtx_of(segment));
 }
 
-Phmask::FeatureBundleMasks 
+Phmask::RuleElem
 Phmask::
-FeatureProfile::segment_to_masks(std::string_view segment) const
+FeatureProfile::segment_to_rule_elem(std::string_view segment) const
 {
+    const static feat_mtx_t flipped_feat_mtx {~0u};
+    feat_mtx_t seg_feat_mtx {this->seg_fm_maps.feat_mtx_of(segment)};
+
     return 
-        Phmask::FeatureBundleMasks 
+        RuleElem
         {
-            all_feats_mask(),
-            seg_fm_maps.feat_mtx_of(segment)
+            FeatureBundleMasks
+            {
+                flipped_feat_mtx,
+                seg_feat_mtx
+            },
+            seg_feat_mtx.test(this->wb_bit),
+            seg_feat_mtx.test(this->sb_bit),
         };
 }
 
-Phmask::FeatureBundleMasks
+Phmask::RuleElem
 Phmask::
-FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str) const
+FeatureProfile::feat_bundle_to_rule_elem(const std::string_view fb_str) const
 {
     Phmask::FeatureBundleMasks masks {};
     std::vector<std::string_view> fb_toks
@@ -181,21 +199,22 @@ FeatureProfile::feat_bundle_str_to_masks(const std::string_view fb_str) const
             break;
         }
     }
-    return masks;
+    return
+        RuleElem { masks, false, false };
 }
 
-Phmask::FeatureBundleMasks
+Phmask::RuleElem
 Phmask::
-FeatureProfile::rule_tok_to_masks(const std::string_view tok) const
+FeatureProfile::rule_tok_to_elem(const std::string_view tok) const
 {
     if (tok.find('[') != std::string::npos)
     {
         // Assume the token is a feature bundle
-        return feat_bundle_str_to_masks(tok);
+        return feat_bundle_to_rule_elem(tok);
     }
     else
     {
-        return segment_to_masks(tok);
+        return segment_to_rule_elem(tok);
     }
 }
 
@@ -233,7 +252,7 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
             }
             else
             {
-                rule.A = rule_tok_to_masks(tok);
+                rule.A = rule_tok_to_elem(tok);
             }
             break;
         case State::B:
@@ -244,7 +263,7 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
             }
             else
             {
-                rule.B = rule_tok_to_masks(tok);
+                rule.B = rule_tok_to_elem(tok);
             }
             break;
         case State::X:
@@ -254,11 +273,11 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
             }
             else
             { 
-                rule.X.emplace_back(rule_tok_to_masks(tok));
+                rule.X.emplace_back(rule_tok_to_elem(tok));
             }
             break;
         case State::Y:
-            rule.Y.emplace_back(rule_tok_to_masks(tok));
+            rule.Y.emplace_back(rule_tok_to_elem(tok));
             break;
         default:
             break;
@@ -266,5 +285,35 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
     }
 
     return rule;
+}
+
+Phmask::WordRep
+Phmask::
+FeatureProfile::word_rep_from_str(const std::string &word) const
+{
+    WordRep word_rep {};
+    word_rep.null_bit = this->null_bit;
+    word_rep.wb_bit = this->wb_bit;
+    word_rep.sb_bit = this->sb_bit;
+
+    std::vector<std::string> segments {word_to_segments(word)};
+    word_rep.seg_reps.reserve(segments.size());
+
+    constexpr feat_mtx_t empty_fm {0u};
+    for (const std::string &segment : segments)
+    {
+        feat_mtx_t feat_mtx {feat_mtx_of(segment)};
+        word_rep.seg_reps.emplace_back(
+            SegRep
+            {
+                feat_mtx,
+                feat_mtx.test(wb_bit),
+                feat_mtx.test(wb_bit),
+                empty_fm,
+            }
+        );
+    }
+
+    return word_rep;
 }
 

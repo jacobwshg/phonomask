@@ -1,5 +1,6 @@
 #include "word.h"
 #include "utils.h"
+#include "feat_mtx.h"
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
 #include <cstddef>
@@ -95,20 +96,89 @@ word_to_segments(const std::string &word)
     return segments;
 }
 
-/*
-std::vector<Phmask::feat_mtx_t> 
+void
 Phmask::
-segments_to_feat_mtxs(const std::vector<std::string> &segments, 
-                      const Phmask::FeatureProfile &profile)
+WordRep::housekeep(void)
 {
-    std::size_t nsegs {segments.size()};
-    std::vector<feat_mtx_t> feat_mtxs {nsegs};
-    for (std::size_t i {0}; i < nsegs; ++i)
+    if (!this->isdirty)
     {
-        feat_mtxs[i] = 
+        return;
     }
+    constexpr feat_mtx_t empty_fm {0u};
+    std::size_t cur_size {seg_reps.size()};
+    std::vector<SegRep> seg_reps_tmp {};
+    seg_reps_tmp.reserve(cur_size);
+
+    for (std::size_t i {0}; i < cur_size; ++i)
+    {
+        feat_mtx_t insert_fm {this->seg_reps[i].insert_before};
+        if (insert_fm.any() && !insert_fm.test(this->null_bit))
+        // Exists segment to be inserted before position I
+        {
+            seg_reps_tmp.emplace_back(
+                SegRep
+                {
+                    insert_fm,
+                    insert_fm.test(this->wb_bit),
+                    insert_fm.test(this->sb_bit),
+                    empty_fm
+                }
+            );
+            this->seg_reps[i].insert_before = empty_fm;
+        }
+        if (!this->seg_reps[i].feat_mtx.test(this->null_bit))
+        // Segment at position I not deleted
+        {
+            seg_reps_tmp.emplace_back(std::move(this->seg_reps[i]));
+        }
+    }
+
+    seg_reps_tmp.shrink_to_fit();
+    this->seg_reps = std::move(seg_reps_tmp);
 }
 
-    std::string feat_mtxs_to_word(const std::vector<feat_mtx_t> &);
-*/
+/*
+Phmask::WordRep &
+Phmask::
+WordRep::apply_rule(const Phmask::Rule &rule)
+{
+    std::size_t wordlen {this->seg_reps.size()},
+                xlen {rule.X.size()},
+                ylen {rule.Y.size()};
+    for (std::size_t i {0}; i < wordlen; ++i)
+    {
+        SegRep seg {this[i]};
 
+        // TODO
+
+        std::size_t xbegin {i - xlen};
+        std::size_t ybegin {i + 1};
+        if (!rule.A.test(cur_seg_fm))
+        {
+            goto done;
+        }
+        for (std::size_t x_i {0}; x_i < xlen; ++x_i)
+        {
+            if (!rule.X[x_i].test(word_fms[xbegin + x_i]))
+            {
+                goto done;
+            }
+        }
+        for (std::size_t y_i {0}; y_i < ylen; ++y_i)
+        {
+            if (!rule.Y[y_i].test(word_fms[ybegin + y_i]))
+            {
+                goto done;
+            }
+        }
+        word_fms[i] = rule.B.set(cur_seg_fm);
+
+        done:
+            continue;
+    }
+
+
+    return *this;
+}
+
+*/

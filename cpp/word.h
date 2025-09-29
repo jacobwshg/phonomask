@@ -4,6 +4,7 @@
 #include "feat_mtx.h"
 #include <vector>
 #include <string>
+//#include <string_view>
 
 namespace Phmask
 {
@@ -13,6 +14,43 @@ namespace Phmask
     segments_to_feat_mtxs(const std::vector<std::string> &);
 
     std::string feat_mtxs_to_word(const std::vector<feat_mtx_t> &);
+
+    // Segment representation in word
+        struct SegRep
+        {
+            feat_mtx_t feat_mtx {};
+            // true for word-initial and final "segments" that are 
+            // actually word boundary symbols
+            bool iswb {false};
+            /* true for "segments" that are actually 
+               syllable boundary symbols;
+               they only match <$> in rules and are skipped by 
+               true segments and feature bundles
+             */
+            bool issb {false};
+            /* Feature matrix of segment to insert before the 
+               current position as necessary after applying 
+               insertion rule 
+             */ 
+            feat_mtx_t insert_before {0u};
+        };
+
+    // Word representation
+    struct WordRep
+    {
+        // "Inherited" from the managing feature profile
+        std::size_t null_bit;
+        std::size_t wb_bit;
+        std::size_t sb_bit;
+
+        // true if insertion or deletion has effect
+        bool isdirty;
+
+        std::vector<SegRep> seg_reps;
+
+        // Commit insertions and deletions
+        void housekeep(void);
+    };
 }
 
 #endif

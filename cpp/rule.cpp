@@ -169,17 +169,17 @@ Rule::masks_str(void) const
     std::ostringstream rule_sstrm {};
     rule_sstrm 
         << "Rule\n" 
-        << "A:\n" << A.str()
-        << "B:\n" << B.str()
+        << "A:\n" << A.masks.str()
+        << "B:\n" << B.masks.str()
         << "X:\n";
-    for (const FeatureBundleMasks &ms : X)
+    for (const RuleElem &elem : X)
     {
-        rule_sstrm << ms.str();
+        rule_sstrm << elem.masks.str();
     }
     rule_sstrm << "Y:\n";
-    for (const FeatureBundleMasks &ms : Y)
+    for (const RuleElem &elem : Y)
     {
-        rule_sstrm << ms.str();
+        rule_sstrm << elem.masks.str();
     }
     return rule_sstrm.str();
 }
