@@ -1,5 +1,5 @@
 #include "word.h"
-#include "utf8.h"
+#include "utils.h"
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
 #include <cstddef>
@@ -8,15 +8,14 @@
 #include <string>
 #include <string_view>
 
-using UNISTR = icu::UnicodeString;
 
 std::vector<std::string> 
 Phmask::
 word_to_segments(const std::string &word)
 {
-    std::vector<std::string> segments {};
-    //std::vector<std::string> segments { "#", };
-    std::string segbuf {}; 
+    using UNISTR = icu::UnicodeString;
+
+    std::vector<std::string> segments { "#", };
     UNISTR u_segbuf {};
     bool tied {false};
 
@@ -30,14 +29,18 @@ word_to_segments(const std::string &word)
         {
         case U'(':
         case U')':
+        case U'#':
+            // Data shouldn't need explicit word boundary symbols;
+            // ignore
             break;
         case U'ˈ':
         case U'ˌ':
-            // TODO: stress
+            // stressed syllable boundary
             [[fallthrough]];
         case U'.':
-            // TODO: syllable
-            //segments.emplace_back("$");
+            // (unstressed) syllable boundary
+            u_segbuf = c;
+            segments.emplace_back(unistr_to_str(u_segbuf));
             break;
         case U'͡':
         case U'͜':
@@ -68,9 +71,7 @@ word_to_segments(const std::string &word)
                 }
                 else
                 {
-                    segbuf.clear();
-                    u_segbuf.toUTF8String(segbuf);
-                    segments.emplace_back(segbuf);
+                    segments.emplace_back(unistr_to_str(u_segbuf));
                     u_segbuf = c; 
                 }
                 break;
@@ -86,12 +87,10 @@ word_to_segments(const std::string &word)
     }
     if (!u_segbuf.isEmpty())
     {
-        segbuf.clear();
-        u_segbuf.toUTF8String(segbuf);
-        segments.emplace_back(segbuf);
+        segments.emplace_back(unistr_to_str(u_segbuf));
     }
 
-    // segments.emplace_back("#");
+    segments.emplace_back("#");
     
     return segments;
 }
