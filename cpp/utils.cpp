@@ -14,11 +14,11 @@ table_stream_ptr(const std::string &path)
     return std::make_unique<std::ifstream>(path);
 }
 
-void
+std::vector<std::string>
 Phmask::
-fields_from_row(std::istream &is, std::vector<std::string> &fields)
+fields_from_row(std::istream &is)
 {
-    fields.clear();
+    std::vector<std::string> fields {};
     std::string field {};
     char c {};
 
@@ -48,17 +48,7 @@ fields_from_row(std::istream &is, std::vector<std::string> &fields)
     {
         // EOF without trailing newline
         fields.emplace_back(field);
-        field.clear();
     }
-}
-
-std::vector<std::string>
-Phmask::
-fields_from_row(std::istream &is)
-{
-    std::vector<std::string> fields {};
-    Phmask::fields_from_row(is, fields);
     return fields;
 }
-
 

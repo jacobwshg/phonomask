@@ -13,9 +13,6 @@ namespace Phmask
     std::unique_ptr<std::istream>
     table_stream_ptr(const std::string &);
 
-    void
-    fields_from_row(std::istream &, std::vector<std::string> &);
-
     std::vector<std::string>
     fields_from_row(std::istream &);
 

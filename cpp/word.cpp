@@ -130,8 +130,9 @@ update_pos(std::size_t pos, std::size_t endpos, bool decr = false)
 }
 
 /*
- Resume evaluating a rule's conditions from intermediate
- positions within WORD_REP and RULE's X and Y parts.
+ Resume scanning a word agains a rule's conditions 
+ from intermediate positions within WORD_REP and RULE's 
+ X and Y parts.
  This recursive design simplifies skipping reserved symbols 
  and possibly optional segments.
  */
@@ -144,6 +145,12 @@ try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
     std::size_t wlen {word_rep.seg_reps.size()}, 
                 rxlen {rule.X.size()}, 
                 rylen {rule.Y.size()};
+
+    if ((rxpos >= rxlen) && (rypos >= rylen))
+    // Rule elements exhausted, all matching segments
+    {
+        return true;
+    }
 
     if (rxpos < rxlen)
     // Element available in RULE's X
@@ -176,7 +183,6 @@ try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         {
             return false;
         }
-        return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
     }
     if (rypos < rylen)
     // Element available in RULE's Y
@@ -208,11 +214,9 @@ try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         {
             return false;
         }
-        return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
     }
 
-    // Rule elements exhausted, all matching segments
-    return true;
+    return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
 }
 
 
