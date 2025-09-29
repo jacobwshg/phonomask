@@ -26,6 +26,7 @@ word_to_segments(const std::string &word)
 {
     using UNISTR = icu::UnicodeString;
 
+    // Pad word begin with word boundary symbol
     std::vector<std::string> segments { "#", };
     UNISTR u_segbuf {};
     bool tied {false};
@@ -40,16 +41,16 @@ word_to_segments(const std::string &word)
         {
         case U'(':
         case U')':
-        case U'#':
-            // Data shouldn't need explicit word boundary symbols;
-            // ignore
+            // Don't support optional segments in data
             break;
+        case U'#':
+            // Word boundary (maybe one data entry can span across words?)
         case U'ˈ':
         case U'ˌ':
-            // stressed syllable boundary
+            // Stressed syllable boundary
             [[fallthrough]];
         case U'.':
-            // (unstressed) syllable boundary
+            // (Unstressed) syllable boundary
             u_segbuf = c;
             segments.emplace_back(unistr_to_str(u_segbuf));
             break;
@@ -100,7 +101,7 @@ word_to_segments(const std::string &word)
     {
         segments.emplace_back(unistr_to_str(u_segbuf));
     }
-
+    // Pad word end with word boundary symbol
     segments.emplace_back("#");
     
     return segments;
@@ -177,13 +178,14 @@ try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         // Rule element doesn't specify syllable boundary
         // but "segment" is syllable boundary (should skip)
         {
-            wxpos = update_pos(wxpos, wlen);
+            wxpos = update_pos(wxpos, wlen, true);
         }
         else
         {
             return false;
         }
     }
+
     if (rypos < rylen)
     // Element available in RULE's Y
     {
@@ -218,7 +220,6 @@ try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
 
     return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
 }
-
 
 void
 Phmask::
@@ -257,6 +258,7 @@ WordRep::housekeep(void)
 
     seg_reps_tmp.shrink_to_fit();
     this->seg_reps = std::move(seg_reps_tmp);
+    this->isdirty = false;
 }
 /*
 Phmask::WordRep &
