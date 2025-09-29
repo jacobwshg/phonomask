@@ -35,6 +35,7 @@ namespace Phmask
             return *this;
         }
 
+        // true if ORIGINAL matches masks' conditions
         bool
         test(const Phmask::feat_mtx_t original) const
         {

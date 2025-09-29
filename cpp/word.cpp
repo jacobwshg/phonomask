@@ -10,6 +10,16 @@
 #include <string_view>
 
 
+namespace Phmask
+{
+    std::size_t
+    update_pos(std::size_t, std::size_t, bool decr);
+
+    bool
+    try_rule_from_pos(const WordRep &, const Rule &, 
+                      std::size_t, std::size_t, std::size_t, std::size_t);
+}
+
 std::vector<std::string> 
 Phmask::
 word_to_segments(const std::string &word)
@@ -96,6 +106,116 @@ word_to_segments(const std::string &word)
     return segments;
 }
 
+/*
+ Increment/decrement POS used to index a vector,
+ safely overflowing to ENDPOS (vector.size()) if out of range
+ DECR: true if decrementing
+ */
+std::size_t
+Phmask::
+update_pos(std::size_t pos, std::size_t endpos, bool decr = false)
+{
+    if (pos == endpos)
+    {
+        return pos;
+    }
+    if (decr)
+    {
+        return pos == 0 ? endpos : --pos;
+    }
+    else
+    {
+        return pos == endpos ? pos : ++pos;
+    }
+}
+
+/*
+ Resume evaluating a rule's conditions from intermediate
+ positions within WORD_REP and RULE's X and Y parts.
+ This recursive design simplifies skipping reserved symbols 
+ and possibly optional segments.
+ */
+bool
+Phmask::
+try_rule_from_pos(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
+                  std::size_t wxpos, std::size_t wypos,
+                  std::size_t rxpos, std::size_t rypos)
+{
+    std::size_t wlen {word_rep.seg_reps.size()}, 
+                rxlen {rule.X.size()}, 
+                rylen {rule.Y.size()};
+
+    if (rxpos < rxlen)
+    // Element available in RULE's X
+    {
+        if (wxpos >= wlen)
+        // No remaining segment on the left in WORD_REP
+        {
+            return false;
+        }
+
+        const SegRep &wx {word_rep.seg_reps[wxpos]};
+        const RuleElem &rx {rule.X[rxpos]};
+
+        bool rx_issb {rx.issb(rule.sb_bit)};
+        bool wx_issb {wx.issb(word_rep.sb_bit)};
+
+        if (rx.masks.test(wx.feat_mtx) || (rx_issb && wx_issb))
+        // Exact segment match, or syllable boundary match
+        {
+            wxpos = update_pos(wxpos, wlen, true);
+            rxpos = update_pos(rxpos, rxlen, true);
+        }
+        else if ((!rx_issb) && wx_issb)
+        // Rule element doesn't specify syllable boundary
+        // but "segment" is syllable boundary (should skip)
+        {
+            wxpos = update_pos(wxpos, wlen);
+        }
+        else
+        {
+            return false;
+        }
+        return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
+    }
+    if (rypos < rylen)
+    // Element available in RULE's Y
+    {
+        if (wypos >= wlen)
+        // No remaining segment on the right in WORD_REP
+        {
+            return false;
+        }
+        const SegRep &wy {word_rep.seg_reps[wypos]};
+        const RuleElem &ry {rule.Y[rypos]};
+
+        bool ry_issb {ry.issb(rule.sb_bit)};
+        bool wy_issb {wy.issb(word_rep.sb_bit)};
+
+        if (ry.masks.test(wy.feat_mtx) || (ry_issb && wy_issb))
+        // Exact segment match, or syllable boundary match
+        {
+            wypos = update_pos(wypos, wlen);
+            rypos = update_pos(rypos, rylen);
+        }
+        else if ((!ry_issb) && wy_issb)
+        // Rule element doesn't specify syllable boundary
+        // but "segment" is syllable boundary (should skip)
+        {
+            wypos = update_pos(wypos, wlen);
+        }
+        else
+        {
+            return false;
+        }
+        return try_rule_from_pos(word_rep, rule, wxpos, wypos, rxpos, rypos);
+    }
+
+    // Rule elements exhausted, all matching segments
+    return true;
+}
+
+
 void
 Phmask::
 WordRep::housekeep(void)
@@ -119,8 +239,6 @@ WordRep::housekeep(void)
                 SegRep
                 {
                     insert_fm,
-                    insert_fm.test(this->wb_bit),
-                    insert_fm.test(this->sb_bit),
                     empty_fm
                 }
             );
@@ -136,49 +254,29 @@ WordRep::housekeep(void)
     seg_reps_tmp.shrink_to_fit();
     this->seg_reps = std::move(seg_reps_tmp);
 }
-
 /*
 Phmask::WordRep &
 Phmask::
 WordRep::apply_rule(const Phmask::Rule &rule)
 {
-    std::size_t wordlen {this->seg_reps.size()},
-                xlen {rule.X.size()},
-                ylen {rule.Y.size()};
-    for (std::size_t i {0}; i < wordlen; ++i)
+    std::size_t wlen {this->seg_reps.size()},
+                rxlen {rule.X.size()},
+                rylen {rule.Y.size()};
+    for (std::size_t apos {rxlen}; apos < wlen - rylen; ++apos)
     {
-        SegRep seg {this[i]};
-
-        // TODO
-
-        std::size_t xbegin {i - xlen};
-        std::size_t ybegin {i + 1};
-        if (!rule.A.test(cur_seg_fm))
+        std::size_t wxpos {apos > 0 ? apos - 1 : wlen},
+                    wypos {apos < wlen ? apos : wlen},
+                    rxpos {rxlen > 0 ? rxlen - 1 : rxlen};
+                    rypos {rylen > 0 ? rylen - 1 : rylen};
+        if rule.A.isnull(rule.null_bit)
+        // Insertion rule
         {
-            goto done;
+            
         }
-        for (std::size_t x_i {0}; x_i < xlen; ++x_i)
-        {
-            if (!rule.X[x_i].test(word_fms[xbegin + x_i]))
-            {
-                goto done;
-            }
-        }
-        for (std::size_t y_i {0}; y_i < ylen; ++y_i)
-        {
-            if (!rule.Y[y_i].test(word_fms[ybegin + y_i]))
-            {
-                goto done;
-            }
-        }
-        word_fms[i] = rule.B.set(cur_seg_fm);
-
-        done:
-            continue;
     }
-
 
     return *this;
 }
-
 */
+
+

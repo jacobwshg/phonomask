@@ -18,10 +18,16 @@ namespace Phmask
     struct RuleElem
     {
         FeatureBundleMasks masks;
-        // true if the rule element is <#>
-        bool iswb;
-        // true if the rule element is <$>
-        bool issb;
+
+        bool isnull(std::size_t null_bit) const
+        {
+            return this->masks.val_mask.test(null_bit);
+        }
+
+        bool issb(std::size_t sb_bit) const
+        {
+            return this->masks.val_mask.test(sb_bit);
+        }
     };
 
     struct Rule

@@ -162,8 +162,10 @@ FeatureProfile::segment_to_rule_elem(std::string_view segment) const
                 flipped_feat_mtx,
                 seg_feat_mtx
             },
+/*
             seg_feat_mtx.test(this->wb_bit),
             seg_feat_mtx.test(this->sb_bit),
+*/
         };
 }
 
@@ -200,7 +202,7 @@ FeatureProfile::feat_bundle_to_rule_elem(const std::string_view fb_str) const
         }
     }
     return
-        RuleElem { masks, false, false };
+        RuleElem { masks, /*false, false*/ };
 }
 
 Phmask::RuleElem
@@ -240,6 +242,9 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
     parser_state {State::A};
 
     Rule rule {};
+    rule.null_bit = this->null_bit;
+    rule.wb_bit = this->wb_bit;
+    rule.sb_bit = this->sb_bit;
 
     for (std::string_view &tok : rule_toks)
     {
@@ -307,8 +312,10 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
             SegRep
             {
                 feat_mtx,
+/*
                 feat_mtx.test(wb_bit),
                 feat_mtx.test(wb_bit),
+*/
                 empty_fm,
             }
         );
