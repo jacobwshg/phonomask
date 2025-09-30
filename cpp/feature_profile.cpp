@@ -319,6 +319,7 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
                 empty_fm,
             }
         );
+        word_rep.apply_at.emplace_back(false);
     }
 
     return word_rep;

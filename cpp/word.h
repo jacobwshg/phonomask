@@ -22,7 +22,7 @@ namespace Phmask
     // Segment representation in word
         struct SegRep
         {
-            feat_mtx_t feat_mtx {};
+            feat_mtx_t feat_mtx;
 /*
             // true for word-initial and final "segments" that are 
             // actually word boundary symbols
@@ -36,7 +36,7 @@ namespace Phmask
             // current position as necessary after applying 
             // insertion rule 
 */
-            feat_mtx_t insert_before {0u};
+            feat_mtx_t insert_before_fm {0u};
 
             bool issb(std::size_t sb_bit) const
             {
@@ -57,8 +57,15 @@ namespace Phmask
 
         std::vector<SegRep> seg_reps;
 
+        // An element is set to true if the corresponding
+        // segment in the word will be affected by a rule
+        std::vector<bool> apply_at;
+
         // Commit insertions and deletions
         void housekeep(void);
+
+        WordRep &
+        apply_rule(const Phmask::Rule &);
     };
 }
 

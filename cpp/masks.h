@@ -47,6 +47,14 @@ namespace Phmask
         {
             return (original & ~sel_mask) | val_mask;
         }
+
+        // In-place
+        void
+        set(Phmask::feat_mtx_t &original) const
+        {
+            original &= ~sel_mask;
+            original |= val_mask;
+        }
     };
 
 /*
