@@ -110,7 +110,6 @@ word_to_segments(const std::string &word)
     // Pad word end with word boundary symbol
     segments.emplace_back("#");
 
-    ///////////
     /*
     std::cout <<"word_to_segments(): ";
     for (std::size_t i{0};i<segments.size();++i){std::cout<<segments[i]<<" ";}

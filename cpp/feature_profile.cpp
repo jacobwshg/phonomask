@@ -248,6 +248,10 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
 
     for (std::string_view &tok : rule_toks)
     {
+        if (tok.size() < 1)
+        {
+            continue;
+        }
         switch (parser_state)
         {
         case State::A:
@@ -261,7 +265,6 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
             }
             break;
         case State::B:
-
             if (tok == "/")
             {
                 parser_state = State::X;

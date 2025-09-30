@@ -20,7 +20,7 @@ rule_str_toks(const std::string &rule_str)
 
     bool in_feat_bdl {false};  // Whether current pos in feature bundle
 
-    for (std::size_t i {0}; i <= r_len; ++i)
+    for (std::size_t i {0}; i < r_len; ++i)
     {
         char c {rule_str[i]};
         switch (c)

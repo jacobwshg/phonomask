@@ -69,9 +69,10 @@ SegFMMaps::feat_mtx_of(const std::string_view segment) const
 {
     std::ostringstream e_sstrm {};
     e_sstrm << "Segment [" << segment << "] not found\n";
+    std::string e_msg {e_sstrm.str()};
     return Phmask::map_find_const(seg_fm_map, 
                                   segment, 
-                                  e_sstrm.str());
+                                  e_msg);
 }
 
 const std::string & 
