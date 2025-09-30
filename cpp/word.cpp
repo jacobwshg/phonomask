@@ -48,11 +48,17 @@ word_to_segments(const std::string &word)
         case U'ˈ':
         case U'ˌ':
             // Stressed syllable boundary
-            [[fallthrough]];
         case U'.':
             // (Unstressed) syllable boundary
-            u_segbuf = c;
+
+            // Flush previous segment
+            /*
+               If the following pair of statements were switched,
+               a symbol will incorrectly overwrite the previous segment 
+               and be flushed twice
+             */
             segments.emplace_back(unistr_to_str(u_segbuf));
+            u_segbuf = c;
             break;
         case U'͡':
         case U'͜':
@@ -103,7 +109,14 @@ word_to_segments(const std::string &word)
     }
     // Pad word end with word boundary symbol
     segments.emplace_back("#");
-    
+
+    ///////////
+    /*
+    std::cout <<"word_to_segments(): ";
+    for (std::size_t i{0};i<segments.size();++i){std::cout<<segments[i]<<" ";}
+    std::cout<<"\n";
+    */
+
     return segments;
 }
 
@@ -168,7 +181,7 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         bool rx_issb {rx.issb(rule.sb_bit)};
         bool wx_issb {wx.issb(word_rep.sb_bit)};
 
-        if (rx.masks.test(wx.feat_mtx) || (rx_issb && wx_issb))
+        if (rx.masks.test_fm(wx.feat_mtx) || (rx_issb && wx_issb))
         // Exact segment match, or syllable boundary match
         {
             wxpos = update_pos(wxpos, wlen, true);
@@ -200,7 +213,7 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         bool ry_issb {ry.issb(rule.sb_bit)};
         bool wy_issb {wy.issb(word_rep.sb_bit)};
 
-        if (ry.masks.test(wy.feat_mtx) || (ry_issb && wy_issb))
+        if (ry.masks.test_fm(wy.feat_mtx) || (ry_issb && wy_issb))
         // Exact segment match, or syllable boundary match
         {
             wypos = update_pos(wypos, wlen);
@@ -229,7 +242,6 @@ WordRep::housekeep(void)
     {
         return;
     }
-    constexpr feat_mtx_t empty_fm {0u};
     std::size_t cur_size {seg_reps.size()};
     std::vector<SegRep> seg_reps_tmp {};
     seg_reps_tmp.reserve(cur_size);
@@ -244,10 +256,10 @@ WordRep::housekeep(void)
                 SegRep
                 {
                     insert_fm,
-                    empty_fm
+                    EMPTY_FEAT_MTX,
                 }
             );
-            this->seg_reps[i].insert_before_fm = empty_fm;
+            this->seg_reps[i].insert_before_fm = EMPTY_FEAT_MTX;
         }
         if (!this->seg_reps[i].feat_mtx.test(this->null_bit))
         // Segment at position I not deleted
@@ -281,7 +293,7 @@ WordRep::apply_rule(const Phmask::Rule &rule)
         const SegRep &cur_seg {this->seg_reps[pos]};
         const feat_mtx_t cur_fm {cur_seg.feat_mtx};
 
-        if ( (!rule.A.masks.test(cur_fm)) && !isinsert )
+        if ( (!rule.A.masks.test_fm(cur_fm)) && !isinsert )
         // Current segment does not match A in rule,
         // and rule is not insertion;
         // Rule does not affect current segment
@@ -323,11 +335,11 @@ WordRep::apply_rule(const Phmask::Rule &rule)
         {
             if (isinsert)
             {
-                rule.B.masks.set(cur_seg.insert_before_fm);
+                rule.B.masks.set_fm(cur_seg.insert_before_fm);
             }
             else
             {
-                rule.B.masks.set(cur_seg.feat_mtx);
+                rule.B.masks.set_fm(cur_seg.feat_mtx);
             }
         }
     }

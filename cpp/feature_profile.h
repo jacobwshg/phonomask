@@ -49,7 +49,8 @@ namespace Phmask
 
         Rule rule_from_str(const std::string &) const;
 
-        WordRep word_rep_from_str (const std::string &) const;
+        WordRep word_rep_from_str(const std::string &) const;
+        std::string word_rep_to_str(const WordRep &) const;
 
     private:
         /* Indices beyond those used for features, used instead for

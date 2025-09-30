@@ -6,6 +6,7 @@
 #include <string_view>
 #include <cstddef>
 #include <string>
+#include <sstream>
 
 namespace Phmask
 {
@@ -16,9 +17,20 @@ namespace Phmask
         feat_mtx_t sel_mask; // 1 for features present in bundle
         feat_mtx_t val_mask; // 1 if present feature is positive
 
-        FeatureBundleMasks(feat_mtx_t = {0u}, feat_mtx_t = {0u});
+        FeatureBundleMasks(feat_mtx_t smask = EMPTY_FEAT_MTX, 
+                           feat_mtx_t vmask = EMPTY_FEAT_MTX) :
+            sel_mask {smask}, val_mask {vmask}
+        {
+        }
 
-        std::string str(void) const;
+        std::string
+        str(void) const
+        {
+            std::ostringstream ms_sstrm {};
+            ms_sstrm << "Selection mask: " << sel_mask << "\n";
+            ms_sstrm << "Value mask: " << val_mask << "\n";
+            return ms_sstrm.str();
+        }
 
         FeatureBundleMasks &
         add_positive(const std::size_t feature_index)
@@ -37,20 +49,14 @@ namespace Phmask
 
         // true if ORIGINAL matches masks' conditions
         bool
-        test(const Phmask::feat_mtx_t original) const
+        test_fm(const Phmask::feat_mtx_t original) const
         {
             return (original & sel_mask) == val_mask;
         }
 
-        feat_mtx_t
-        set(const Phmask::feat_mtx_t original) const
-        {
-            return (original & ~sel_mask) | val_mask;
-        }
-
-        // In-place
+        // Modify ORIGINAL in place
         void
-        set(Phmask::feat_mtx_t &original) const
+        set_fm(Phmask::feat_mtx_t &original) const
         {
             original &= ~sel_mask;
             original |= val_mask;

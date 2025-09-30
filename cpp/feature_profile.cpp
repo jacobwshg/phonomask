@@ -304,24 +304,34 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
     std::vector<std::string> segments {word_to_segments(word)};
     word_rep.seg_reps.reserve(segments.size());
 
-    constexpr feat_mtx_t empty_fm {0u};
     for (const std::string &segment : segments)
     {
         feat_mtx_t feat_mtx {feat_mtx_of(segment)};
         word_rep.seg_reps.emplace_back(
             SegRep
             {
-                feat_mtx,
-/*
-                feat_mtx.test(wb_bit),
-                feat_mtx.test(wb_bit),
-*/
-                empty_fm,
+                .feat_mtx {feat_mtx},
+                .insert_before_fm {EMPTY_FEAT_MTX},
             }
         );
         word_rep.apply_at.emplace_back(false);
     }
 
     return word_rep;
+}
+
+std::string 
+Phmask::
+FeatureProfile::word_rep_to_str(const WordRep &word_rep) const
+{
+    std::ostringstream word_sstrm {};
+    const std::vector<SegRep> &seg_reps {word_rep.seg_reps};
+    for (std::size_t i {0}; i < seg_reps.size(); ++i)
+    {
+        feat_mtx_t cur_fm {seg_reps[i].feat_mtx};
+        const std::string &segment {this->segment_of(cur_fm)};
+        word_sstrm << segment;
+    }
+    return word_sstrm.str();
 }
 
