@@ -1,0 +1,25 @@
+
+FeatureProfile::FeatureProfile()
+|- table_stream_ptr()
+|- fields_from_row()
+|- FeatIdxMaps::populate()
+|- SegFMMaps::populate()
+|- FeatureProfile::add_reserved()
+
+FeatureProfile::rule_from_str()
+|- rule_str_toks()
+|- Rule::Rule()
+|- FeatureProfile::rule_tok_to_elem()
+   |- FeatureProfile::feat_bundle_to_rule_elem()
+      |- parse_feature_bundle_str()
+   |- FeatureProfile::segment_to_rule_elem()
+      |- FeatureProfile::feat_mtx_of()
+
+FeatureProfile::word_rep_from_str()
+|- WordRep::WordRep()
+|- word_to_segments()
+|- FeatureProfile::feat_mtx_of()
+
+FeatureProfile::word_rep_to_str()
+|- FeatureProfile::segment_of()
+

@@ -123,7 +123,7 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
         // Feature at IDX is effective
         {
             ef_feats_str += (feat_mtx.test(idx) ? "+" : "-");
-            const std::string &feature {this->feat_idx_maps.feature_at(idx)};
+            const std::string &feature {this->feature_at(idx)};
             ef_feats_str += feature;
             ef_feats_str += ", ";
         }
@@ -180,7 +180,7 @@ FeatureProfile::feat_bundle_to_rule_elem(const std::string_view fb_str) const
         value.remove_suffix(tok_len - 1);
         feature.remove_prefix(1);
 
-        std::size_t feature_index {this->feat_idx_maps.index_of(feature)};
+        std::size_t feature_index {this->index_of(feature)};
 
         // TODO: to support alpha, modify this part
         switch(value[0])
