@@ -12,14 +12,8 @@ namespace Phmask
 
     struct FeatureBundleMasks
     {
-        feat_mtx_t sel_mask; // 1 for features present in bundle
-        feat_mtx_t val_mask; // 1 if present feature is positive
-
-        FeatureBundleMasks(feat_mtx_t smask = EMPTY_FEAT_MTX, 
-                           feat_mtx_t vmask = EMPTY_FEAT_MTX) :
-            sel_mask {smask}, val_mask {vmask}
-        {
-        }
+        feat_mtx_t sel_mask {EMPTY_FEAT_MTX}; // 1 for features present in bundle
+        feat_mtx_t val_mask {EMPTY_FEAT_MTX}; // 1 if present feature is positive
 
         std::string
         str(void) const

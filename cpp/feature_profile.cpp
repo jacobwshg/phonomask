@@ -22,7 +22,7 @@ FeatureProfile::add_reserved(void)
     // Add reserved symbols
     std::size_t 
         // 1 if null segment symbol
-        null_bit {num_feats},
+        null_bit {this->num_feats},
         // 1 if word boundary symbol
         wb_bit {null_bit + 1},
         // 1 if syllable boundary symbol
@@ -157,8 +157,8 @@ FeatureProfile::segment_to_rule_elem(std::string_view segment) const
         {
             FeatureBundleMasks 
             {
-                Phmask::FLIPPED_EMPTY_FEAT_MTX,
-                seg_feat_mtx
+                .sel_mask = Phmask::FLIPPED_EMPTY_FEAT_MTX,
+                .val_mask = seg_feat_mtx
             }
         };
 }
