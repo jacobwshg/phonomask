@@ -6,8 +6,7 @@ void
 Phmask::
 FeatIdxMaps::populate(const std::vector<std::string>& header_row_fields) 
 {
-    for (std::size_t colno {0}; colno < header_row_fields.size();
-             ++colno)
+    for (std::size_t colno {0}; colno < header_row_fields.size(); ++colno)
     {
         if (colno == 0)
         {

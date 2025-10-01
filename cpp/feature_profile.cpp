@@ -136,15 +136,14 @@ std::string
 Phmask::
 FeatureProfile::seg_feat_mtx_str(const std::string &segment) const
 {
-    return this->seg_effective_feats_str(segment, all_feats_mask());
+    return this->seg_effective_feats_str(segment, this->all_feats_mask());
 }
 
 std::string
 Phmask::
 FeatureProfile::seg_positive_feats_str(const std::string &segment) const
 {
-    return this->seg_effective_feats_str(segment,
-                                         this->feat_mtx_of(segment));
+    return this->seg_effective_feats_str(segment, this->feat_mtx_of(segment));
 }
 
 Phmask::RuleElem
@@ -301,7 +300,9 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
     word_rep.sb_bit = this->sb_bit;
 
     std::vector<std::string> segments {Phmask::word_to_segments(word)};
-    word_rep.seg_reps.reserve(segments.size());
+    std::size_t nsegs {segments.size()};
+    word_rep.seg_reps.reserve(nsegs);
+    word_rep.apply_at.resize(nsegs, false);
 
     for (const std::string &segment : segments)
     {
@@ -313,7 +314,6 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
                 .insert_before_fm {EMPTY_FEAT_MTX},
             }
         );
-        word_rep.apply_at.emplace_back(false);
     }
 
     return word_rep;

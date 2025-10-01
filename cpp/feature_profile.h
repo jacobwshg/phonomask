@@ -22,18 +22,7 @@ namespace Phmask
         FeatIdxMaps feat_idx_maps;
         SegFMMaps seg_fm_maps;
 
-        // Add reserved symbols
-        void add_reserved(void);
-
         explicit FeatureProfile(const std::string &);
-
-        feat_mtx_t all_feats_mask(void) const
-        {
-            feat_mtx_t all_feats_mask {0u};
-            all_feats_mask.set();
-            all_feats_mask = ~(all_feats_mask << num_feats);
-            return all_feats_mask;
-        }
 
         const std::string &feature_at(const std::size_t) const;
         std::size_t index_of(const std::string_view) const;
@@ -56,6 +45,17 @@ namespace Phmask
         std::size_t null_bit;
         std::size_t wb_bit;
         std::size_t sb_bit;
+
+        // Add reserved symbols
+        void add_reserved(void);
+
+        feat_mtx_t all_feats_mask(void) const
+        {
+            feat_mtx_t all_feats_mask {0u};
+            all_feats_mask.set();
+            all_feats_mask = ~(all_feats_mask << num_feats);
+            return all_feats_mask;
+        }
 
         std::string 
         seg_effective_feats_str(const std::string &, Phmask::feat_mtx_t) const;

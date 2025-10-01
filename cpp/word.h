@@ -44,7 +44,7 @@ namespace Phmask
         std::size_t sb_bit;
 
         // true if insertion or deletion has effect
-        bool isdirty;
+        bool isdirty {false};
 
         std::vector<SegRep> seg_reps;
 
