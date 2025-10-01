@@ -2,7 +2,6 @@
 #define FEAT_BDL_MASKS_H
 
 #include "feat_mtx.h"
-//#include "feature_profile.h"
 #include <string_view>
 #include <cstddef>
 #include <string>
@@ -10,7 +9,6 @@
 
 namespace Phmask
 {
-    //class FeatureProfile;
 
     struct FeatureBundleMasks
     {
@@ -27,53 +25,44 @@ namespace Phmask
         str(void) const
         {
             std::ostringstream ms_sstrm {};
-            ms_sstrm << "Selection mask: " << sel_mask << "\n";
-            ms_sstrm << "Value mask: " << val_mask << "\n";
+            ms_sstrm << "Selection mask: " << this->sel_mask << "\n";
+            ms_sstrm << "Value mask: " << this->val_mask << "\n";
             return ms_sstrm.str();
         }
 
+        /* Add a positive-valued feature */
         FeatureBundleMasks &
         add_positive(const std::size_t feature_index)
         {
-            sel_mask.set(feature_index);
-            val_mask.set(feature_index);
+            this->sel_mask.set(feature_index);
+            this->val_mask.set(feature_index);
             return *this;
         }
 
+        /* Add a negative-valued feature */
         FeatureBundleMasks &
         add_negative(const std::size_t feature_index)
         {
-            sel_mask.set(feature_index);
+            this->sel_mask.set(feature_index);
             return *this;
         }
 
-        // true if ORIGINAL matches masks' conditions
+        /* Return true if ORIGINAL feature matrix 
+           matches masks' conditions */
         bool
         test_fm(const Phmask::feat_mtx_t original) const
         {
-            return (original & sel_mask) == val_mask;
+            return (original & this->sel_mask) == this->val_mask;
         }
 
-        // Modify ORIGINAL in place
+        /* Modify ORIGINAL feature matrix in place */
         void
         set_fm(Phmask::feat_mtx_t &original) const
         {
-            original &= ~sel_mask;
-            original |= val_mask;
+            original &= ~this->sel_mask;
+            original |= this->val_mask;
         }
     };
-
-/*
-    FeatureBundleMasks
-    masks_from_segment(const Phmask::FeatureProfile &, const std::string_view);
-
-    FeatureBundleMasks
-    masks_from_feat_bundle_str(const Phmask::FeatureProfile &, const std::string_view);
-
-    FeatureBundleMasks
-    masks_from_rule_tok(const Phmask::FeatureProfile &, const std::string_view);
-*/
-
 }
 
 #endif

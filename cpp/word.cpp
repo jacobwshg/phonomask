@@ -241,7 +241,7 @@ WordRep::housekeep(void)
     {
         return;
     }
-    std::size_t cur_size {seg_reps.size()};
+    std::size_t cur_size {this->seg_reps.size()};
     std::vector<SegRep> seg_reps_tmp {};
     seg_reps_tmp.reserve(cur_size);
 
@@ -351,5 +351,4 @@ WordRep::apply_rule(const Phmask::Rule &rule)
 
     return *this;
 }
-
 

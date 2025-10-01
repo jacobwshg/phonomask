@@ -20,9 +20,12 @@ namespace Phmask
 
         std::string str(void) const;
     private:
-        std::unordered_map<std::string, feat_mtx_t, SvStrHash, SvStrEq> seg_fm_map;
-        std::unordered_map<feat_mtx_t, std::string, std::hash<feat_mtx_t>> 
-            fm_seg_map;
+        std::unordered_map<std::string,
+                           feat_mtx_t, 
+                           SvStrHash, SvStrEq> seg_fm_map;
+        std::unordered_map<feat_mtx_t,
+                           std::string,
+                           std::hash<feat_mtx_t>> fm_seg_map;
     };
 }
 

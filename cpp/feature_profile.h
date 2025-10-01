@@ -43,10 +43,6 @@ namespace Phmask
         std::string seg_feat_mtx_str(const std::string &) const;
         std::string seg_positive_feats_str(const std::string &) const;
 
-        RuleElem segment_to_rule_elem(std::string_view) const;
-        RuleElem feat_bundle_to_rule_elem(const std::string_view) const;
-        RuleElem rule_tok_to_elem(const std::string_view) const;
-
         Rule rule_from_str(const std::string &) const;
 
         WordRep word_rep_from_str(const std::string &) const;
@@ -63,6 +59,10 @@ namespace Phmask
 
         std::string 
         seg_effective_feats_str(const std::string &, Phmask::feat_mtx_t) const;
+
+        RuleElem segment_to_rule_elem(std::string_view) const;
+        RuleElem feat_bundle_to_rule_elem(const std::string_view) const;
+        RuleElem rule_tok_to_elem(const std::string_view) const;
     };
 }
 

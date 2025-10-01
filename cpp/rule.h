@@ -1,7 +1,6 @@
 #ifndef PHMASK_RULE_H
 #define PHMASK_RULE_H
 
-//#include "feature_profile.h"
 #include "masks.h"
 #include <vector>
 #include <string>
@@ -40,8 +39,6 @@ namespace Phmask
         RuleElem B;
         std::vector<RuleElem> X;
         std::vector<RuleElem> Y;
-
-        //Rule(const FeatureProfile &profile, const std::string &rule_str);
 
         std::string masks_str(void) const;
     };
