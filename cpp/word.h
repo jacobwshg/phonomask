@@ -20,29 +20,20 @@ namespace Phmask
     struct WordRep;
 
     // Segment representation in word
-        struct SegRep
-        {
-            feat_mtx_t feat_mtx;
-/*
-            // true for word-initial and final "segments" that are 
-            // actually word boundary symbols
-            bool iswb {false};
-            // true for "segments" that are actually 
-            // syllable boundary symbols;
-            // they only match <$> in rules and are skipped by 
-            // true segments and feature bundles
-            bool issb {false};
-            // Feature matrix of segment to insert before the 
-            // current position as necessary after applying 
-            // insertion rule 
-*/
-            feat_mtx_t insert_before_fm {0u};
+    struct SegRep
+    {
+        feat_mtx_t feat_mtx;
 
-            bool issb(std::size_t sb_bit) const
-            {
-                return this->feat_mtx.test(sb_bit);
-            }
-        };
+        /* Feature matrix of segment to insert before the 
+            current position (as necessary) after applying 
+            an insertion rule */
+        feat_mtx_t insert_before_fm {0u};
+
+        bool issb(std::size_t sb_bit) const
+        {
+            return this->feat_mtx.test(sb_bit);
+        }
+    };
 
     // Word representation
     struct WordRep
@@ -61,7 +52,7 @@ namespace Phmask
         // segment in the word will be affected by a rule
         std::vector<bool> apply_at;
 
-        // Commit insertions and deletions
+        /* Commit insertion or deletion */
         void housekeep(void);
 
         WordRep &

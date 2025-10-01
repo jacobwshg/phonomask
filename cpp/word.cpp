@@ -281,6 +281,9 @@ WordRep::apply_rule(const Phmask::Rule &rule)
                 rxlen {rule.X.size()},
                 rylen {rule.Y.size()};
 
+    // Whether the rule can apply at any position at all
+    bool can_apply {false};
+
     // true if the rule is insertion or deletion, 
     // respectively indicated by the A or B element
     // being the null segment symbol
@@ -325,6 +328,10 @@ WordRep::apply_rule(const Phmask::Rule &rule)
 
         // Finally, all segments match the rule; mark current position
         this->apply_at[pos] = true;
+        if (!can_apply)
+        {
+            can_apply = true;
+        }
     }
 
     for (std::size_t pos {0}; pos < wlen; ++pos)
@@ -343,7 +350,7 @@ WordRep::apply_rule(const Phmask::Rule &rule)
         }
     }
 
-    if (isinsert || isdelete)
+    if (can_apply && (isinsert || isdelete))
     {
         this->isdirty = true;
     }

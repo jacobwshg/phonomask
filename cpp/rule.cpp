@@ -18,7 +18,7 @@ rule_str_toks(const std::string &rule_str)
     std::size_t tok_begin {0}, // Initial pos in rule token
                 tok_end {0};   // Pos after rule token
 
-    bool in_feat_bdl {false};  // Whether current pos in feature bundle
+    bool in_feat_bdl {false};  // Whether current pos is within a feature bundle
 
     for (std::size_t i {0}; i < r_len; ++i)
     {
