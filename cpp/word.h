@@ -12,11 +12,6 @@ namespace Phmask
 {
     std::vector<std::string> word_to_segments(const std::string &);
 
-    std::vector<feat_mtx_t> 
-    segments_to_feat_mtxs(const std::vector<std::string> &);
-
-    std::string feat_mtxs_to_word(const std::vector<feat_mtx_t> &);
-
     struct WordRep;
 
     // Segment representation in word
@@ -28,6 +23,11 @@ namespace Phmask
             current position (as necessary) after applying 
             an insertion rule */
         feat_mtx_t insert_before_fm {0u};
+
+        bool isnull(std::size_t null_bit) const
+        {
+            return this->feat_mtx.test(null_bit);
+        }
 
         bool issb(std::size_t sb_bit) const
         {

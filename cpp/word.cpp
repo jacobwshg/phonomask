@@ -248,7 +248,7 @@ WordRep::housekeep(void)
     for (std::size_t i {0}; i < cur_size; ++i)
     {
         feat_mtx_t insert_fm {this->seg_reps[i].insert_before_fm};
-        if (insert_fm.any() && !insert_fm.test(this->null_bit))
+        if ( insert_fm.any() && !insert_fm.test(this->null_bit) )
         // Exists segment to be inserted before position I
         {
             seg_reps_tmp.emplace_back(
@@ -260,7 +260,7 @@ WordRep::housekeep(void)
             );
             this->seg_reps[i].insert_before_fm = EMPTY_FEAT_MTX;
         }
-        if (!this->seg_reps[i].feat_mtx.test(this->null_bit))
+        if ( !this->seg_reps[i].isnull(this->null_bit) )
         // Segment at position I not deleted
         {
             seg_reps_tmp.emplace_back(std::move(this->seg_reps[i]));
