@@ -306,12 +306,12 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
 
     for (const std::string &segment : segments)
     {
-        feat_mtx_t feat_mtx {this->feat_mtx_of(segment)};
+        feat_mtx_t seg_feat_mtx {this->feat_mtx_of(segment)};
         word_rep.seg_reps.emplace_back(
             SegRep
             {
-                .feat_mtx {feat_mtx},
-                .insert_before_fm {EMPTY_FEAT_MTX},
+                .feat_mtx = seg_feat_mtx,
+                .insert_before_fm = EMPTY_FEAT_MTX,
             }
         );
     }

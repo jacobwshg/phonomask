@@ -169,10 +169,10 @@ feature value currently degraded to `-`')
         return self.compare_seg_features(segment_pair_str, False)
 
 
-lx301 = FeatureProfile('./lx301-base.csv')
+lx301 = FeatureProfile('../lx301-base.csv')
 
 if __name__ == '__main__':
-    table_path = './lx301-base.csv'
+    table_path = '../lx301-base.csv'
     profile = FeatureProfile(table_path)
     profile.load_table()
     print(profile)

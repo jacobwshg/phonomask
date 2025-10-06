@@ -49,11 +49,15 @@ namespace Phmask
         // Add reserved symbols
         void add_reserved(void);
 
+        /* Return a mask that has 1 for each index used by features of 
+           real segments in the feature profile. 
+           The result differs from FLIPPED_EMPTY_FEAT_MTX, which has 1 
+           also for reserved symbol bits and unused higher bits. */
         feat_mtx_t all_feats_mask(void) const
         {
             feat_mtx_t all_feats_mask {0u};
             all_feats_mask.set();
-            all_feats_mask = ~(all_feats_mask << num_feats);
+            all_feats_mask = ~(all_feats_mask << this->num_feats);
             return all_feats_mask;
         }
 
