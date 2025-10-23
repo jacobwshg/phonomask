@@ -12,7 +12,7 @@
 #include <sstream>
 #include <memory>
 #include <stdexcept>
-#include <unordered_set>
+#include <array>
 #include <cstddef>
 
 void
@@ -219,7 +219,7 @@ Phmask::Rule
 Phmask::
 FeatureProfile::rule_from_str(const std::string &rule_str) const
 {
-    const static std::unordered_set<std::string, SvStrHash, SvStrEq> 
+    constexpr static std::array<std::string_view, 3> 
         arrows
     {
         "→", "->", ">",
@@ -247,14 +247,20 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
         {
             continue;
         }
+        bool isarrow { false };
         switch (parser_state)
         {
         case State::A:
-            if (arrows.find(tok) != arrows.end())
+            for ( const std::string_view &arrow : arrows )
             {
-                parser_state = State::B;
+                if ( tok == arrow )
+                {
+                    parser_state = State::B;
+                    isarrow = true;
+                    break;
+                }
             }
-            else
+            if ( !isarrow )
             {
                 rule.A = this->rule_tok_to_elem(tok);
             }
@@ -299,7 +305,7 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
     word_rep.wb_bit = this->wb_bit;
     word_rep.sb_bit = this->sb_bit;
 
-    std::vector<std::string> segments {Phmask::word_to_segments(word)};
+    std::vector<std::string> segments { Phmask::word_to_segments(word) };
     std::size_t nsegs {segments.size()};
     word_rep.seg_reps.reserve(nsegs);
     word_rep.apply_at.resize(nsegs, false);

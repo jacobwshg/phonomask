@@ -32,7 +32,15 @@ manipulation.
 
 ## Data structures
 
+`FeatIdxMaps`
 
+`SegFMMaps`
+
+`FeatureProfile`
+
+`WordRep` and `SegRep`
+
+`RuleElem` and `Rule`
 
 ## Data flow
 
