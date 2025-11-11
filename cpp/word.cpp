@@ -155,21 +155,23 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
                  std::size_t wxpos, std::size_t wypos,
                  std::size_t rxpos, std::size_t rypos)
 {
-    std::size_t wlen {word_rep.seg_reps.size()}, 
-                rxlen {rule.X.size()}, 
-                rylen {rule.Y.size()};
+    /* Obtain length of the word and the rule's X and Y sequences */
+    std::size_t
+        wlen {word_rep.seg_reps.size()}, 
+        rxlen {rule.X.size()}, 
+        rylen {rule.Y.size()};
 
     if ((rxpos >= rxlen) && (rypos >= rylen))
-    // Rule elements exhausted, all matching segments
+    /* Rule elements exhausted, all matching segments */
     {
         return true;
     }
 
     if (rxpos < rxlen)
-    // Element available in RULE's X
+    /* Element available in RULE's X */
     {
         if (wxpos >= wlen)
-        // No remaining segment on the left in WORD_REP
+        /* No remaining segment on the left in WORD_REP */
         {
             return false;
         }
@@ -181,14 +183,14 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         bool wx_issb {wx.issb(word_rep.sb_bit)};
 
         if (rx.masks.test_fm(wx.feat_mtx) || (rx_issb && wx_issb))
-        // Exact segment match, or syllable boundary match
+        /* Exact segment match, or syllable boundary match */
         {
             wxpos = update_pos(wxpos, wlen, true);
             rxpos = update_pos(rxpos, rxlen, true);
         }
         else if ((!rx_issb) && wx_issb)
-        // Rule element doesn't specify syllable boundary
-        // but "segment" is syllable boundary (should skip)
+        /* Rule element doesn't specify syllable boundary
+         but "segment" is syllable boundary (should skip) */
         {
             wxpos = update_pos(wxpos, wlen, true);
         }
@@ -199,10 +201,10 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
     }
 
     if (rypos < rylen)
-    // Element available in RULE's Y
+    /* Element available in RULE's Y */
     {
         if (wypos >= wlen)
-        // No remaining segment on the right in WORD_REP
+        /* No remaining segment on the right in WORD_REP */
         {
             return false;
         }
@@ -213,14 +215,14 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
         bool wy_issb {wy.issb(word_rep.sb_bit)};
 
         if (ry.masks.test_fm(wy.feat_mtx) || (ry_issb && wy_issb))
-        // Exact segment match, or syllable boundary match
+        /* Exact segment match, or syllable boundary match */
         {
             wypos = update_pos(wypos, wlen);
             rypos = update_pos(rypos, rylen);
         }
         else if ((!ry_issb) && wy_issb)
-        // Rule element doesn't specify syllable boundary
-        // but "segment" is syllable boundary (should skip)
+        /* Rule element doesn't specify syllable boundary
+           but "segment" is syllable boundary (should skip) */
         {
             wypos = update_pos(wypos, wlen);
         }
@@ -233,6 +235,8 @@ try_rule_context(const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
     return try_rule_context(word_rep, rule, wxpos, wypos, rxpos, rypos);
 }
 
+
+/* Commit insertions and deletions */
 void
 Phmask::
 WordRep::housekeep(void)
@@ -249,7 +253,7 @@ WordRep::housekeep(void)
     {
         feat_mtx_t insert_fm {this->seg_reps[i].insert_before_fm};
         if ( insert_fm.any() && !insert_fm.test(this->null_bit) )
-        // Exists segment to be inserted before position I
+        /* Exists segment to be inserted before position I */
         {
             seg_reps_tmp.emplace_back(
                 SegRep
@@ -261,7 +265,7 @@ WordRep::housekeep(void)
             this->seg_reps[i].insert_before_fm = EMPTY_FEAT_MTX;
         }
         if ( !this->seg_reps[i].isnull(this->null_bit) )
-        // Segment at position I not deleted
+        /* Segment at position I not deleted */
         {
             seg_reps_tmp.emplace_back(std::move(this->seg_reps[i]));
         }
@@ -277,56 +281,69 @@ Phmask::WordRep &
 Phmask::
 WordRep::apply_rule(const Phmask::Rule &rule)
 {
-    std::size_t wlen {this->seg_reps.size()},
-                rxlen {rule.X.size()},
-                rylen {rule.Y.size()};
+    /* Obtain length of the word and the rule's X and Y sequences */
+    std::size_t
+        wlen {this->seg_reps.size()},
+        rxlen {rule.X.size()},
+        rylen {rule.Y.size()};
 
-    // Whether the rule can apply at any position at all
+    /* Whether the rule can apply at any position at all */
     bool can_apply {false};
 
-    // true if the rule is insertion or deletion, 
-    // respectively indicated by the A or B element
-    // being the null segment symbol
+    /* True if the rule is insertion or deletion, 
+       respectively indicated by the A or B element
+       being the null segment symbol */
     bool isinsert {rule.A.isnull(rule.null_bit)},
          isdelete {rule.B.isnull(rule.null_bit)};
 
+    /* Test each segment position for which X can fit on the left
+       and Y can fit on the right */
     for (std::size_t pos {rxlen}; pos < wlen - rylen; ++pos)
     {
         const SegRep &cur_seg {this->seg_reps[pos]};
         const feat_mtx_t cur_fm {cur_seg.feat_mtx};
 
         if ( (!rule.A.masks.test_fm(cur_fm)) && !isinsert )
-        // Current segment does not match A in rule,
-        // and rule is not insertion;
-        // Rule does not affect current segment
+        /* Current segment does not match A in rule,
+           and rule is not insertion; thus rule does not 
+           affect current segment */
         {
             continue;
         }
 
-        // Starting positions to begin recursively testing the rule
-        // outwards from the current segment (A)'s position
+        /* Initialize starting positions in the word and rule 
+           to begin recursively matching X and Y elements to segments
+           outwards from the current segment (A)'s position */
         std::size_t 
-            // X in word: one position left of A
+            /* X in word: one position left of A */
             wxpos {pos > 0 ? pos - 1 : wlen},
-            // Y in word: same as A (unchanged if rule is insertion)
+
+            /* Y in word: same as A (unchanged if rule is insertion,
+               else advanced below) */
             wypos {pos},
-            // X in rule: rightmost position
+
+            /* X in rule: rightmost position */
             rxpos {rxlen > 0 ? rxlen - 1 : rxlen},
-            // Y in rule: leftmost position
+
+            /* Y in rule: leftmost position */
             rypos {0};
+
         if (!isinsert)
-        // Not an insertion rule
+        /* Rule is not insertion; advance Y pos in word 
+           past current segment */
         {
             ++wypos;
         }
         
         if (!try_rule_context(*this, rule, wxpos, wypos, rxpos, rypos))
-        // Adjacent segments do not match rule elements
+        /* Some adjacent segment does not match rule element;
+           rule cannot apply at current segment postion */
         {
             continue;
         }
 
-        // Finally, all segments match the rule; mark current position
+        /* Finally, all adjacent segments match the rule; 
+           mark current position */
         this->apply_at[pos] = true;
         if (!can_apply)
         {

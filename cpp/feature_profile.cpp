@@ -296,6 +296,9 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
     return rule;
 }
 
+/* Construct a WordRep from a data word string.
+   This is done by segmenting the word and mapping the segments
+   to SegReps wrapping their feature matrices. */
 Phmask::WordRep
 Phmask::
 FeatureProfile::word_rep_from_str(const std::string &word) const
@@ -325,6 +328,8 @@ FeatureProfile::word_rep_from_str(const std::string &word) const
     return word_rep;
 }
 
+/* Convert a WordRep back into a word string by retrieving
+   and concatenating segments corresponding to each SegRep member. */
 std::string 
 Phmask::
 FeatureProfile::word_rep_to_str(const WordRep &word_rep) const

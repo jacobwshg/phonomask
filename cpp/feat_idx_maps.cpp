@@ -20,6 +20,7 @@ FeatIdxMaps::populate(const std::vector<std::string>& header_row_fields)
     }
 }
 
+/* Return the feature label at a specified index */
 const std::string &
 Phmask::
 FeatIdxMaps::feature_at(const std::size_t index) const
