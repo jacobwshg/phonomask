@@ -22,15 +22,15 @@ FeatureProfile::add_reserved(void)
     // Add reserved symbols
     std::size_t 
         // 1 if null segment symbol
-        null_bit {this->num_feats},
+        null_bit     { this->num_feats },
         // 1 if word boundary symbol
-        wb_bit {null_bit + 1},
+        wb_bit       { null_bit + 1 },
         // 1 if syllable boundary symbol
-        sb_bit {wb_bit + 1},
+        sb_bit       { wb_bit + 1 },
         // 1 if <$> or <.>, 0 if <ˈ> or <ˌ>
-        sb_ascii_bit {sb_bit + 1},
+        sb_ascii_bit { sb_bit + 1 },
         // "significant" - 1 if <.> or <ˈ>, 0 if <$> or <ˌ>
-        sb_sig_bit {sb_ascii_bit + 1};
+        sb_sig_bit   { sb_ascii_bit + 1 };
     this->null_bit = null_bit;
     this->wb_bit = wb_bit;
     this->sb_bit = sb_bit;
@@ -58,14 +58,14 @@ FeatureProfile::FeatureProfile(const std::string &path):
     { 
         Phmask::table_stream_ptr(path) 
     };
-    std::istream &table_strm {*table_sp};
+    std::istream &table_strm { *table_sp };
 
     std::vector<std::string> header_row_fields
     {
         Phmask::fields_from_row(table_strm)
     };
 
-    std::size_t num_cols {header_row_fields.size()};
+    std::size_t num_cols { header_row_fields.size() };
     if (num_cols > 1)
     {
         this->num_feats = num_cols - 1;
@@ -116,8 +116,8 @@ FeatureProfile::seg_effective_feats_str(const std::string &segment,
 {
     std::string ef_feats_str {"["};
 
-    feat_mtx_t feat_mtx {this->feat_mtx_of(segment)};
-    for (std::size_t idx {0}; idx < this->num_feats; ++idx)
+    const feat_mtx_t feat_mtx { this->feat_mtx_of(segment) };
+    for (std::size_t idx { 0 }; idx < this->num_feats; ++idx)
     {
         if (ef_mask.test(idx))
         // Feature at IDX is effective
@@ -150,7 +150,7 @@ Phmask::RuleElem
 Phmask::
 FeatureProfile::segment_to_rule_elem(std::string_view segment) const
 {
-    feat_mtx_t seg_feat_mtx {this->feat_mtx_of(segment)};
+    const feat_mtx_t seg_feat_mtx { this->feat_mtx_of(segment) };
 
     return 
         RuleElem
@@ -174,13 +174,14 @@ FeatureProfile::feat_bundle_to_rule_elem(const std::string_view fb_str) const
     };
     for (const std::string_view &tok : fb_toks)
     {
-        std::size_t tok_len {tok.size()};
-        std::string_view value {tok},  
-                         feature {tok};
+        std::size_t tok_len { tok.size() };
+        std::string_view
+            value { tok },  
+            feature { tok };
         value.remove_suffix(tok_len - 1);
         feature.remove_prefix(1);
 
-        std::size_t feature_index {this->index_of(feature)};
+        std::size_t feature_index { this->index_of(feature) };
 
         // TODO: to support alpha, modify this part
         switch(value[0])
@@ -219,7 +220,7 @@ Phmask::Rule
 Phmask::
 FeatureProfile::rule_from_str(const std::string &rule_str) const
 {
-    constexpr static std::array<std::string_view, 3> 
+    static constexpr std::array<std::string_view, 3> 
         arrows
     {
         "→", "->", ">",
@@ -233,8 +234,8 @@ FeatureProfile::rule_from_str(const std::string &rule_str) const
     enum class State
     {
         A, B, X, Y,
-    }
-    parser_state {State::A};
+    };
+    State parser_state { State::A };
 
     Rule rule {};
     rule.null_bit = this->null_bit;
@@ -338,8 +339,8 @@ FeatureProfile::word_rep_to_str(const WordRep &word_rep) const
     const std::vector<SegRep> &seg_reps {word_rep.seg_reps};
     for (std::size_t i {0}; i < seg_reps.size(); ++i)
     {
-        feat_mtx_t cur_fm {seg_reps[i].feat_mtx};
-        const std::string &segment {this->segment_of(cur_fm)};
+        const feat_mtx_t cur_fm { seg_reps[i].feat_mtx };
+        const std::string &segment { this->segment_of(cur_fm) };
         word_sstrm << segment;
     }
     return word_sstrm.str();
