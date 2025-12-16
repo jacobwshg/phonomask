@@ -44,7 +44,7 @@ namespace Phmask
     inline std::string_view
     utf8_str_cview(const std::string &s, std::size_t cidx, std::size_t clen)
     {
-        std::string_view cv {s};
+        std::string_view cv { s };
         cv.remove_prefix(cidx);
         cv.remove_suffix(s.size() - cidx - clen);
         return cv;

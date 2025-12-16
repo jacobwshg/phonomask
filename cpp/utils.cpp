@@ -52,3 +52,13 @@ fields_from_row(std::istream &is)
     return fields;
 }
 
+std::string
+Phmask::
+unistr_to_str(const icu::UnicodeString &unistr)
+{
+    std::string s {};
+    s.reserve(unistr.length());
+    unistr.toUTF8String(s);
+    return s;
+}
+

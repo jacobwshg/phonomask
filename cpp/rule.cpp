@@ -7,12 +7,17 @@
 #include <unordered_set>
 #include <sstream>
 
+/*
+    Preprocess a rule string.
+    Example: "X -> Y / A1 A2 _ B1 B2" becomes 
+    { "X", "->", "Y", "/", "A1", "A2", "_", "B1", "B2" }
+*/
 std::vector<std::string_view>
 Phmask::
-rule_str_toks(const std::string &rule_str)
+rule_str_toks(const std::string &rule_str) 
 {
     std::vector<std::string_view> rule_toks {};
-    std::size_t r_len { rule_str.size() };
+    const std::size_t r_len { rule_str.size() };
 
     std::string_view tok { "" };
     std::size_t 
@@ -22,7 +27,7 @@ rule_str_toks(const std::string &rule_str)
     /* Whether current pos is within a feature bundle */
     bool in_feat_bdl { false };  
 
-    for (std::size_t i { 0 }; i < r_len; ++i)
+    for ( std::size_t i { 0 }; i < r_len; ++i )
     {
         const char c { rule_str[i] };
         switch (c)
@@ -65,18 +70,25 @@ rule_str_toks(const std::string &rule_str)
     return rule_toks;
 }
 
+
+/*
+    Parse feature-value pairs out of a feature bundle string.
+    Example: "[+cons, -nas]" becomes { "+cons", "-nas" }
+*/
 std::vector<std::string_view>
 Phmask::
 parse_feature_bundle_str(const std::string_view fb_str)
 {
     std::vector<std::string_view> toks {};
-    std::size_t fb_len { fb_str.size() };
+    const std::size_t fb_len { fb_str.size() };
+
     std::size_t
         tok_begin { 0 },
         tok_end   { 0 };
+
     for (std::size_t i { 0 }; i < fb_len; ++i)
     {
-        char c {fb_str[i]};
+        const char c { fb_str[i] };
         switch (c)
         {
         case '[':

@@ -24,11 +24,11 @@ SegFMMaps::populate(std::istream &table_stream)
             return;
         }
 
-        std::string &segment {seg_entry_fields[0]};
-        feat_mtx_t feat_mtx {0};
-        for (std::size_t colno {1}; colno < seg_entry_fields.size(); ++colno)
+        std::string &segment { seg_entry_fields[0] };
+        feat_mtx_t feat_mtx { 0 };
+        for (std::size_t colno { 1 }; colno < seg_entry_fields.size(); ++colno)
         {
-            std::size_t idx {colno - 1};
+            const std::size_t idx { colno - 1 };
             /* TODO: Assuming binary features for now;
                underspecification is lost */
             if (seg_entry_fields[colno] == "+")
@@ -54,11 +54,11 @@ Phmask::SegFMMaps &
 Phmask::
 SegFMMaps::add_seg_alias(const std::string &alias, const std::string &original)
 {
-    const auto &it {this->seg_fm_map.find(original)};
-    if (it != this->seg_fm_map.end())
-    // Segment being aliased indeed exists
+    const auto &mpit { this->seg_fm_map.find(original) };
+    if (mpit != this->seg_fm_map.end())
+    /* Segment being aliased indeed exists */
     {
-        this->seg_fm_map.try_emplace(alias, it->second);
+        this->seg_fm_map.try_emplace(alias, mpit->second);
     }
     return *this;
 }
@@ -70,18 +70,22 @@ SegFMMaps::feat_mtx_of(const std::string_view segment) const
 {
     std::ostringstream e_sstrm {};
     e_sstrm << "Segment [" << segment << "] not found\n";
-    return Phmask::map_find_const(this->seg_fm_map, 
-                                  segment, 
-                                  e_sstrm.str());
+    return Phmask::map_find_const(
+        this->seg_fm_map, 
+        segment, 
+        e_sstrm.str()
+    );
 }
 
 const std::string & 
 Phmask::
 SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx) const
 {
-    return Phmask::map_find_const(this->fm_seg_map, 
-                                  feat_mtx, 
-                                  "No known segment for feature matrix\n");
+    return Phmask::map_find_const(
+        this->fm_seg_map, 
+        feat_mtx, 
+        "No known segment for feature matrix\n"
+    );
 }
 
 std::string

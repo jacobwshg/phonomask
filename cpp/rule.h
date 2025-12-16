@@ -8,9 +8,18 @@
 
 namespace Phmask
 {
+    /*
+        Preprocess a rule string.
+        Example: "X -> Y / A1 A2 _ B1 B2" becomes 
+        { "X", "->", "Y", "/", "A1", "A2", "_", "B1", "B2" }
+    */
     std::vector<std::string_view>
     rule_str_toks(const std::string &rule_str);
 
+    /*
+        Parse feature-value pairs out of a feature bundle string.
+        Example: "[+cons, -nas]" becomes { "+cons", "-nas" }
+    */
     std::vector<std::string_view>
     parse_feature_bundle_str(const std::string_view);
 

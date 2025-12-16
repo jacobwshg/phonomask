@@ -39,12 +39,11 @@ std::size_t
 Phmask::
 FeatIdxMaps::index_of(const std::string_view feature) const
 {
-    return 
-        Phmask::map_find_const(
-            this->feat_idx_map, 
-            feature, 
-            "Feature not found\n"
-        );
+    return Phmask::map_find_const(
+        this->feat_idx_map, 
+        feature, 
+        "Feature not found\n"
+    );
 }
 
 std::string

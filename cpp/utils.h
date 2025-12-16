@@ -16,14 +16,8 @@ namespace Phmask
     std::vector<std::string>
     fields_from_row(std::istream &);
 
-    inline std::string
-    unistr_to_str(icu::UnicodeString &unistr)
-    {
-        std::string s {};
-        s.reserve(unistr.length());
-        unistr.toUTF8String(s);
-        return s;
-    }
+    std::string
+    unistr_to_str(const icu::UnicodeString &);
 
     template<typename T_Map, typename T_Key> const typename T_Map::mapped_type &
     map_find_const(const T_Map &m, const T_Key &k, const std::string &e_msg)
