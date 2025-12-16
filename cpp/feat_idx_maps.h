@@ -21,10 +21,13 @@ namespace Phmask
         std::string feature_layout_str(void) const;
 
     private:
-        std::unordered_map<std::string,
-                           std::size_t,
-                           SvStrHash,
-                           SvStrEq> feat_idx_map;
+        std::unordered_map<
+            std::string,
+            std::size_t,
+            SvStrHash,
+            SvStrEq
+        > feat_idx_map;
+
         std::vector<std::string> idx_feat_map;
     };
 }

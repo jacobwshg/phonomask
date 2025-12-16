@@ -6,15 +6,15 @@ void
 Phmask::
 FeatIdxMaps::populate(const std::vector<std::string>& header_row_fields) 
 {
-    for (std::size_t colno {0}; colno < header_row_fields.size(); ++colno)
+    for (std::size_t colno { 0 }; colno < header_row_fields.size(); ++colno)
     {
         if (colno == 0)
         {
             continue;
         }
 
-        const std::string &feature {header_row_fields[colno]};
-        std::size_t idx {colno - 1};
+        const std::string &feature { header_row_fields[colno] };
+        std::size_t idx { colno - 1 };
         this->feat_idx_map[feature] = idx;
         this->idx_feat_map.emplace_back(feature);
     }
@@ -39,9 +39,12 @@ std::size_t
 Phmask::
 FeatIdxMaps::index_of(const std::string_view feature) const
 {
-    return Phmask::map_find_const(this->feat_idx_map, 
-                                  feature, 
-                                  "Feature not found\n");
+    return 
+        Phmask::map_find_const(
+            this->feat_idx_map, 
+            feature, 
+            "Feature not found\n"
+        );
 }
 
 std::string
@@ -62,7 +65,7 @@ Phmask::
 FeatIdxMaps::feature_layout_str(void) const
 {
     std::ostringstream lay_sstrm {};
-    std::size_t nfeats {this->idx_feat_map.size()};
+    std::size_t nfeats { this->idx_feat_map.size() };
 
     for (std::size_t i {0}; i < nfeats; ++i)
     {

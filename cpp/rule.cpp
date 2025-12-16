@@ -12,17 +12,19 @@ Phmask::
 rule_str_toks(const std::string &rule_str)
 {
     std::vector<std::string_view> rule_toks {};
-    std::size_t r_len {rule_str.size()};
+    std::size_t r_len { rule_str.size() };
 
-    std::string_view tok {""};
-    std::size_t tok_begin {0}, // Initial pos in rule token
-                tok_end {0};   // Pos after rule token
+    std::string_view tok { "" };
+    std::size_t 
+        tok_begin { 0 }, // Initial pos in rule token
+        tok_end   { 0 }; // Pos after rule token
 
-    bool in_feat_bdl {false};  // Whether current pos is within a feature bundle
+    /* Whether current pos is within a feature bundle */
+    bool in_feat_bdl { false };  
 
-    for (std::size_t i {0}; i < r_len; ++i)
+    for (std::size_t i { 0 }; i < r_len; ++i)
     {
-        char c {rule_str[i]};
+        const char c { rule_str[i] };
         switch (c)
         {
         case ' ':
@@ -68,10 +70,11 @@ Phmask::
 parse_feature_bundle_str(const std::string_view fb_str)
 {
     std::vector<std::string_view> toks {};
-    std::size_t fb_len {fb_str.size()};
-    std::size_t tok_begin {0},
-                tok_end {0};
-    for (std::size_t i {0}; i < fb_len; ++i)
+    std::size_t fb_len { fb_str.size() };
+    std::size_t
+        tok_begin { 0 },
+        tok_end   { 0 };
+    for (std::size_t i { 0 }; i < fb_len; ++i)
     {
         char c {fb_str[i]};
         switch (c)
@@ -82,7 +85,7 @@ parse_feature_bundle_str(const std::string_view fb_str)
         case ' ':
             if (tok_end > tok_begin)
             {
-                std::string_view tok {fb_str};
+                std::string_view tok { fb_str };
                 tok.remove_prefix(tok_begin);
                 tok.remove_suffix(fb_len - tok_end);
                 toks.emplace_back(tok);

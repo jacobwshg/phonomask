@@ -20,6 +20,7 @@ namespace Phmask
     unistr_to_str(icu::UnicodeString &unistr)
     {
         std::string s {};
+        s.reserve(unistr.length());
         unistr.toUTF8String(s);
         return s;
     }
