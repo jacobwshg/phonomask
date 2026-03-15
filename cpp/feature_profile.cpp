@@ -58,15 +58,14 @@ FeatureProfile::add_reserved( void )
 
 /*
  * @brief
- *   Construct a feature profile from a table encapsulated in an input
- *   (string or file) stream.
+ *   Populate a feature profile using the content of a table encapsulated 
+ *   in an input (string or file) stream.
  * @param
  *   table_strm: the input stream serving content of the table.
 */
+void
 Phmask::
-FeatureProfile::FeatureProfile( std::istream &table_strm ):
-	num_feats { 0 }, feat_idx_maps {}, seg_fm_maps {}, 
-	null_bit {}, wb_bit {}, sb_bit {}
+FeatureProfile::populate( std::istream &table_strm )
 {
 	std::vector<std::string> header_row_fields
 	{
@@ -89,7 +88,6 @@ FeatureProfile::FeatureProfile( std::istream &table_strm ):
 	this->add_reserved();
 }
 
-
 /*
  * @brief
  *   Construct a feature profile from a local csv table file.
@@ -107,25 +105,7 @@ FeatureProfile::FeatureProfile( const std::string &path ):
 	};
 	std::istream &table_strm { *table_sp };
 
-	std::vector<std::string> header_row_fields
-	{
-		Phmask::fields_from_row( table_strm )
-	};
-
-	std::size_t num_cols { header_row_fields.size() };
-	if ( num_cols > 1 )
-	{
-		this->num_feats = num_cols - 1;
-	}
-	if ( this->num_feats > 40 )
-	{
-		throw std::runtime_error("Currently supporting up to 40 features\n");
-	}
-
-	this->feat_idx_maps.populate( header_row_fields );
-	this->seg_fm_maps.populate( table_strm );
-
-	this->add_reserved();
+	this->populate( table_strm );
 }
 
 /*

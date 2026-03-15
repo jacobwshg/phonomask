@@ -2,8 +2,10 @@
 #include "feature_profile.h"
 #include "word.h"
 #include "rule.h"
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/bind.h>
+#endif
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -50,18 +52,18 @@ apply_rule_to_word(
 	const std::string &wordstr
 )
 {
-	Phmask::Rule rule { rule_from_string( rulestr ) };
-	Phmask::WordRep wordrep { word_rep_from_str( wordstr ) };
+	Phmask::Rule rule { PROFILE.rule_from_str( rulestr ) };
+	Phmask::WordRep wordrep { PROFILE.word_rep_from_str( wordstr ) };
 	wordrep.apply_rule( rule );
 
-	return ::PROFILE.wordrep_to_str( wordrep );
+	return ::PROFILE.word_rep_to_str( wordrep );
 }
 
 /*
  * @brief
  *   Apply a group of rules to a word in order, and return the state of the word
  *   after each step.
- * @param
+ * @params
  *   rulestrs: an ordered group of rules.
  *   wordstr: the IPA word upon which to apply rules.
  * @return
@@ -74,7 +76,7 @@ apply_rules_to_word(
 	const std::string &wordstr
 )
 {
-	const std::size_t rule_cnt { rulestrs.size(); }
+	const std::size_t rule_cnt { rulestrs.size() };
 	if ( !rule_cnt )
 	{
 		return {};
@@ -89,24 +91,37 @@ apply_rules_to_word(
 	std::for_each(
 		rulestrs.begin(),
 		rulestrs.end(),
-		[]( const std::string &r_str )
+		[ &rules ]( const std::string &r_str )
 		{
 			rules.emplace_back( ::PROFILE.rule_from_str( r_str ) );
 		}
-	)
+	);
 
 	Phmask::WordRep wordrep { ::PROFILE.word_rep_from_str( wordstr ) };
 
 	std::for_each(
 		rules.begin(),
 		rules.end(),
-		[ &wordrep ]( const Phmask::Rule &r )
+		[ &wordrep, &results ]( const Phmask::Rule &rule )
 		{
 			wordrep.apply_rule( rule );
 			results.emplace_back( ::PROFILE.word_rep_to_str( wordrep ) );
 		}
-	)
+	);
 
 	return results;
 }
 
+#ifdef __EMSCRIPTEN__
+EMSCRIPTEN_BINDINGS( phmask )
+{
+	emscripten::function( "populateProfile", &profile_populate );
+	emscripten::function( "applyRuleToWord", &apply_rule_to_word );
+	emscripten::function( "applyRulesToWord", &apply_rules_to_word );
+}
+#endif
+
+int main()
+{
+
+}

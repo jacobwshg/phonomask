@@ -22,8 +22,10 @@ namespace Phmask
 		FeatIdxMaps feat_idx_maps;
 		SegFMMaps seg_fm_maps;
 
-		explicit FeatureProfile( std::istream & );
+		FeatureProfile( void ) = default;
 		explicit FeatureProfile( const std::string & );
+
+		void populate( std::istream & );
 
 		const std::string &feature_at( const std::size_t ) const;
 		std::size_t index_of( const std::string_view ) const;
