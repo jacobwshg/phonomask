@@ -22,7 +22,7 @@ namespace Phmask
     template<typename T_Map, typename T_Key> const typename T_Map::mapped_type &
     map_find_const(const T_Map &m, const T_Key &k, const std::string &e_msg)
     {
-        const auto &it = m.find(k);
+        const auto &it = m.find( k );
         if (it == m.end())
         {
             throw std::runtime_error(e_msg);
