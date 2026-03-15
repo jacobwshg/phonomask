@@ -12,62 +12,71 @@
 
 namespace Phmask
 {
-    struct Rule;
-    struct FeatureBundleMasks;
+	struct Rule;
+	struct FeatureBundleMasks;
 
-    class FeatureProfile
-    {
-    public:
-        std::size_t num_feats;
-        FeatIdxMaps feat_idx_maps;
-        SegFMMaps seg_fm_maps;
+	class FeatureProfile
+	{
+	public:
+		std::size_t num_feats;
+		FeatIdxMaps feat_idx_maps;
+		SegFMMaps seg_fm_maps;
 
-        explicit FeatureProfile(const std::string &);
+		explicit FeatureProfile( std::istream & );
+		explicit FeatureProfile( const std::string & );
 
-        const std::string &feature_at(const std::size_t) const;
-        std::size_t index_of(const std::string_view) const;
-        feat_mtx_t feat_mtx_of(const std::string_view) const;
-        const std::string &segment_of(const feat_mtx_t) const;
+		const std::string &feature_at( const std::size_t ) const;
+		std::size_t index_of( const std::string_view ) const;
+		feat_mtx_t feat_mtx_of( const std::string_view ) const;
+		const std::string &segment_of( const feat_mtx_t ) const;
 
-        std::string seg_feat_mtx_str(const std::string &) const;
-        std::string seg_positive_feats_str(const std::string &) const;
+		std::string seg_feat_mtx_str( const std::string & ) const;
+		std::string seg_positive_feats_str( const std::string & ) const;
 
-        Rule rule_from_str(const std::string &) const;
+		Rule rule_from_str( const std::string & ) const;
 
-        WordRep word_rep_from_str(const std::string &) const;
-        std::string word_rep_to_str(const WordRep &) const;
+		WordRep word_rep_from_str( const std::string & ) const;
+		std::string word_rep_to_str( const WordRep & ) const;
 
-    private:
-        /* Indices beyond those used for features, used instead for
-           distinguishing reserved symbols for null segments and 
-           word/syllable boundary
-         */
-        std::size_t null_bit;
-        std::size_t wb_bit;
-        std::size_t sb_bit;
+	private:
+		/*
+		 * Indices beyond those used for features, used instead for
+		 * distinguishing reserved symbols for null segments and 
+		 * word/syllable boundary
+		 */
+		std::size_t null_bit;
+		std::size_t wb_bit;
+		std::size_t sb_bit;
 
-        // Add reserved symbols
-        void add_reserved(void);
+		// Add reserved symbols
+		void add_reserved(void);
 
-        /* Return a mask that has 1 for each index used by features of 
-           real segments in the feature profile. 
-           The result differs from FLIPPED_EMPTY_FEAT_MTX, which has 1 
-           also for reserved symbol bits and unused higher bits. */
-        feat_mtx_t all_feats_mask(void) const
-        {
-            feat_mtx_t all_feats_mask { 0u };
-            all_feats_mask.set();
-            all_feats_mask = ~(all_feats_mask << this->num_feats);
-            return all_feats_mask;
-        }
+		/* 
+		 * @brief
+		 *   Return a mask that has a set bit for each index used by 
+		 *   actual feature segments in the feature profile. 
+		 *   The result differs from FLIPPED_EMPTY_FEAT_MTX, which has 1 
+		 *   also for reserved symbol bits and unused higher bits.
+		 * @return
+		 *   the mask with 1 for all used feature bits.
+		 */
+		feat_mtx_t all_feats_mask(void) const
+		{
+			feat_mtx_t all_feats_mask { 0u };
+			all_feats_mask.set();
+			all_feats_mask = ~(all_feats_mask << this->num_feats);
+			return all_feats_mask;
+		}
 
-        std::string 
-        seg_effective_feats_str(const std::string &, Phmask::feat_mtx_t) const;
+		std::string 
+		seg_effective_feats_str(
+			const std::string &, Phmask::feat_mtx_t
+		) const;
 
-        RuleElem segment_to_rule_elem(std::string_view) const;
-        RuleElem feat_bundle_to_rule_elem(const std::string_view) const;
-        RuleElem rule_tok_to_elem(const std::string_view) const;
-    };
+		RuleElem segment_to_rule_elem( std::string_view ) const;
+		RuleElem feat_bundle_to_rule_elem( const std::string_view ) const;
+		RuleElem rule_tok_to_elem( const std::string_view ) const;
+	};
 }
 
 #endif
