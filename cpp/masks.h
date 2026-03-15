@@ -5,7 +5,7 @@
 #include <string_view>
 #include <cstddef>
 #include <string>
-#include <sstream>
+#include <bitset>
 
 namespace Phmask
 {
@@ -20,10 +20,14 @@ namespace Phmask
         std::string
         str(void) const
         {
-            std::ostringstream ms_sstrm {};
-            ms_sstrm << "Selection mask: " << this->sel_mask << "\n";
-            ms_sstrm << "Value mask: " << this->val_mask << "\n";
-            return ms_sstrm.str();
+			std::string msk_str {};
+			msk_str.reserve( 128 );
+            msk_str +=
+				std::string { "Selection mask: " } 
+				+ this->sel_mask.to_string() + "\n"
+            	+ "Value mask: "
+				+ this->val_mask.to_string() + "\n";
+            return msk_str;
         }
 
         /* Add a positive-valued feature */

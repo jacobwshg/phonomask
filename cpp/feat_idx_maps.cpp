@@ -1,6 +1,5 @@
 #include "feat_idx_maps.h"
 #include "utils.h"
-#include <sstream>
 
 /* @brief
  *   Populate a feature-index map with the header row of a feature table file.
@@ -89,13 +88,14 @@ std::string
 Phmask::
 FeatIdxMaps::str( void ) const
 {
-	std::ostringstream sstrm {};
-	sstrm << "Index\tFeature\n";
+	std::string mp_str { };
+	mp_str.reserve( 512 );
+	mp_str += "Index\tFeature\n";
 	for ( std::size_t i { 0 }; i < this->idx_feat_map.size(); ++i )
 	{
-		sstrm << i << "\t" << this->idx_feat_map[ i ] << "\n";
+		mp_str += std::to_string( i ) + "\t" + this->idx_feat_map[ i ] + "\n";
 	}
-	return sstrm.str();
+	return mp_str;
 }
 
 /*
@@ -113,17 +113,18 @@ std::string
 Phmask::
 FeatIdxMaps::feature_layout_str( void ) const
 {
-	std::ostringstream lay_sstrm {};
+	std::string lay_str {};
+	lay_str.reserve( 256 );
 	std::size_t nfeats { this->idx_feat_map.size() };
 
 	for ( std::size_t i { 0 }; i < nfeats; ++i )
 	{
-		lay_sstrm << this->idx_feat_map[ nfeats - 1 - i ];
+		lay_str += this->idx_feat_map[ nfeats - 1 - i ];
 		if ( i < nfeats - 1 )
 		{
-			lay_sstrm << " | ";
+			lay_str += " | ";
 		}
 	}
-	return lay_sstrm.str();
+	return lay_str;
 }
 

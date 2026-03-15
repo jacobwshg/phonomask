@@ -5,16 +5,21 @@
 #include <string_view>
 #include <cstddef>
 #include <unordered_set>
-#include <sstream>
 
 /*
-    Preprocess a rule string.
-    Example: "X -> Y / A1 A2 _ B1 B2" becomes 
-    { "X", "->", "Y", "/", "A1", "A2", "_", "B1", "B2" }
-*/
+ * @brief
+ *   Preprocess a rule string into coarse-grained tokens.
+ *   Example: "X -> Y / A1 A2 _ B1 B2" becomes 
+ *   { "X", "->", "Y", "/", "A1", "A2", "_", "B1", "B2" }.
+ * @param
+ *   rule_str: a human-readable rule string.
+ * @return
+ *   temporary views into rule tokens, which will immediately be used to construct
+ *   a rule object.
+ */
 std::vector<std::string_view>
 Phmask::
-rule_str_toks(const std::string &rule_str) 
+rule_str_toks( const std::string &rule_str ) 
 {
     std::vector<std::string_view> rule_toks {};
     const std::size_t r_len { rule_str.size() };
@@ -30,28 +35,28 @@ rule_str_toks(const std::string &rule_str)
     for ( std::size_t i { 0 }; i < r_len; ++i )
     {
         const char c { rule_str[i] };
-        switch (c)
+        switch ( c )
         {
         case ' ':
-            if (!in_feat_bdl)
+            if ( !in_feat_bdl )
             {
-                if (tok_end > tok_begin)
+                if ( tok_end > tok_begin )
                 { 
                     tok = rule_str;
-                    tok.remove_prefix(tok_begin); 
-                    tok.remove_suffix(r_len - tok_end);
-                    rule_toks.emplace_back(tok);
+                    tok.remove_prefix( tok_begin ); 
+                    tok.remove_suffix( r_len - tok_end );
+                    rule_toks.emplace_back( tok );
                 }
-                tok_end = (tok_begin = i + 1);
+                tok_end = ( tok_begin = i + 1 );
                 continue;
             }
             [[fallthrough]];
         default:
-            if (c == '[')
+            if ( c == '[' )
             {
                 in_feat_bdl = true;
             }
-            else if (c == ']')
+            else if ( c == ']' )
             {
                 in_feat_bdl = false;
             }
@@ -59,12 +64,12 @@ rule_str_toks(const std::string &rule_str)
             break;
         }
     }
-    if (tok_end > tok_begin)
+    if ( tok_end > tok_begin )
     {
         tok = rule_str; 
-        tok.remove_prefix(tok_begin); 
-        tok.remove_suffix(r_len - tok_end);
-        rule_toks.emplace_back(tok);
+        tok.remove_prefix( tok_begin ); 
+        tok.remove_suffix( r_len - tok_end );
+        rule_toks.emplace_back( tok );
     }
 
     return rule_toks;
@@ -72,12 +77,17 @@ rule_str_toks(const std::string &rule_str)
 
 
 /*
-    Parse feature-value pairs out of a feature bundle string.
-    Example: "[+cons, -nas]" becomes { "+cons", "-nas" }
-*/
+ * @brief
+ *   Parse feature-value pairs out of a feature bundle string (within a rule string).
+ *   Example: "[+cons, -nas]" becomes { "+cons", "-nas" }.
+ * @param
+ *   fb_str: temporary view into the feature bundle string.
+ * @return
+ *   temporary views into feature-value pairs as strings.
+ */
 std::vector<std::string_view>
 Phmask::
-parse_feature_bundle_str(const std::string_view fb_str)
+parse_feature_bundle_str( const std::string_view fb_str )
 {
     std::vector<std::string_view> toks {};
     const std::size_t fb_len { fb_str.size() };
@@ -112,25 +122,33 @@ parse_feature_bundle_str(const std::string_view fb_str)
     return toks;
 }
 
+/*
+ * @brief
+ *   Constructs a debug string for bitmasks within a rule object,
+ *   with A, B, X, Y component displayed separately.
+ * @return
+ *   the debug string.
+ */
 std::string
 Phmask::
-Rule::masks_str(void) const
+Rule::masks_str( void ) const
 {
-    std::ostringstream rule_sstrm {};
-    rule_sstrm 
-        << "Rule\n" 
-        << "A:\n" << this->A.masks.str()
-        << "B:\n" << this->B.masks.str()
-        << "X:\n";
-    for (const RuleElem &elem : this->X)
+    std::string rule_str {};
+	rule_str.reserve( 128 );
+    rule_str +=
+        std::string { "Rule\n" } 
+        + "A:\n" + this->A.masks.str()
+        + "B:\n" + this->B.masks.str()
+        + "X:\n";
+    for ( const RuleElem &elem : this->X )
     {
-        rule_sstrm << elem.masks.str();
+        rule_str + elem.masks.str();
     }
-    rule_sstrm << "Y:\n";
-    for (const RuleElem &elem : this->Y)
+    rule_str += "Y:\n";
+    for ( const RuleElem &elem : this->Y )
     {
-        rule_sstrm << elem.masks.str();
+        rule_str += elem.masks.str();
     }
-    return rule_sstrm.str();
+    return rule_str;
 }
 
