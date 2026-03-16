@@ -159,7 +159,7 @@ EMSCRIPTEN_BINDINGS( phmask )
 	emscripten::class_<PhmaskSession>( "PhmaskSession" )
 		.constructor<>()
 		.function( "populate", &PhmaskSession::populate )
-		.function( "apply", &PhmaskSession::apply_rule_to_word )
+		.function( "applyRule", &PhmaskSession::apply_rule_to_word )
 		.function( "applyMany", &PhmaskSession::apply_rules_to_word );
 }
 #endif
