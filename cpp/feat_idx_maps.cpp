@@ -31,6 +31,8 @@ FeatIdxMaps::populate( const std::vector<std::string> &header_row_fields )
 
 	for ( const std::string &feature: header_row_fields )
 	{
+		std::cout << "constructing header row feature "<<feature<<"\n";
+
 		if ( icol > num_feats )
 		{
 			break;
@@ -38,6 +40,7 @@ FeatIdxMaps::populate( const std::vector<std::string> &header_row_fields )
 		if ( icol == 0 )
 		{
 			// skip the empty cell atop col 0, which holds segments
+			++icol;
 			continue;
 		}
 
@@ -126,8 +129,8 @@ FeatIdxMaps::str( void ) const
 /*
  * @brief
  *   Construct the "layout" string of a feature-index map, which reflects 
- *   how the feature names were displayed in the header row of the original 
- *   table file (lowest index at left).
+ *   how the feature names were displayed in the map (lowest index at RIGHT)
+ *   as opposed to the original table file.
  * @return
  *   The feature-index map's layout string.
  *   Example:

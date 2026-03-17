@@ -32,17 +32,20 @@ SegFMMaps::populate( std::istream &table_stream )
 			std::min( Phmask::MAX_NUM_FEATS, seg_entry_fields.size()-1 )
 		};
 
+		// idx is meant to be feature idx, so feature in col 1 has idx 0
 		std::size_t idx { 0 };
-		for (
-			const std::string &field : seg_entry_fields
-		)
+		bool seen_segment { false };
+		for ( const std::string &field : seg_entry_fields )
 		{
-			if ( idx == 0 )
+			if ( !seen_segment )
 			{
-				// field is segment itself
+				// assign col 0 field to segment, don't increment idx
 				segment = field;
+				seen_segment = true;
+				continue;
 			}
-			else if ( idx <= num_feats )
+
+			if ( idx < num_feats )
 			{
 				// field is feature value within supported feature length
 				// TODO: support only binary features for now
@@ -56,7 +59,6 @@ SegFMMaps::populate( std::istream &table_stream )
 				// truncate too long rows to supported length
 				break;
 			}
-
 			++idx;
 		}
 		this->seg_fm_map[ segment ] = feat_mtx;
@@ -121,7 +123,7 @@ const std::string &
 Phmask::
 SegFMMaps::segment_of( const Phmask::feat_mtx_t feat_mtx ) const
 {
-	const std::string unknown_seg { "?" };
+	static const std::string unknown_seg { "?" };
 	return Phmask::map_find_const(
 		this->fm_seg_map, 
 		feat_mtx,

@@ -200,6 +200,12 @@ FeatureProfile::seg_effective_feats_str(
 	std::string ef_feats_str { "[" };
 
 	const feat_mtx_t feat_mtx { this->feat_mtx_of( segment ) };
+
+	if ( feat_mtx == INVALID_FEAT_MTX )
+	{
+		return std::string { "unknown segment\n" };
+	}
+
 	for ( std::size_t idx { 0 }; idx < this->num_feats; ++idx )
 	{
 		if ( ef_mask.test( idx ) )
@@ -275,6 +281,10 @@ Phmask::
 FeatureProfile::segment_to_rule_elem( std::string_view segment ) const
 {
 	const feat_mtx_t seg_feat_mtx { this->feat_mtx_of( segment ) };
+
+	// if the segment is not found, the returned feature matrix used as val_mask
+	// will be INVALID_FEAT_MTX. In rule evaluation, no rule element should 
+	// be able to match it with all features being selected by the flipped empty mtx.
 
 	return 
 		RuleElem
