@@ -277,7 +277,7 @@ try_rule_context(
 /* Commit insertions and deletions. */
 void
 Phmask::
-WordRep::housekeep(void)
+WordRep::housekeep( void )
 {
 	if ( !this->isdirty )
 	{
@@ -321,6 +321,9 @@ WordRep::apply_rule(
 	const Phmask::Rule &rule
 )
 {
+
+	//std::cout << "word rep null bit: "<<this->null_bit<<", rule null bit: "<<rule.null_bit<<"\n";
+
 	/* Obtain length of the word and the rule's X and Y sequences */
 	const std::size_t
 		wlen  { this->seg_reps.size() },
@@ -353,7 +356,7 @@ WordRep::apply_rule(
 		const SegRep &cur_seg { this->seg_reps[pos] };
 		const feat_mtx_t cur_fm { cur_seg.feat_mtx };
 
-		if ( (!rule.A.masks.test_fm(cur_fm)) && !isinsert )
+		if ( ( !rule.A.masks.test_fm( cur_fm ) ) && !isinsert )
 		/* Current segment does not match A in rule,
 		   and rule is not insertion; thus rule does not 
 		   affect current segment */
@@ -445,6 +448,10 @@ WordRep::apply_rule(
 			*/
 
 			rule.B.masks.set_fm( cur_seg.feat_mtx );
+			if ( isdelete )
+			{
+				cur_seg.feat_mtx.set( this->null_bit );
+			}
 		}
 	}
 

@@ -13,6 +13,9 @@
 #include <array>
 #include <cstddef>
 
+/////////
+#include <iostream>
+
 /*
  * @brief
  *   Add reserved markers (null segment, word boundary, syllable boundary
@@ -410,10 +413,7 @@ FeatureProfile::rule_from_str( const std::string &rule_str ) const
 		"→", "->", ">",
 	};
 
-	std::vector<std::string_view> rule_toks
-	{
-		Phmask::rule_str_toks( rule_str )
-	};
+	std::vector<std::string_view> rule_toks { Phmask::rule_str_toks( rule_str ) };
 
 	enum class State
 	{
@@ -433,6 +433,7 @@ FeatureProfile::rule_from_str( const std::string &rule_str ) const
 			continue;
 		}
 		bool isarrow { false };
+
 		switch ( parser_state )
 		{
 		case State::A:
@@ -447,30 +448,38 @@ FeatureProfile::rule_from_str( const std::string &rule_str ) const
 			}
 			if ( !isarrow )
 			{
+				std::cout << "state A token " << tok << "\n";
+
 				rule.A = this->rule_tok_to_elem( tok );
 			}
 			break;
 		case State::B:
-			if ( tok == "/" )
+			if ( tok[0] == '/' )
 			{
 				parser_state = State::X;
 			}
 			else
 			{
+				std::cout << "state B token " << tok << "\n";
+
 				rule.B = this->rule_tok_to_elem( tok );
 			}
 			break;
 		case State::X:
-			if ( tok == "_" )
+			if ( tok[0] == '_' )
 			{
 				parser_state = State::Y;
 			}
 			else
 			{ 
+				std::cout << "state X token " << tok << "\n";
+
 				rule.X.emplace_back( this->rule_tok_to_elem( tok ) );
 			}
 			break;
 		case State::Y:
+			std::cout << "state Y token " << tok << "\n";
+
 			rule.Y.emplace_back( this->rule_tok_to_elem( tok ) );
 			break;
 		default:

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTF="phmask.out"
+OUTF="phmask"
 
 rm -rf ./$OUTF
 

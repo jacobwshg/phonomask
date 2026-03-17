@@ -6,6 +6,10 @@
 #include <cstddef>
 #include <unordered_set>
 
+//
+#include <algorithm>
+#include <iostream>
+
 /*
  * @brief
  *   Preprocess a rule string into coarse-grained tokens.
@@ -37,6 +41,10 @@ rule_str_toks( const std::string &rule_str )
 		const char c { rule_str[i] };
 		switch ( c )
 		{
+		// TODO: use ICU to capture non-ascii arrows
+		//case '-':
+		//case '/':
+		//case '_':
 		case ' ':
 			if ( !in_feat_bdl )
 			{
@@ -71,6 +79,18 @@ rule_str_toks( const std::string &rule_str )
 		tok.remove_suffix( r_len - tok_end );
 		rule_toks.emplace_back( tok );
 	}
+
+
+	std::cout << "\n\nrule "<< rule_str << "tokens: \n";
+	std::for_each(
+		rule_toks.begin(),
+		rule_toks.end(),
+		[]( const std::string_view &tok )
+		{
+			std::cout << tok << "\n";
+		}
+	);
+	std::cout<<"\n\n\n";
 
 	return rule_toks;
 }
@@ -142,7 +162,7 @@ Rule::masks_str( void ) const
 		+ "X:\n";
 	for ( const RuleElem &elem : this->X )
 	{
-		rule_str + elem.masks.str();
+		rule_str += elem.masks.str();
 	}
 	rule_str += "Y:\n";
 	for ( const RuleElem &elem : this->Y )

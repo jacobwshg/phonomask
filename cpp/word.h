@@ -10,54 +10,54 @@
 
 namespace Phmask
 {
-    std::vector<std::string> word_to_segments(const std::string &);
+	std::vector<std::string> word_to_segments(const std::string &);
 
-    struct WordRep;
+	struct WordRep;
 
-    // Segment representation in word
-    struct SegRep
-    {
-        feat_mtx_t feat_mtx;
+	// Segment representation in word
+	struct SegRep
+	{
+		feat_mtx_t feat_mtx;
 
-        /* Feature matrix of segment to insert before the 
-            current position (as necessary) after applying 
-            an insertion rule */
-        feat_mtx_t insert_before_fm {0u};
+		/* Feature matrix of segment to insert before the 
+			current position (as necessary) after applying 
+			an insertion rule */
+		feat_mtx_t insert_before_fm { 0UL };
 
-        bool isnull(std::size_t null_bit) const
-        {
-            return this->feat_mtx.test(null_bit);
-        }
+		bool isnull( std::size_t null_bit ) const
+		{
+			return this->feat_mtx.test( null_bit );
+		}
 
-        bool issb(std::size_t sb_bit) const
-        {
-            return this->feat_mtx.test(sb_bit);
-        }
-    };
+		bool issb( std::size_t sb_bit ) const
+		{
+			return this->feat_mtx.test( sb_bit );
+		}
+	};
 
-    // Word representation
-    struct WordRep
-    {
-        // "Inherited" from the managing feature profile
-        std::size_t null_bit;
-        std::size_t wb_bit;
-        std::size_t sb_bit;
+	// Word representation
+	struct WordRep
+	{
+		// "Inherited" from the managing feature profile
+		std::size_t null_bit;
+		std::size_t wb_bit;
+		std::size_t sb_bit;
 
-        // true if insertion or deletion has effect
-        bool isdirty {false};
+		// true if insertion or deletion has effect
+		bool isdirty { false };
 
-        std::vector<SegRep> seg_reps;
+		std::vector<SegRep> seg_reps;
 
-        // An element is set to true if the corresponding
-        // segment in the word will be affected by a rule
-        std::vector<bool> apply_at;
+		// An element is set to true if the corresponding
+		// segment in the word will be affected by a rule
+		std::vector<bool> apply_at;
 
-        /* Commit insertion or deletion */
-        void housekeep(void);
+		/* Commit insertion or deletion */
+		void housekeep( void );
 
-        WordRep &
-        apply_rule(const Phmask::Rule &);
-    };
+		WordRep &
+		apply_rule( const Phmask::Rule & );
+	};
 }
 
 #endif
