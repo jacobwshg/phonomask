@@ -64,7 +64,12 @@ parentPort.on(
 			{
 				const sess = sessions.get( sessionId );
 				const { rules, word } = payload;
-				console.log( `worker received rules ${rules}, word ${word}` );
+				console.log( `worker received rules` );
+				for ( let r of rules )
+				{
+					console.log( "\t", r );
+				}
+				console.log( `, word ${ word }` );
 				const results = sess.apply_many( rules, word );
 				console.log( `worker apply_many result: ${ results }` );
 				parentPort.postMessage(

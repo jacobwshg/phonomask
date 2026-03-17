@@ -71,11 +71,11 @@ PhmaskSession::populate( const std::string &table_str )
 	try
 	{
 		this->profile.populate( table_sstrm );
-		return { "" };
+		return { "successfully populated feature profile" };
 	}
 	catch ( const std::runtime_error &e ) 
 	{
-		return { std::string{ "Cpp error: " } + e.what() };
+		return { std::string{ "cpp error: " } + e.what() };
 	}
 }
 
@@ -105,7 +105,7 @@ PhmaskSession::apply_rule_to_word(
 	}
 	catch ( const std::runtime_error &e )
 	{
-		return { std::string{ "Cpp error: " } + e.what() };
+		return { std::string{ "cpp error: " } + e.what() };
 	}
 }
 
@@ -180,7 +180,7 @@ PhmaskSession::apply_rules_to_word(
 	}
 	catch ( const std::runtime_error &e )
 	{
-		return { std::string{ "Cpp error: " } + e.what() };
+		return { std::string{ "cpp error: " } + e.what() };
 	}
 }
 
@@ -225,7 +225,7 @@ main(
 	{
         "∅ -> a / [+cons] _ [+cons,]     ",
         "[+cons, -syl, -son, -voi] -> [+voi] / [-cons, +syl, +son, +voi] _ [-cons, +syl, +son, +voi]",
-		" [-cont] -> ∅  / # ",
+		" [-cont, +cons, ] -> ∅ / _ # "
 	};
 
 	sess.apply_rules_to_word( rs, w );

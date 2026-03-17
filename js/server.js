@@ -139,6 +139,9 @@ apply_rule( req, res )
 	);
 
 	const response = await resultProm;
+
+	console.log( "worker apply_rule response: ", response );
+
 	if ( response.type === "ERROR" ) 
 	{
 		return res.status( 500 ).send( response.error );
@@ -166,6 +169,9 @@ apply_many( req, res )
 	);
 
 	const response = await resultProm;
+
+	console.log( "worker apply_many response: ", response );
+
 	if ( response.type === "ERROR" ) 
 	{
 		return res.status( 500 ).send( response.error );

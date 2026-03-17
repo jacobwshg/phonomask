@@ -69,6 +69,15 @@ void
 Phmask::
 FeatureProfile::populate( std::istream &table_strm )
 {
+	for (
+		char c {}; 
+		( c = table_strm.get() ) && std::isspace( c );
+		table_strm.get()
+	)
+	{
+	}
+	table_strm.unget();
+
 	std::vector<std::string> header_row_fields
 	{
 		Phmask::fields_from_row( table_strm )
@@ -83,12 +92,15 @@ FeatureProfile::populate( std::istream &table_strm )
 	{
 		std::cout << "Warning - currently supporting up to "
 			<< MAX_NUM_FEATS 
-			<< " features, additional features truncated\n";
+			<< " features, additional features will be truncated\n";
 		this->num_feats = MAX_NUM_FEATS;
 	}
 
 	this->feat_idx_maps.populate( header_row_fields );
 	this->seg_fm_maps.populate( table_strm );
+
+	std::cout << "seg-feat mtx map str:\n"
+		<< this->seg_fm_maps.str();
 
 	this->add_reserved();
 }
