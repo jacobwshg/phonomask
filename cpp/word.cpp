@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+////
+#include <iostream>
 
 namespace Phmask
 {
@@ -279,13 +281,16 @@ void
 Phmask::
 WordRep::housekeep( void )
 {
+
+	std::size_t cur_size { this->seg_reps.size() };
+	std::vector<SegRep> seg_reps_new {};
+
 	if ( !this->isdirty )
 	{
-		return;
+		goto done;
 	}
-	std::size_t cur_size { this->seg_reps.size() };
-	std::vector<SegRep> seg_reps_tmp {};
-	seg_reps_tmp.reserve( cur_size );
+
+	seg_reps_new.reserve( cur_size );
 
 	for ( std::size_t i { 0 }; i < cur_size; ++i )
 	{
@@ -293,7 +298,7 @@ WordRep::housekeep( void )
 		if ( insert_fm.any() && !insert_fm.test( this->null_bit ) )
 		/* Exists segment to be inserted before position I */
 		{
-			seg_reps_tmp.emplace_back(
+			seg_reps_new.emplace_back(
 				SegRep
 				{
 					insert_fm,
@@ -305,14 +310,16 @@ WordRep::housekeep( void )
 		if ( !this->seg_reps[i].isnull( this->null_bit ) )
 		/* Segment at position I not deleted */
 		{
-			seg_reps_tmp.emplace_back( std::move( this->seg_reps[i] ) );
+			seg_reps_new.emplace_back( std::move( this->seg_reps[i] ) );
 		}
 	}
+	this->seg_reps = std::move( seg_reps_new );
 
-	seg_reps_tmp.shrink_to_fit();
-	this->seg_reps = std::move( seg_reps_tmp );
-	this->apply_at = std::vector<bool>( seg_reps.size(), false );
-	this->isdirty = false;
+	done:
+		// reset word representation metadata across separate
+		// rule applications
+		this->isdirty = false;
+		this->apply_at.assign( this->apply_at.size(), false );
 }
 
 Phmask::WordRep &
@@ -351,9 +358,9 @@ WordRep::apply_rule(
 
 	/* Test each segment position for which X can fit on the left
 	   and Y can fit on the right */
-	for (std::size_t pos { rxlen }; pos < wlen - rylen; ++pos)
+	for ( std::size_t pos { rxlen }; pos < wlen - rylen; ++pos )
 	{
-		const SegRep &cur_seg { this->seg_reps[pos] };
+		const SegRep &cur_seg { this->seg_reps[ pos ] };
 		const feat_mtx_t cur_fm { cur_seg.feat_mtx };
 
 		if ( ( !rule.A.masks.test_fm( cur_fm ) ) && !isinsert )
@@ -361,7 +368,17 @@ WordRep::apply_rule(
 		   and rule is not insertion; thus rule does not 
 		   affect current segment */
 		{
+			std::cout << "site does not match rule at position "<<pos<<"\n";
 			continue;
+		}
+	
+		if ( !isinsert )
+		{
+			std::cout<< "\n\n\nmask test match\n";
+			std::cout<<"rule A masks: \n";
+			std::cout<<rule.A.masks.str();
+			std::cout<<"cur feat mtx:\n";
+			std::cout<<cur_fm.to_string()<<"\n\n\n\n";
 		}
 
 		/* Initialize starting positions in the word and rule 
@@ -381,7 +398,7 @@ WordRep::apply_rule(
 			/* Y in rule: leftmost position */
 			rypos { 0 };
 
-		if (!isinsert)
+		if ( !isinsert )
 		/* Rule is not insertion; advance Y pos in word 
 		   past current segment */
 		{
@@ -394,12 +411,16 @@ WordRep::apply_rule(
 		/* Some adjacent segment does not match rule element;
 		   rule cannot apply at current segment postion */
 		{
+			std::cout << "context does not match rule at position "<<pos<<"\n";
+
 			continue;
 		}
 
 		/* Finally, all adjacent segments match the rule; 
 		   mark current position */
-		this->apply_at[pos] = true;
+		std::cout<<"can apply at position"<<pos<<"\n";
+
+		this->apply_at[ pos ] = true;
 		if (!can_apply)
 		{
 			can_apply = true;
