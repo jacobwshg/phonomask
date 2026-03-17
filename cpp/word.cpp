@@ -36,6 +36,12 @@ word_to_segments( const std::string &word )
 {
 	using UNISTR = icu::UnicodeString;
 
+	if ( !word.size() )
+	{
+		// empty word
+		return {};
+	}
+
 	UNISTR u_word { UNISTR::fromUTF8(word) };
 	const std::int32_t uwlen { u_word.length() };
 
@@ -43,10 +49,18 @@ word_to_segments( const std::string &word )
 	UNISTR u_segbuf {};
 
 	/* Vector of parsed segments, where each segment is a native string */
-	std::vector<std::string> segments { "#", };
+	std::vector<std::string> segments { };
+	segments.reserve( uwlen + 2 );
+
+	// if word does not begin with a word boundary, we add one by default
+	// in case rules look for one
+	if ( word[0] != '#' )
+	{
+		segments.emplace_back( "#" );
+	}
+
 	/* Worst case: each Unicode char in `u_word` is its own segment
 	   (no ties, no modifiers), plus space for word boundary symbols */
-	segments.reserve(uwlen + 2);
 
 	bool tied { false };
 
@@ -58,7 +72,7 @@ word_to_segments( const std::string &word )
 		{
 		case U'(':
 		case U')':
-			// Don't support optional segments in data
+			// Don't support optional segments in data ( yet )
 			break;
 		case U'#':
 			// Word boundary (maybe one data entry can span across words?)
@@ -71,7 +85,7 @@ word_to_segments( const std::string &word )
 			// Flush previous segment
 			/*
 			   If the following pair of statements were switched,
-			   a symbol will incorrectly overwrite the previous segment 
+			   a symbol will incorrectly overwrite end of the previous segment 
 			   and be flushed twice
 			 */
 			segments.emplace_back(unistr_to_str(u_segbuf));
@@ -124,8 +138,11 @@ word_to_segments( const std::string &word )
 	{
 		segments.emplace_back(unistr_to_str(u_segbuf));
 	}
-	/* Pad word end with word boundary symbol */
-	segments.emplace_back("#");
+	/* Pad word end with word boundary symbol if it does not exist */
+	if ( word[ word.size()-1 ] != '#' )
+	{
+		segments.emplace_back("#");
+	}
 
 	/*
 	std::cout <<"word_to_segments(): ";
@@ -189,6 +206,39 @@ try_rule_context(
 	std::size_t rxpos, std::size_t rypos
 )
 {
+
+	const std::size_t
+		null_bit { wordrepr.null_bit },
+		sb_bit   { wordrepr.sb_bit },
+		wb_bit   { wordrepr.wb_bit };
+
+	bool rsvd_match { true };
+	if ( rule.null_bit != null_bit )
+	{
+		std::cout
+			<< "Word and rule null bit mismatch (should match): \n"
+			<< "word: " << null_bit << ", rule: "<< rule.null_bit << "\n";
+		rsvd_match = false;
+	}
+	if ( rule.sb_bit != sb_bit )
+	{
+		std::cout
+			<< "Word and rule segment boundary bit mismatch (should match): \n"
+			<< "word: " << sb_bit << ", rule: "<< rule.sb_bit << "\n";
+		rsvd_match = false;
+	}
+	if ( rule.wb_bit != wb_bit )
+	{
+		std::cout
+			<< "Word and rule word boundary bit mismatch (should match): \n"
+			<< "word: " << wb_bit << ", rule: "<< rule.wb_bit << "\n";
+		rsvd_match = false;
+	}
+	if ( !rsvd_match )
+	{
+		return false;
+	}
+ 
 	/* Obtain length of the word and the rule's X and Y sequences */
 	const std::size_t
 		wlen  { wordrepr.segreprs.size() }, 
@@ -201,6 +251,7 @@ try_rule_context(
 		return true;
 	}
 
+	/* Trace through left of potential application site */
 	if ( rxpos < rxlen )
 	/* Element available in RULE's X */
 	{
@@ -211,10 +262,23 @@ try_rule_context(
 		}
 		const SegRepr &wx { wordrepr.segreprs[wxpos] };
 		const RuleElem &rx { rule.X[rxpos] };
-		const bool 
-			rx_issb { rx.issb(rule.sb_bit) },
-			wx_issb { wx.issb(wordrepr.sb_bit) };
 
+		/* Word boundary test */
+		const bool
+			rx_iswb { rx.iswb( wb_bit ) },
+			wx_iswb { wx.iswb( wb_bit ) };
+		if ( wx_iswb ^ rx_iswb )
+		{
+			// for now, we require strict word boundary matching.
+			// if one of rule or word has it and the other does not,
+			// match fails.
+			return false;
+		}
+
+		/* Segment boundary test */
+		const bool 
+			rx_issb { rx.issb( sb_bit ) },
+			wx_issb { wx.issb( sb_bit ) };	
 		if (
 			rx.masks.test_fm( wx.feat_mtx )
 			|| ( rx_issb && wx_issb )
@@ -226,7 +290,9 @@ try_rule_context(
 		}
 		else if ( ( !rx_issb ) && wx_issb )
 		/* Rule element doesn't specify syllable boundary
-		 but "segment" (symbol in word) is syllable boundary - should skip */
+		 but "segment" (symbol in word) is syllable boundary 
+		 - can skip?
+		*/
 		{
 			wxpos = update_pos( wxpos, wlen, true );
 		}
@@ -236,6 +302,7 @@ try_rule_context(
 		}
 	}
 
+	/* Then trace through right (if left all match) */
 	if ( rypos < rylen )
 	/* Element available in RULE's Y */
 	{
@@ -246,10 +313,22 @@ try_rule_context(
 		}
 		const SegRepr &wy { wordrepr.segreprs[wypos] };
 		const RuleElem &ry { rule.Y[rypos] };
-		const bool 
-			ry_issb { ry.issb(rule.sb_bit) },
-			wy_issb { wy.issb(wordrepr.sb_bit) };
 
+		/* Word boundary test */
+		const bool
+			ry_iswb { ry.iswb( wb_bit ) },
+			wy_iswb { wy.iswb( wb_bit ) };
+		if ( wy_iswb ^ ry_iswb )
+		{
+			// for now, we require strict word boundary matching.
+			// if one of rule or word has it and the other does not,
+			// match fails.
+			return false;
+		}
+
+		const bool 
+			ry_issb { ry.issb( sb_bit ) },
+			wy_issb { wy.issb( sb_bit ) };
 		if (
 			ry.masks.test_fm( wy.feat_mtx )
 			|| ( ry_issb && wy_issb )
@@ -261,7 +340,7 @@ try_rule_context(
 		}
 		else if ( ( !ry_issb ) && wy_issb )
 		/* Rule element doesn't specify syllable boundary
-		   but "segment" is syllable boundary (should skip) */
+		   but "segment" is syllable boundary (can skip) */
 		{
 			wypos = update_pos( wypos, wlen );
 		}
@@ -298,6 +377,8 @@ WordRepr::housekeep( void )
 		if ( insert_fm.any() && !insert_fm.test( this->null_bit ) )
 		/* Exists segment to be inserted before position I */
 		{
+
+			std::cout << "housekeep will insert empty feat mtx before position "<< i <<"\n";
 			segreprs_new.emplace_back(
 				SegRepr
 				{

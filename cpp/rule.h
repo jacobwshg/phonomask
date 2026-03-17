@@ -32,6 +32,11 @@ namespace Phmask
 			return this->masks.val_mask.test( null_bit );
 		}
 
+		bool iswb( std::size_t wb_bit ) const
+		{
+			return this->masks.val_mask.test( wb_bit );
+		}
+
 		bool issb( std::size_t sb_bit ) const
 		{
 			return this->masks.val_mask.test( sb_bit );

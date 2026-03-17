@@ -195,6 +195,8 @@ EMSCRIPTEN_BINDINGS( phmask )
 */
 EMSCRIPTEN_BINDINGS( phmask )
 {
+	//emscripten::register_vector<std::string>( "StringVec" );
+
 	emscripten::class_<PhmaskSession>( "PhmaskSession" )
 		.constructor<>()
 		.function( "populate", &PhmaskSession::populate )

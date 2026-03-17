@@ -29,6 +29,11 @@ namespace Phmask
 			return this->feat_mtx.test( null_bit );
 		}
 
+		bool iswb( std::size_t wb_bit ) const
+		{
+			return this->feat_mtx.test( wb_bit );
+		}
+
 		bool issb( std::size_t sb_bit ) const
 		{
 			return this->feat_mtx.test( sb_bit );

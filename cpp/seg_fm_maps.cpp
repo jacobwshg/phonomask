@@ -131,6 +131,10 @@ SegFMMaps::segment_of( const Phmask::feat_mtx_t feat_mtx ) const
 	);
 }
 
+/*
+ * @brief
+ *   Construct a debug string with segments and their feature matrices as bitmaps.
+ */
 std::string
 Phmask::
 SegFMMaps::str(void) const

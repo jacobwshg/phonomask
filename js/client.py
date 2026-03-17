@@ -2,14 +2,21 @@ import requests
 import json
 import uuid
 
-baseurl = "http://localhost:3000/"
+baseurl = "http://localhost:3000"
 
 # Step 1: Create a session
 def create_session(table_str):
 	url = baseurl + "/api/create_session"
-	payload = {"table_str": table_str}
+	payload = { "table_str": table_str }
 	
 	response = requests.post(url, json=payload)
+	
+	#while True:
+	#	pass
+
+	print( "create_session response:" )
+	print( response )
+
 	data = response.json()
 	return data["sessionId"]
 
@@ -61,23 +68,33 @@ u,-,+,+,+,+
 #ə,-,+,+,-,-
 	
 
+	with open ( "../lx301-base.csv", "r" ) as tblf:
+		feature_table = tblf.read()
+
+	print( "python feature table: " )
+	print( feature_table )
+
 	# Create session
-	session_id = create_session(feature_table)
+	session_id = create_session( feature_table )
 	print(f"Created session: {session_id}")
 	
 	# Apply rules
 	rules = [
-		"∅ -> a / [ -syl ] _ [ -syl ]",
-		"a -> u / _ #",
-		"p -> b / [ +voi ] _"
+		"∅ -> a / [ -syl ] _ [ -syl ] ",
+		"a -> u / _ [ +bk ] ",
+		"[ -voi ] -> [ +voi ] / [ +voi ]  _ [ +voi ] ",
 	]
 
-	word = "ptk"
+	testword = "ptk"
+
+	word = testword
 	print( "word: " + word )
 	for r in rules:
+		print( "rule: " + r )
 		word = apply_rule( session_id, r, word )
 		print( "word after application: " + word )
 
-	result = apply_many_rules( session_id, rules, "ptk" )
+	word = testword
+	result = apply_many_rules( session_id, rules, word )
 	print(f"Results: {result['result']}")
 

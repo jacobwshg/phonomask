@@ -26,6 +26,7 @@ namespace Phmask
 		explicit FeatureProfile( const std::string & );
 
 		void populate( std::istream & );
+		//std::string str( void ) const;
 
 		const std::string &feature_at( const std::size_t ) const;
 		std::size_t index_of( const std::string_view ) const;

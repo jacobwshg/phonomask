@@ -63,14 +63,24 @@ parentPort.on(
 			else if ( type === "APPLY_MANY" )
 			{
 				const sess = sessions.get( sessionId );
-				const { rules, word } = payload;
+				let { rules, word } = payload;
 				console.log( `worker received rules` );
 				for ( let r of rules )
 				{
 					console.log( "\t", r );
 				}
 				console.log( `, word ${ word }` );
-				const results = sess.apply_many( rules, word );
+
+let results = [];
+
+// Create a StringVec object (not a regular JavaScript array)
+for ( let r of rules )
+{
+	const result = sess.apply_rule( r, word );
+	word = result;
+	results.push( result );
+}
+	
 				console.log( `worker apply_many result: ${ results }` );
 				parentPort.postMessage(
 					{
