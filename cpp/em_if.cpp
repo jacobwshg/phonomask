@@ -205,6 +205,7 @@ EMSCRIPTEN_BINDINGS( phmask )
 }
 #endif
 
+#ifndef __EMSCRIPTEN__
 int
 main(
 	int argc, char *argv[]
@@ -232,4 +233,5 @@ main(
 
 	sess.apply_rules_to_word( rs, w );
 }
+#endif
 

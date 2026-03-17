@@ -13,6 +13,9 @@ SegFMMaps::populate( std::istream &table_stream )
 	 * had been consumed to construct FeatIdxMaps.
 	 */
 
+	this->seg_fm_map.clear();
+	this->fm_seg_map.clear();
+
 	while ( !table_stream.eof() )
 	{
 		std::vector<std::string> seg_entry_fields

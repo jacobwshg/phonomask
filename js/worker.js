@@ -1,21 +1,70 @@
 
 import { parentPort } from "worker_threads";
-import createPhmaskModule from "./phmask.js";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath( import.meta.url );
+let __dirname;
+try
+{
+	__dirname = dirname( __filename );
+}
+catch ( e )
+{
+	__dirname = process.cwd();
+}
+
+// for serving wasm files from cloud
+//const wasmModulePath = process.env.WASM_MODULE_PATH || `${__dirname}/phmask.js`;
+//const createPhmaskModule = await import( wasmModulePath );
+
+console.log( "__dirname: ", __dirname );
 
 let phmask = null;
 const sessions = new Map();
 
+
+///*
 // Initialize the Wasm module within the worker
+import createPhmaskModule from "./phmask.js";
 createPhmaskModule().then(
 	( module ) =>
 	{
-   		phmask = module;
+		console.log( "module: ", module );
+	 		phmask = module;
 		console.log( "worker initialized wasm module" );
 		parentPort.postMessage(
 			{ type: "READY" }
 		);
 	}
 );
+//*/
+
+/*
+// dynamic import - didn't work;
+// module:  [Module: null prototype] { default: [AsyncFunction: Module] }
+
+let wasmModulePath = process.env.WASM_MODULE_PATH || `${__dirname}/phmask.js`;
+
+console.log( "wasmModulePath: ", wasmModulePath );
+await import( wasmModulePath ).then(
+	( module ) => {
+		console.log( "module: ", module );
+		phmask = module.default();
+		console.log("worker initialized wasm module");
+		parentPort.postMessage(
+			{ type: "READY" }
+		);
+	}
+).catch((err) => {
+	console.error(`Failed to load WASM module from ${wasmModulePath}:`, err);
+	parentPort.postMessage({
+		type: "ERROR",
+		error: `Failed to initialize WASM: ${err.message}`
+	});
+});
+*/
 
 /* listen for msg from parent */
 parentPort.on(
@@ -34,9 +83,10 @@ parentPort.on(
 				console.log( "worker initialized wasm session" );
 				const { table_str } = payload;
 
-				sess.populate( table_str ); //stuck
+				sess.populate( table_str );
 
 				console.log( "worker wasm session populated" );
+				// add session to pool
 				sessions.set( sessionId, sess );
 				parentPort.postMessage(
 					{
@@ -47,6 +97,7 @@ parentPort.on(
 			}
 			else if ( type === "APPLY_RULE" )
 			{
+				// retrieve session
 				const sess = sessions.get( sessionId );
 				const { rule, word } = payload;
 				console.log( `worker received rule ${rule}, word ${word}` );
@@ -71,15 +122,14 @@ parentPort.on(
 				}
 				console.log( `, word ${ word }` );
 
-let results = [];
+				let results = [];
 
-// Create a StringVec object (not a regular JavaScript array)
-for ( let r of rules )
-{
-	const result = sess.apply_rule( r, word );
-	word = result;
-	results.push( result );
-}
+				for ( let r of rules )
+				{
+					const result = sess.apply_rule( r, word );
+					word = result;
+					results.push( result );
+				}
 	
 				console.log( `worker apply_many result: ${ results }` );
 				parentPort.postMessage(
@@ -102,6 +152,7 @@ for ( let r of rules )
 		}
 		catch ( err )
 		{
+			console.log( "worker error: ", err );
 			parentPort.postMessage(
 				{
 					type: "ERROR",

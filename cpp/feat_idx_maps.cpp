@@ -15,6 +15,8 @@ void
 Phmask::
 FeatIdxMaps::populate( const std::vector<std::string> &header_row_fields ) 
 {
+	this->idx_feat_map.clear();
+	this->feat_idx_map.clear();
 
 	std::size_t icol { 0 };
 

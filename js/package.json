@@ -1,0 +1,24 @@
+
+{
+	"name": "phonomask",
+
+	"version": "0.1.0",
+
+	"type": "module", 
+
+	"main": "server.js",
+
+	"scripts":
+	{
+		"dev": "node server.js",
+		"dkr": "docker build -t phonomask-build ."
+	},
+
+	"dependencies":
+	{
+		"aws-sdk": "^2.1693.0",
+		"express": "^5.2.1",
+		"uuid": "^13.0.0"
+	}
+}
+

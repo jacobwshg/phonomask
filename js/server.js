@@ -33,6 +33,7 @@ worker.on(
 const PORT = 3000;
 app.listen(
 	PORT,
+	"0.0.0.0",
 	() => {
 		console.log( `Phonomask server running at ${PORT}` );
 	}
@@ -99,7 +100,7 @@ create_session( req, res )
 		if ( response.type === "ERROR" )
 		{
 			sessionId = -1;
-			print( "server create_session response error" );
+			console.error( "server create_session response error" );
 			return res.status( 468 ).send( response.error );
 		}
 		res.json(

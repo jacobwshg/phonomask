@@ -69,6 +69,10 @@ void
 Phmask::
 FeatureProfile::populate( std::istream &table_strm )
 {
+	// reset
+	this->num_feats = 0;
+	this->null_bit = this->wb_bit = this->sb_bit = 0;
+
 	for (
 		char c {}; 
 		( c = table_strm.get() ) && std::isspace( c );
