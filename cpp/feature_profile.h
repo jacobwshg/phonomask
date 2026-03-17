@@ -44,7 +44,7 @@ namespace Phmask
 		/*
 		 * Indices beyond those used for features, used instead for
 		 * distinguishing reserved symbols for null segments and 
-		 * word/syllable boundary
+		 * word/syllable boundary.
 		 */
 		std::size_t null_bit;
 		std::size_t wb_bit;

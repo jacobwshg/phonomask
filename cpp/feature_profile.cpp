@@ -10,7 +10,6 @@
 #include <string>
 #include <string_view>
 #include <memory>
-#include <stdexcept>
 #include <array>
 #include <cstddef>
 
@@ -77,9 +76,12 @@ FeatureProfile::populate( std::istream &table_strm )
 	{
 		this->num_feats = num_cols - 1;
 	}
-	if ( this->num_feats > 40 )
+	if ( this->num_feats > MAX_NUM_FEATS )
 	{
-		throw std::runtime_error("Currently supporting up to 40 features\n");
+		std::cout << "Warning - currently supporting up to "
+			<< MAX_NUM_FEATS 
+			<< " features, additional features truncated\n";
+		this->num_feats = MAX_NUM_FEATS;
 	}
 
 	this->feat_idx_maps.populate( header_row_fields );
@@ -325,7 +327,8 @@ FeatureProfile::feat_bundle_to_rule_elem( const std::string_view fb_str ) const
 			masks.add_negative( feature_index );
 			break;
 		default:
-			throw std::runtime_error( "Feature bundle format not yet supported\n" );
+			std::cout << "Warning - value " << value[0] << " cast to binary negative\n";
+			masks.add_negative( feature_index );
 			break;
 		}
 	}

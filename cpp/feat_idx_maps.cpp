@@ -1,4 +1,6 @@
+
 #include "feat_idx_maps.h"
+#include "feat_mtx.h"
 #include "utils.h"
 
 /* @brief
@@ -13,27 +15,45 @@ void
 Phmask::
 FeatIdxMaps::populate( const std::vector<std::string> &header_row_fields ) 
 {
-	for (
-		std::size_t colno { 0 };
-		colno < header_row_fields.size();
-		++colno
-	)
+
+	std::size_t icol { 0 };
+
+	if ( header_row_fields.empty() )
 	{
-		if ( colno == 0 )
+		return;
+	}
+
+	const std::size_t num_feats = std::min(
+		Phmask::MAX_NUM_FEATS,
+		header_row_fields.size() - 1
+	);
+	this->idx_feat_map.reserve( num_feats );
+
+	for ( const std::string &feature: header_row_fields )
+	{
+		if ( icol > num_feats )
 		{
+			break;
+		}
+		if ( icol == 0 )
+		{
+			// skip the empty cell atop col 0, which holds segments
 			continue;
 		}
 
-		const std::string &feature { header_row_fields[colno] };
-		std::size_t idx { colno - 1 };
+		// feature at column 1 begins at idx 0
+		const std::size_t idx { icol-1 };
 		this->feat_idx_map[ feature ] = idx;
 		this->idx_feat_map.emplace_back( feature );
+
+		++icol;
 	}
 }
 
 /*
  * @brief
  *   Retrieve the feature name at a specified index.
+ *   If the index is out of bounds, return an error string.
  * @param
  *   index: the index.
  * @return
@@ -49,13 +69,17 @@ FeatIdxMaps::feature_at( const std::size_t index ) const
 	}
 	else 
 	{
-		throw std::runtime_error( "Not enough features\n" );
+		static const std::string oob { "<index out of bounds>" };
+		return oob;
 	}
 }
 
 /*
  * @brief
  *   Retrieve the index of a specified feature.
+ *   If the feature is not found, return an invalid idx.
+ *   This index may be used by a reserved symbol flag, but not by any 
+ *   valid feature.
  * @param
  *   feature: the name of the feature.
  * @return
@@ -65,10 +89,11 @@ std::size_t
 Phmask::
 FeatIdxMaps::index_of( const std::string_view feature ) const
 {
+	
 	return Phmask::map_find_const(
 		this->feat_idx_map, 
 		feature, 
-		"Feature not found\n"
+		Phmask::MAX_NUM_FEATS + 1
 	);
 }
 
@@ -100,9 +125,9 @@ FeatIdxMaps::str( void ) const
 
 /*
  * @brief
- *   Construct the "layout" string of a feature-index map,
- *   which reflects how the feature names were displayed 
- *   in the header row of the original table file.
+ *   Construct the "layout" string of a feature-index map, which reflects 
+ *   how the feature names were displayed in the header row of the original 
+ *   table file (lowest index at left).
  * @return
  *   The feature-index map's layout string.
  *   Example:
@@ -113,14 +138,18 @@ std::string
 Phmask::
 FeatIdxMaps::feature_layout_str( void ) const
 {
+	const std::size_t num_feats { this->idx_feat_map.size() };
+	if ( num_feats < 1 )
+	{
+		return { "" };
+	}
+
 	std::string lay_str {};
 	lay_str.reserve( 256 );
-	std::size_t nfeats { this->idx_feat_map.size() };
-
-	for ( std::size_t i { 0 }; i < nfeats; ++i )
+	for ( std::size_t i { 0 }; i < num_feats; ++i )
 	{
-		lay_str += this->idx_feat_map[ nfeats - 1 - i ];
-		if ( i < nfeats - 1 )
+		lay_str += this->idx_feat_map[ num_feats - 1 - i ];
+		if ( i + 1 < num_feats )
 		{
 			lay_str += " | ";
 		}

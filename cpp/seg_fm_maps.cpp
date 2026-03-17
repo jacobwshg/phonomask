@@ -1,3 +1,4 @@
+
 #include "seg_fm_maps.h"
 #include "feat_mtx.h"
 #include "utils.h"
@@ -6,40 +7,67 @@
 
 void
 Phmask::
-SegFMMaps::populate(std::istream &table_stream) 
+SegFMMaps::populate( std::istream &table_stream ) 
 {
 	/* Assume that the feature table's header row
-	   had been consumed to construct FeatIdxMaps
+	 * had been consumed to construct FeatIdxMaps.
 	 */
 
-	while (!table_stream.eof())
+	while ( !table_stream.eof() )
 	{
 		std::vector<std::string> seg_entry_fields
 		{
 			Phmask::fields_from_row(table_stream)
 		};
-		if (seg_entry_fields.size() < 1)
+		if ( seg_entry_fields.size() < 1 )
 		{
 			return;
 		}
 
-		std::string &segment { seg_entry_fields[0] };
-		feat_mtx_t feat_mtx { 0 };
-		for (std::size_t colno { 1 }; colno < seg_entry_fields.size(); ++colno)
+		std::string segment { };
+		feat_mtx_t feat_mtx { 0UL };
+
+		const std::size_t num_feats
+		{ 
+			std::min( Phmask::MAX_NUM_FEATS, seg_entry_fields.size()-1 )
+		};
+
+		std::size_t idx { 0 };
+		for (
+			const std::string &field : seg_entry_fields
+		)
 		{
-			const std::size_t idx { colno - 1 };
-			/* TODO: Assuming binary features for now;
-			   underspecification is lost */
-			if (seg_entry_fields[colno] == "+")
+			if ( idx == 0 )
 			{
-				feat_mtx.set(idx);
+				// field is segment itself
+				segment = field;
 			}
+			else if ( idx <= num_feats )
+			{
+				// field is feature value within supported feature length
+				// TODO: support only binary features for now
+				if ( field[ 0 ] == '+' )
+				{
+					feat_mtx.set( idx );
+				}
+			}
+			else 
+			{
+				// truncate too long rows to supported length
+				break;
+			}
+
+			++idx;
 		}
-		this->seg_fm_map[segment] = feat_mtx;
-		this->fm_seg_map[feat_mtx] = segment;
+		this->seg_fm_map[ segment ] = feat_mtx;
+		this->fm_seg_map[ feat_mtx ] = segment;
 	}
 }
 
+/*
+ * @brief
+ *   Add a pair of segment and feature matrix read from file to maps.
+ */
 Phmask::SegFMMaps &
 Phmask::
 SegFMMaps::add(const std::string &segment, const Phmask::feat_mtx_t &feat_mtx)
@@ -49,43 +77,55 @@ SegFMMaps::add(const std::string &segment, const Phmask::feat_mtx_t &feat_mtx)
 	return *this;
 }
 
+/*
+ * @brief
+ *   Add an alias for an existing segment, so that both can map to the same
+ *   feature matrix. However, note that keying the feature matrix to segment map
+ *   with the shared feature matrix can only return one of the segments.
+ */
 Phmask::SegFMMaps &
 Phmask::
-SegFMMaps::add_seg_alias(const std::string &alias, const std::string &original)
+SegFMMaps::add_seg_alias( const std::string &alias, const std::string &original )
 {
-	const auto &mpit { this->seg_fm_map.find(original) };
-	if (mpit != this->seg_fm_map.end())
+	const auto &mpit { this->seg_fm_map.find( original ) };
+	if ( mpit != this->seg_fm_map.end() )
 	/* Segment being aliased indeed exists */
 	{
-		this->seg_fm_map.try_emplace(alias, mpit->second);
+		this->seg_fm_map.try_emplace( alias, mpit->second );
 	}
 	return *this;
 }
 
-
+/*
+ * @brief
+ *   Retrieve the feature matrix of a segment. If the segment does not exist,
+ *   return a invalid feature matrix.
+ */
 Phmask::feat_mtx_t 
 Phmask::
-SegFMMaps::feat_mtx_of(const std::string_view segment) const
+SegFMMaps::feat_mtx_of( const std::string_view segment ) const
 {
-	std::string e_str
-	{
-		std::string { "Segment [" } + std::string { segment } + "] not found\n" 
-	};
 	return Phmask::map_find_const(
 		this->seg_fm_map, 
 		segment, 
-		e_str
+		Phmask::INVALID_FEAT_MTX
 	);
 }
 
+/*
+ * @brief
+ *   Retrieve the segment described by a feature matrix.
+ *   If the feature matrix does not exist, an "unknown segment" symbol is returned.
+ */
 const std::string & 
 Phmask::
-SegFMMaps::segment_of(const Phmask::feat_mtx_t feat_mtx) const
+SegFMMaps::segment_of( const Phmask::feat_mtx_t feat_mtx ) const
 {
+	const std::string unknown_seg { "?" };
 	return Phmask::map_find_const(
 		this->fm_seg_map, 
-		feat_mtx, 
-		"No known segment for feature matrix\n"
+		feat_mtx,
+		unknown_seg
 	);
 }
 
