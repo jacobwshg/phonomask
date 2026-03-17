@@ -1,10 +1,12 @@
 #!/bin/bash
 
-rm -rf ./*.out
+OUTF="phmask.out"
 
-clang++ -Wall -Wextra -std=c++20 -o phmask.out \
+rm -rf ./$OUTF
+
+clang++ -Wall -Wextra -std=c++20 -o ./$OUTF \
 	./utils.cpp \
 	./seg_fm_maps.cpp ./feat_idx_maps.cpp ./feature_profile.cpp \
 	./rule.cpp ./word.cpp \
-	./test.cpp -licuuc -licudata 
+	./test_main.cpp -licuuc -licudata 
 

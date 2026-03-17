@@ -138,6 +138,7 @@ word_to_segments( const std::string &word )
  * @brief
  *   Helper for rule evaluation: Increment/decrement position for indexing a vector,
  *   safely overflowing to out-of-bounds position if out of range.
+ *   If position already overflowed, don't change.
  * @param
  *   pos: index position.
  * @param
@@ -150,11 +151,14 @@ word_to_segments( const std::string &word )
  */
 std::size_t
 Phmask::
-update_pos(std::size_t pos, std::size_t endpos, bool decr = false)
+update_pos(
+	std::size_t pos, std::size_t endpos,
+	bool decr = false
+)
 {
 	if (pos == endpos)
 	{
-		return pos;
+		return endpos;
 	}
 	if (decr)
 	{
@@ -189,16 +193,16 @@ try_rule_context(
 		rxlen { rule.X.size() }, 
 		rylen { rule.Y.size() };
 
-	if ((rxpos >= rxlen) && (rypos >= rylen))
+	if ( ( rxpos >= rxlen ) && ( rypos >= rylen ) )
 	/* Rule elements exhausted, all matching segments */
 	{
 		return true;
 	}
 
-	if (rxpos < rxlen)
+	if ( rxpos < rxlen )
 	/* Element available in RULE's X */
 	{
-		if (wxpos >= wlen)
+		if ( wxpos >= wlen )
 		/* No remaining segment on the left in WORD_REP */
 		{
 			return false;
@@ -209,17 +213,20 @@ try_rule_context(
 			rx_issb { rx.issb(rule.sb_bit) },
 			wx_issb { wx.issb(word_rep.sb_bit) };
 
-		if (rx.masks.test_fm(wx.feat_mtx) || (rx_issb && wx_issb))
+		if (
+			rx.masks.test_fm( wx.feat_mtx )
+			|| ( rx_issb && wx_issb )
+		)
 		/* Exact segment match, or syllable boundary match */
 		{
-			wxpos = update_pos(wxpos, wlen, true);
-			rxpos = update_pos(rxpos, rxlen, true);
+			wxpos = update_pos( wxpos, wlen, true );
+			rxpos = update_pos( rxpos, rxlen, true );
 		}
-		else if ((!rx_issb) && wx_issb)
+		else if ( ( !rx_issb ) && wx_issb )
 		/* Rule element doesn't specify syllable boundary
-		 but "segment" is syllable boundary (should skip) */
+		 but "segment" (symbol in word) is syllable boundary - should skip */
 		{
-			wxpos = update_pos(wxpos, wlen, true);
+			wxpos = update_pos( wxpos, wlen, true );
 		}
 		else
 		{
@@ -227,10 +234,10 @@ try_rule_context(
 		}
 	}
 
-	if (rypos < rylen)
+	if ( rypos < rylen )
 	/* Element available in RULE's Y */
 	{
-		if (wypos >= wlen)
+		if ( wypos >= wlen )
 		/* No remaining segment on the right in WORD_REP */
 		{
 			return false;
@@ -241,17 +248,20 @@ try_rule_context(
 			ry_issb { ry.issb(rule.sb_bit) },
 			wy_issb { wy.issb(word_rep.sb_bit) };
 
-		if (ry.masks.test_fm(wy.feat_mtx) || (ry_issb && wy_issb))
+		if (
+			ry.masks.test_fm( wy.feat_mtx )
+			|| ( ry_issb && wy_issb )
+		)
 		/* Exact segment match, or syllable boundary match */
 		{
-			wypos = update_pos(wypos, wlen);
-			rypos = update_pos(rypos, rylen);
+			wypos = update_pos( wypos, wlen );
+			rypos = update_pos( rypos, rylen );
 		}
-		else if ((!ry_issb) && wy_issb)
+		else if ( ( !ry_issb ) && wy_issb )
 		/* Rule element doesn't specify syllable boundary
 		   but "segment" is syllable boundary (should skip) */
 		{
-			wypos = update_pos(wypos, wlen);
+			wypos = update_pos( wypos, wlen );
 		}
 		else
 		{
@@ -259,7 +269,8 @@ try_rule_context(
 		}
 	}
 
-	return try_rule_context(word_rep, rule, wxpos, wypos, rxpos, rypos);
+	// recurse with updated positions
+	return try_rule_context( word_rep, rule, wxpos, wypos, rxpos, rypos );
 }
 
 
@@ -323,8 +334,17 @@ WordRep::apply_rule(
 	   respectively indicated by the A or B element
 	   being the null segment symbol */
 	const bool 
-		isinsert { rule.A.isnull(rule.null_bit) },
-		isdelete { rule.B.isnull(rule.null_bit) };
+		isinsert { rule.A.isnull( rule.null_bit ) },
+		isdelete { rule.B.isnull( rule.null_bit ) };
+
+	if ( isinsert )
+	{
+		std::cout << "apply_rule: rule is insertion\n";
+	}
+	if ( isdelete )
+	{
+		std::cout << "apply_rule: rule is deletion\n";
+	}
 
 	/* Test each segment position for which X can fit on the left
 	   and Y can fit on the right */
@@ -365,7 +385,9 @@ WordRep::apply_rule(
 			++wypos;
 		}
 		
-		if (!try_rule_context(*this, rule, wxpos, wypos, rxpos, rypos))
+		if (
+			!try_rule_context( *this, rule, wxpos, wypos, rxpos, rypos )
+		)
 		/* Some adjacent segment does not match rule element;
 		   rule cannot apply at current segment postion */
 		{

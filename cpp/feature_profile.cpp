@@ -41,17 +41,17 @@ FeatureProfile::add_reserved( void )
 	this->sb_bit = sb_bit;
 	this->seg_fm_maps
 		// null segment
-		.add("∅", feat_mtx_t{0u}.set(null_bit))
+		.add( "∅", feat_mtx_t{ 0UL }.set(null_bit) )
 		// word boundary
-		.add("#", feat_mtx_t{0u}.set(wb_bit))
+		.add( "#", feat_mtx_t{ 0UL }.set(wb_bit) )
 		// syllable boundary (rule)
-		.add("$", feat_mtx_t{0u}.set(sb_bit).set(sb_ascii_bit))
+		.add( "$", feat_mtx_t{ 0UL }.set(sb_bit).set(sb_ascii_bit) )
 		// syllable boundary (data, unstressed)
-		.add(".", feat_mtx_t{0u}.set(sb_bit).set(sb_ascii_bit).set(sb_sig_bit))
+		.add( ".", feat_mtx_t{ 0UL }.set(sb_bit).set(sb_ascii_bit).set(sb_sig_bit) )
 		// syllable boundary (primary stress)
-		.add("ˈ", feat_mtx_t{0u}.set(sb_bit).set(sb_sig_bit))
+		.add( "ˈ", feat_mtx_t{ 0UL }.set(sb_bit).set(sb_sig_bit) )
 		// syllable boundary (secondary stress)
-		.add("ˌ", feat_mtx_t{0u}.set(sb_bit));
+		.add( "ˌ", feat_mtx_t{ 0UL }.set(sb_bit) );
 }
 
 
@@ -197,7 +197,9 @@ FeatureProfile::seg_effective_feats_str(
 	Phmask::feat_mtx_t ef_mask
 ) const
 {
-	std::string ef_feats_str { "[" };
+	std::string ef_feats_str {};
+	ef_feats_str.reserve( 128 );
+	ef_feats_str += "[";
 
 	const feat_mtx_t feat_mtx { this->feat_mtx_of( segment ) };
 
@@ -206,12 +208,27 @@ FeatureProfile::seg_effective_feats_str(
 		return std::string { "unknown segment\n" };
 	}
 
+	// print type if feat mtx belongs to reserved symbol
+	if ( feat_mtx.test( this->null_bit ) )
+	{
+		ef_feats_str += "_null, ";
+	}
+	if ( feat_mtx.test( this->wb_bit ) )
+	{
+		ef_feats_str += "_word_boundary, ";
+	}
+	if ( feat_mtx.test( this->sb_bit ) )
+	{
+		ef_feats_str += "_syl_boundary, ";
+	}
+
+	// now, print features if feat mtx belong to valid segment
 	for ( std::size_t idx { 0 }; idx < this->num_feats; ++idx )
 	{
 		if ( ef_mask.test( idx ) )
 		// Feature at IDX is effective
 		{
-			ef_feats_str += ( feat_mtx.test( idx ) ? "+" : "-" );
+			ef_feats_str += ( feat_mtx.test( idx ) ? '+' : '-' );
 			const std::string &feature { this->feature_at( idx ) };
 			ef_feats_str += feature;
 			ef_feats_str += ", ";
@@ -325,20 +342,24 @@ FeatureProfile::feat_bundle_to_rule_elem( const std::string_view fb_str ) const
 		value.remove_suffix( tok_len - 1 );
 		feature.remove_prefix( 1 );
 
-		std::size_t feature_index { this->index_of( feature ) };
+		std::size_t i_feat { this->index_of( feature ) };
+		if ( i_feat >= this->num_feats )
+		{
+			std::cout << "Warning - unknown feature " << feature << "\n";
+		}
 
-		// TODO: to support alpha, modify this part
+		// TODO: to support alpha or underspec, modify this part
 		switch( value[0] )
 		{
 		case '+':
-			masks.add_positive( feature_index );
+			masks.add_positive( i_feat );
 			break;
 		case '-':
-			masks.add_negative( feature_index );
+			masks.add_negative( i_feat );
 			break;
 		default:
 			std::cout << "Warning - value " << value[0] << " cast to binary negative\n";
-			masks.add_negative( feature_index );
+			masks.add_negative( i_feat );
 			break;
 		}
 	}

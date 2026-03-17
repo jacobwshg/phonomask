@@ -105,14 +105,14 @@ parse_feature_bundle_str( const std::string_view fb_str )
 		case ']':
 		case ',':
 		case ' ':
-			if (tok_end > tok_begin)
+			if ( tok_end > tok_begin )
 			{
 				std::string_view tok { fb_str };
-				tok.remove_prefix(tok_begin);
-				tok.remove_suffix(fb_len - tok_end);
-				toks.emplace_back(tok);
+				tok.remove_prefix( tok_begin );
+				tok.remove_suffix( fb_len - tok_end );
+				toks.emplace_back( tok );
 			}
-			tok_end = (tok_begin = i + 1);
+			tok_end = ( tok_begin = i + 1 );
 			break;
 		default:
 			tok_end = i + 1;

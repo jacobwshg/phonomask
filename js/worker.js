@@ -10,7 +10,7 @@ createPhmaskModule().then(
 	( module ) =>
 	{
    		phmask = module;
-		console.log( "worker initialzied wasm module" );
+		console.log( "worker initialized wasm module" );
 		parentPort.postMessage(
 			{ type: "READY" }
 		);
@@ -27,39 +27,51 @@ parentPort.on(
 		try
 		{
 			console.log( `worker received msg type ${type}` );
+
 			if ( type === "CREATE_SESSION" )
 			{
 				const sess = new phmask.PhmaskSession();
-				sess.populate( payload );
+				console.log( "worker initialized wasm session" );
+				const { table_str } = payload;
+
+				sess.populate( table_str ); //stuck
+
+				console.log( "worker wasm session populated" );
 				sessions.set( sessionId, sess );
 				parentPort.postMessage(
 					{
 						type: "SUCCESS",
-						sessionId
+						sessionId: sessionId
 					}
 				);
 			}
 			else if ( type === "APPLY_RULE" )
 			{
 				const sess = sessions.get( sessionId );
-				const result = sess.applyRule( payload.rule, payload.word );
+				const { rule, word } = payload;
+				console.log( `worker received rule ${rule}, word ${word}` );
+				const result = sess.apply_rule( rule, word );
+				console.log( `worker apply_rule result: ${result}` );
 				parentPort.postMessage(
 					{
 						type: "RESULT",
-						sessionId,
-						result
+						sessionId: sessionId,
+						result: result
 					}
 				);
 			} 
 			else if ( type === "APPLY_MANY" )
 			{
 				const sess = sessions.get( sessionId );
-				const result = sess.applyRule( payload.rules, payload.word );
+				const { rules, word } = payload;
+				console.log( `worker received rules ${rules}, word ${word}` );
+				const results = sess.apply_many( rules, word );
+				console.log( `worker apply_many result: ${ results }` );
 				parentPort.postMessage(
 					{
 						type: "RESULT",
 						sessionId,
-						result
+						result: results
 					}
 				);
 			} 

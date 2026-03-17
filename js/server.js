@@ -20,6 +20,7 @@ worker.on(
 		// Find the original HTTP request and resolve it
 		if ( msg.sessionId )
 		{
+			console.log( `worker msg has sId ${msg.sessionId}` );
 			const resolver = pendingRequests.get( msg.sessionId );
 			if ( resolver )
 			{
@@ -74,9 +75,13 @@ create_session( req, res )
 		const { v4 } = await import('uuid');
 		let sessionId = v4();
 
+		console.log( `server created sessionId ${sessionId}` );
+
 		const resultProm = new Promise(
 			( resolve ) =>
 			{
+				pendingRequests.set( sessionId, resolve );
+
 				worker.postMessage(
 					{
 						type: "CREATE_SESSION",
@@ -87,8 +92,11 @@ create_session( req, res )
 			}
 		);
 
+
+		console.log( "server waiting for worker create_session promise" );
 		const response = await resultProm;
-		if ( response.type === ERROR )
+		console.log( "worker create_session promise resolved" );
+		if ( response.type === "ERROR" )
 		{
 			sessionId = -1;
 			print( "server create_session response error" );
@@ -105,12 +113,15 @@ create_session( req, res )
 	//{
 		//res.status( 500 ).send( e.message );
 	//}
+	console.log( `end of server create_session` );
 }
 
 async function
 apply_rule( req, res )
 {
 	const { sessionId, rule, word } = req.body;
+
+	console.log( `server received rule ${rule}, word ${word}` );
 
 	// Create a promise that resolves when the worker replies
 	const resultProm = new Promise(
