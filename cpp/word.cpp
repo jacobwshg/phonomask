@@ -19,7 +19,7 @@ namespace Phmask
 
 	bool
 	try_rule_context(
-		const WordRep &, const Rule &, 
+		const WordRepr &, const Rule &, 
 		std::size_t, std::size_t, 
 		std::size_t, std::size_t
 	);
@@ -184,14 +184,14 @@ update_pos(
 bool
 Phmask::
 try_rule_context(
-	const Phmask::WordRep &word_rep, const Phmask::Rule &rule,
+	const Phmask::WordRepr &wordrepr, const Phmask::Rule &rule,
 	std::size_t wxpos, std::size_t wypos,
 	std::size_t rxpos, std::size_t rypos
 )
 {
 	/* Obtain length of the word and the rule's X and Y sequences */
 	const std::size_t
-		wlen  { word_rep.seg_reps.size() }, 
+		wlen  { wordrepr.segreprs.size() }, 
 		rxlen { rule.X.size() }, 
 		rylen { rule.Y.size() };
 
@@ -209,11 +209,11 @@ try_rule_context(
 		{
 			return false;
 		}
-		const SegRep &wx { word_rep.seg_reps[wxpos] };
+		const SegRepr &wx { wordrepr.segreprs[wxpos] };
 		const RuleElem &rx { rule.X[rxpos] };
 		const bool 
 			rx_issb { rx.issb(rule.sb_bit) },
-			wx_issb { wx.issb(word_rep.sb_bit) };
+			wx_issb { wx.issb(wordrepr.sb_bit) };
 
 		if (
 			rx.masks.test_fm( wx.feat_mtx )
@@ -244,11 +244,11 @@ try_rule_context(
 		{
 			return false;
 		}
-		const SegRep &wy { word_rep.seg_reps[wypos] };
+		const SegRepr &wy { wordrepr.segreprs[wypos] };
 		const RuleElem &ry { rule.Y[rypos] };
 		const bool 
 			ry_issb { ry.issb(rule.sb_bit) },
-			wy_issb { wy.issb(word_rep.sb_bit) };
+			wy_issb { wy.issb(wordrepr.sb_bit) };
 
 		if (
 			ry.masks.test_fm( wy.feat_mtx )
@@ -272,48 +272,48 @@ try_rule_context(
 	}
 
 	// recurse with updated positions
-	return try_rule_context( word_rep, rule, wxpos, wypos, rxpos, rypos );
+	return try_rule_context( wordrepr, rule, wxpos, wypos, rxpos, rypos );
 }
 
 
 /* Commit insertions and deletions. */
 void
 Phmask::
-WordRep::housekeep( void )
+WordRepr::housekeep( void )
 {
 
-	std::size_t cur_size { this->seg_reps.size() };
-	std::vector<SegRep> seg_reps_new {};
+	std::size_t cur_size { this->segreprs.size() };
+	std::vector<SegRepr> segreprs_new {};
 
 	if ( !this->isdirty )
 	{
 		goto done;
 	}
 
-	seg_reps_new.reserve( cur_size );
+	segreprs_new.reserve( cur_size );
 
 	for ( std::size_t i { 0 }; i < cur_size; ++i )
 	{
-		const feat_mtx_t insert_fm { this->seg_reps[i].insert_before_fm };
+		const feat_mtx_t insert_fm { this->segreprs[i].insert_before_fm };
 		if ( insert_fm.any() && !insert_fm.test( this->null_bit ) )
 		/* Exists segment to be inserted before position I */
 		{
-			seg_reps_new.emplace_back(
-				SegRep
+			segreprs_new.emplace_back(
+				SegRepr
 				{
 					insert_fm,
 					EMPTY_FEAT_MTX,
 				}
 			);
-			this->seg_reps[i].insert_before_fm = EMPTY_FEAT_MTX;
+			this->segreprs[i].insert_before_fm = EMPTY_FEAT_MTX;
 		}
-		if ( !this->seg_reps[i].isnull( this->null_bit ) )
+		if ( !this->segreprs[i].isnull( this->null_bit ) )
 		/* Segment at position I not deleted */
 		{
-			seg_reps_new.emplace_back( std::move( this->seg_reps[i] ) );
+			segreprs_new.emplace_back( std::move( this->segreprs[i] ) );
 		}
 	}
-	this->seg_reps = std::move( seg_reps_new );
+	this->segreprs = std::move( segreprs_new );
 
 	done:
 		// reset word representation metadata across separate
@@ -322,9 +322,9 @@ WordRep::housekeep( void )
 		this->apply_at.assign( this->apply_at.size(), false );
 }
 
-Phmask::WordRep &
+Phmask::WordRepr &
 Phmask::
-WordRep::apply_rule(
+WordRepr::apply_rule(
 	const Phmask::Rule &rule
 )
 {
@@ -333,7 +333,7 @@ WordRep::apply_rule(
 
 	/* Obtain length of the word and the rule's X and Y sequences */
 	const std::size_t
-		wlen  { this->seg_reps.size() },
+		wlen  { this->segreprs.size() },
 		rxlen { rule.X.size() },
 		rylen { rule.Y.size() };
 
@@ -360,7 +360,7 @@ WordRep::apply_rule(
 	   and Y can fit on the right */
 	for ( std::size_t pos { rxlen }; pos < wlen - rylen; ++pos )
 	{
-		const SegRep &cur_seg { this->seg_reps[ pos ] };
+		const SegRepr &cur_seg { this->segreprs[ pos ] };
 		const feat_mtx_t cur_fm { cur_seg.feat_mtx };
 
 		if ( ( !rule.A.masks.test_fm( cur_fm ) ) && !isinsert )
@@ -430,7 +430,7 @@ WordRep::apply_rule(
 	/* Apply rule at all eligible positions identified above */
 	for ( std::size_t pos { 0 }; pos < wlen; ++pos )
 	{
-		SegRep &cur_seg { this->seg_reps[pos] };
+		SegRepr &cur_seg { this->segreprs[pos] };
 		if ( !this->apply_at[pos] )
 		{
 			continue;

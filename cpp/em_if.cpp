@@ -99,9 +99,9 @@ PhmaskSession::apply_rule_to_word(
 	try
 	{
 		Phmask::Rule rule { this->profile.rule_from_str( rulestr ) };
-		Phmask::WordRep wordrep { this->profile.word_rep_from_str( wordstr ) };
-		wordrep.apply_rule( rule );
-		return this->profile.word_rep_to_str( wordrep );
+		Phmask::WordRepr wordrepr { this->profile.wordrepr_from_str( wordstr ) };
+		wordrepr.apply_rule( rule );
+		return this->profile.wordrepr_to_str( wordrepr );
 	}
 	catch ( const std::runtime_error &e )
 	{
@@ -161,16 +161,16 @@ PhmaskSession::apply_rules_to_word(
 			}
 		);
 
-		Phmask::WordRep wordrep { this->profile.word_rep_from_str( wordstr ) };
+		Phmask::WordRepr wordrepr { this->profile.wordrepr_from_str( wordstr ) };
 
 		std::for_each(
 			rules.begin(),
 			rules.end(),
-			[ &wordrep, &results, this ]( const Phmask::Rule &rule
+			[ &wordrepr, &results, this ]( const Phmask::Rule &rule
 		)
 		{
-				wordrep.apply_rule( rule );
-				std::string ws { this->profile.word_rep_to_str( wordrep ) };
+				wordrepr.apply_rule( rule );
+				std::string ws { this->profile.wordrepr_to_str( wordrepr ) };
 				std::cout << "word after rule application: " << ws << "\n";
 				results.emplace_back( std::move( ws ) );
 			}

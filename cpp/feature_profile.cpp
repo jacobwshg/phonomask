@@ -500,25 +500,25 @@ FeatureProfile::rule_from_str( const std::string &rule_str ) const
  * @return
  *   the word's representation.
  */
-Phmask::WordRep
+Phmask::WordRepr
 Phmask::
-FeatureProfile::word_rep_from_str( const std::string &word ) const
+FeatureProfile::wordrepr_from_str( const std::string &word ) const
 {
-	WordRep word_rep {};
-	word_rep.null_bit = this->null_bit;
-	word_rep.wb_bit = this->wb_bit;
-	word_rep.sb_bit = this->sb_bit;
+	WordRepr wordrepr {};
+	wordrepr.null_bit = this->null_bit;
+	wordrepr.wb_bit = this->wb_bit;
+	wordrepr.sb_bit = this->sb_bit;
 
 	std::vector<std::string> segments { Phmask::word_to_segments( word ) };
 	std::size_t nsegs { segments.size() };
-	word_rep.seg_reps.reserve( nsegs );
-	word_rep.apply_at.resize( nsegs, false );
+	wordrepr.segreprs.reserve( nsegs );
+	wordrepr.apply_at.resize( nsegs, false );
 
 	for ( const std::string &segment : segments )
 	{
 		feat_mtx_t seg_feat_mtx { this->feat_mtx_of( segment ) };
-		word_rep.seg_reps.emplace_back(
-			SegRep
+		wordrepr.segreprs.emplace_back(
+			SegRepr
 			{
 				.feat_mtx = seg_feat_mtx,
 				.insert_before_fm = EMPTY_FEAT_MTX,
@@ -526,7 +526,7 @@ FeatureProfile::word_rep_from_str( const std::string &word ) const
 		);
 	}
 
-	return word_rep;
+	return wordrepr;
 }
 
 /* 
@@ -534,20 +534,20 @@ FeatureProfile::word_rep_from_str( const std::string &word ) const
  *   Reconstruct a word representation back into a word string by recovering
  *   segments from their representations and concatenating them.
  * @param
- *   word_rep: a word representation.
+ *   wordrepr: a word representation.
  * @return
  *   the original word string, consisting of segments.
  */
 std::string 
 Phmask::
-FeatureProfile::word_rep_to_str( const WordRep &word_rep ) const
+FeatureProfile::wordrepr_to_str( const WordRepr &wordrepr ) const
 {
 	std::string word_str {};
 	word_str.reserve( 32 );
-	const std::vector<SegRep> &seg_reps { word_rep.seg_reps };
-	for (std::size_t i { 0 }; i < seg_reps.size(); ++i )
+	const std::vector<SegRepr> &segreprs { wordrepr.segreprs };
+	for (std::size_t i { 0 }; i < segreprs.size(); ++i )
 	{
-		const feat_mtx_t cur_fm { seg_reps[i].feat_mtx };
+		const feat_mtx_t cur_fm { segreprs[i].feat_mtx };
 		const std::string &segment { this->segment_of( cur_fm ) };
 		word_str += segment;
 	}

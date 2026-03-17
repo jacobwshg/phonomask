@@ -12,10 +12,10 @@ namespace Phmask
 {
 	std::vector<std::string> word_to_segments(const std::string &);
 
-	struct WordRep;
+	struct WordRepr;
 
 	// Segment representation in word
-	struct SegRep
+	struct SegRepr
 	{
 		feat_mtx_t feat_mtx;
 
@@ -36,7 +36,7 @@ namespace Phmask
 	};
 
 	// Word representation
-	struct WordRep
+	struct WordRepr
 	{
 		// "Inherited" from the managing feature profile
 		std::size_t null_bit;
@@ -46,7 +46,7 @@ namespace Phmask
 		// true if insertion or deletion has effect
 		bool isdirty { false };
 
-		std::vector<SegRep> seg_reps;
+		std::vector<SegRepr> segreprs;
 
 		// An element is set to true if the corresponding
 		// segment in the word will be affected by a rule
@@ -55,7 +55,7 @@ namespace Phmask
 		/* Commit insertion or deletion */
 		void housekeep( void );
 
-		WordRep &
+		WordRepr &
 		apply_rule( const Phmask::Rule & );
 	};
 }
