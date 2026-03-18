@@ -121,16 +121,13 @@ parentPort.on(
 					console.log( "\t", r );
 				}
 				console.log( `, word ${ word }` );
-
 				let results = [];
-
 				for ( let r of rules )
 				{
 					const result = sess.apply_rule( r, word );
 					word = result;
 					results.push( result );
 				}
-	
 				console.log( `worker apply_many result: ${ results }` );
 				parentPort.postMessage(
 					{
@@ -139,7 +136,23 @@ parentPort.on(
 						result: results
 					}
 				);
-			} 
+			}
+			else if ( type === "FEATURES_STR" )
+			{
+				// retrieve session
+				const sess = sessions.get( sessionId );
+				const { segment } = payload;
+				console.log( `worker received segment ${segment}` );
+				const result = sess.features_str( segment );
+				console.log( `worker features_str result: ${result}` );
+				parentPort.postMessage(
+					{
+						type: "RESULT",
+						sessionId: sessionId,
+						result: result
+					}
+				);
+			}
 			else if ( type === "DELETE_SESSION" )
 			{
 				const sess = sess.get( sessionId );
@@ -148,6 +161,12 @@ parentPort.on(
 					sess.delete();
 					sessions.delete( sessionId );
 				}
+				parentPort.postMessage(
+					{
+						type: "RESULT", 
+						message: `worker deleted session ${sessionId}`
+					}
+				);
 			}
 		}
 		catch ( err )

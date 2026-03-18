@@ -120,9 +120,7 @@ async function
 apply_rule( req, res )
 {
 	const { sessionId, rule, word } = req.body;
-
 	console.log( `server received rule ${rule}, word ${word}` );
-
 	// Create a promise that resolves when the worker replies
 	const resultProm = new Promise(
 		( resolve ) =>
@@ -137,14 +135,11 @@ apply_rule( req, res )
 			);
 		}
 	);
-
 	const response = await resultProm;
-
 	console.log( "worker apply_rule response: ", response );
-
 	if ( response.type === "ERROR" ) 
 	{
-		return res.status( 500 ).send( response.error );
+		res.status( 500 ).send( response.error );
 	}
 	res.json( { result: response.result } );
 }
@@ -153,7 +148,6 @@ async function
 apply_many( req, res )
 {
 	const { sessionId, rules, word } = req.body;
-
 	const resultProm = new Promise(
 		( resolve ) =>
 		{
@@ -167,21 +161,75 @@ apply_many( req, res )
 			);
 		}
 	);
-
 	const response = await resultProm;
 
 	console.log( "worker apply_many response: ", response );
 
 	if ( response.type === "ERROR" ) 
 	{
-		return res.status( 500 ).send( response.error );
+		res.status( 500 ).send( response.error );
 	}
 	res.json( { result: response.result } );
 }
+
+async function
+features_str( req, res )
+{
+	const { sessionId, segment } = req.body;
+	const resultProm = new Promise(
+		( resolve ) =>
+		{
+			pendingRequests.set( sessionId, resolve );
+			worker.postMessage(
+				{
+					type: "FEATURES_STR",
+					sessionId,
+					payload: { segment }
+				}
+			);
+		}
+	);
+	const response = await resultProm;
+	console.log( "worker features_str response: ", response  );
+	if ( response.type === "ERROR" )
+	{
+		res.status( 500 ).send( response.error );
+	}
+	res.json( { result: response.result } );
+}
+
+async function
+delete_session( req, res )
+{
+	const resultProm = new Promise(
+		( resolve ) =>
+		{
+			pendingRequests.set( sessionId, resolve );
+			worker.postMessage(
+				{
+					type: "DELETE_SESSION",
+					sessionId,
+				}
+			);
+		}
+	);
+	const response = await resultProm;
+	console.log( "worker delete_session response: ", response );
+	if ( response.type === "ERROR" )
+	{
+		res.status( 500 ).send( response.error );
+	}
+	res.json( { result: response.result } );
+}
+
 
 app.post( "/api/create_session", create_session );
 
 app.post( "/api/apply_rule", apply_rule );
 
 app.post( "/api/apply_many", apply_many );
+
+app.get( "/api/features_str", features_str );
+
+app.post( "/api/delete_session", delete_session );
 

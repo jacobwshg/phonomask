@@ -42,6 +42,9 @@ public:
 		const std::vector<std::string> &,
 		const std::string &
 	);
+
+	std::string
+	seg_feats_str( const std::string & );
 };
 
 /*
@@ -184,6 +187,23 @@ PhmaskSession::apply_rules_to_word(
 	}
 }
 
+/*
+ * @brief
+ *   Construct a display string of a segment's feature values.
+ * @param
+ *   the IPA segment being queried.
+ * @return
+ *   a human-readable string describing the segment's feature values,
+ *   for example, "[+cons, -son, ...]".
+ */
+std::string
+PhmaskSession::
+seg_feats_str( const std::string &segment )
+{
+	return this->profile.seg_feat_mtx_str( segment );
+}
+
+
 #ifdef __EMSCRIPTEN__
 /*
 EMSCRIPTEN_BINDINGS( phmask )
@@ -202,6 +222,7 @@ EMSCRIPTEN_BINDINGS( phmask )
 		.function( "populate", &PhmaskSession::populate )
 		.function( "apply_rule", &PhmaskSession::apply_rule_to_word )
 		.function( "apply_many", &PhmaskSession::apply_rules_to_word );
+		.function( "features_str", &PhmaskSession::seg_feats_str );
 }
 #endif
 
@@ -232,6 +253,11 @@ main(
 	};
 
 	sess.apply_rules_to_word( rs, w );
+
+	const std::string segment { "r" };
+	std::cout << "feature string for [" << segment << "]: "
+		<< sess.seg_feats_str( segment )
+		<< "\n";
 }
 #endif
 
