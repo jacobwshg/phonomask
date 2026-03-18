@@ -6,7 +6,7 @@ baseurl = "http://localhost:3000"
 #baseurl = "https://ec2-3-21-142-111.us-east-2.compute.amazonaws.com"
 
 # Step 1: Create a session
-def create_session(table_str):
+def create_session(  ):
 	url = baseurl + "/session"
 	payload = { }
 	
@@ -21,6 +21,17 @@ def create_session(table_str):
 	json = response.json()
 	print( json["result"] )
 	return json["sessionId"]
+
+def update_profile( sid, table_str ):
+	url = baseurl + "/profile"
+	body = { "sessionId": sid, "table_str": table_str }
+	response = requests.post( url, json=body )
+	print( "update_profile response:" )
+
+	print( response )
+
+	json = response.json()
+	print( json[ "result" ] )
 
 def apply_rule( sid, rule, word ):
 	url = baseurl + "/api/apply_rule"
@@ -74,15 +85,16 @@ u,-,+,+,+,+
 #ə,-,+,+,-,-
 	
 
-	with open ( "../lx301-base.csv", "r" ) as tblf:
-		feature_table = tblf.read()
-
-	print( "python feature table: " )
-	print( feature_table )
+	#with open ( "../lx301-base.csv", "r" ) as tblf:
+	#	feature_table = tblf.read()
+	#print( "python feature table: " )
+	#print( feature_table )
 
 	# Create session
-	session_id = create_session( feature_table )
+	session_id = create_session( )
 	print(f"Created session: {session_id}")
+
+	update_profile( session_id, feature_table )
 	
 	# Apply rules
 	rules = [

@@ -91,17 +91,17 @@ create_session( req, res )
 		);
 
 		console.log( "server waiting for worker create_session promise" );
-		const response = await resultProm;
+		const worker_response = await resultProm;
 		console.log( "worker create_session promise resolved" );
-		if ( response.type === "ERROR" )
+		if ( worker_response.type === "ERROR" )
 		{
 			sessionId = -1;
 			console.error( "server create_session response error" );
-			res.status( 500 ).send( response.error );
+			res.status( 500 ).send( worker_response.error );
 			return;
 		}
 
-		const table_str = response.result;
+		const table_str = worker_response.result;
 
 		let result = "Welcome to Phonomask, a bitmask-based phonology engine.\n\nSample feature profile loaded:\n\n";
 		result += table_str;
@@ -119,6 +119,42 @@ create_session( req, res )
 		//res.status( 500 ).send( e.message );
 	//}
 	console.log( `end of server create_session` );
+}
+
+async function
+update_profile( req, res )
+{
+	const { sessionId, table_str } = req.body;
+	const resultProm = new Promise(
+		( resolve ) =>
+		{
+			pendingRequests.set( sessionId, resolve );
+			worker.postMessage(
+				{
+					type: "UPDATE_PROFILE",
+					sessionId: sessionId,
+					worker_payload: { table_str }
+				}
+			)
+		}
+	)
+	const worker_response = await resultProm;
+	if ( worker_response.type === "ERROR" )
+	{
+		res.status( 500 ).send( worker_response.error );
+		return;
+	}
+
+	let result = worker_response.result;
+	result += "\n";
+	result += table_str;
+
+	res.json(
+		{
+			sessionId: sessionId,
+			result: result
+		}
+	);
 }
 
 async function
@@ -231,6 +267,8 @@ delete_session( req, res )
 
 
 app.post( "/session", create_session );
+
+app.post( "/profile", update_profile );
 
 app.post( "/api/apply_rule", apply_rule );
 

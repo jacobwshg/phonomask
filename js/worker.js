@@ -107,6 +107,24 @@ parentPort.on(
 				);
 				console.log( "worker create_session success" );
 			}
+
+			else if ( type === "UPDATE_PROFILE" )
+			{
+				// retrieve session
+				const sess = sessions.get( sessionId );
+				const { table_str } = worker_payload;
+				console.log( `worker received table str ${table_str} ` );
+				sess.populate( table_str );
+				parentPort.postMessage(
+					{
+						type: "SUCCESS",
+						sessionId: sessionId,
+						result: "Update profile success!\n"
+					}
+				);
+				console.log( "worker update profile success" );
+			} 
+	
 			else if ( type === "APPLY_RULE" )
 			{
 				// retrieve session
