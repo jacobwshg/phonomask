@@ -3,6 +3,7 @@ import json
 import uuid
 
 baseurl = "http://localhost:3000"
+#baseurl = "https://ec2-3-21-142-111.us-east-2.compute.amazonaws.com"
 
 # Step 1: Create a session
 def create_session(table_str):
@@ -22,35 +23,39 @@ def create_session(table_str):
 
 def apply_rule( sid, rule, word ):
 	url = baseurl + "/api/apply_rule"
-	payload = {
+	body = {
 		"sessionId":sid,
 		"rule":rule,
 		"word":word
 	}
-	res = requests.post( url, json=payload )
+	res = requests.post( url, json=body )
 	print( "apply_rule response: " )
 	result = res.json()
 	print( result )
 	return result[ "result" ]
 	
-
-
 # Step 2: Apply multiple rules
 def apply_many_rules(session_id, rules, word):
 	url = baseurl + "/api/apply_many"
-	payload = {
+	body = {
 		"sessionId": session_id,
 		"rules": rules,  # Python list of strings
 		"word": word
 	}
 	
-	response = requests.post(url, json=payload)
+	response = requests.post( url, json=body )
 	print( "\n\napply_many_rules response:" )
 	print( response )
 	print( response.json() )
 	print( "\n\n\n" )
 
 	return response.json()
+
+def delete_session( sid ):
+	url = baseurl + "/api/delete_session"
+	body = { "sessionId":sid }
+	res = requests.post( url, json=body )
+	print( res )
 
 # Example usage
 if __name__ == "__main__":
@@ -97,4 +102,7 @@ u,-,+,+,+,+
 	word = testword
 	result = apply_many_rules( session_id, rules, word )
 	print(f"Results: {result['result']}")
+
+	result = delete_session( session_id )
+
 

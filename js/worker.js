@@ -71,7 +71,7 @@ parentPort.on(
 	"message", 
 	( msg ) => 
 	{
-		const { type, sessionId, payload } = msg;
+		const { type, sessionId, worker_payload } = msg;
 
 		try
 		{
@@ -81,7 +81,7 @@ parentPort.on(
 			{
 				const sess = new phmask.PhmaskSession();
 				console.log( "worker initialized wasm session" );
-				const { table_str } = payload;
+				const { table_str } = worker_payload;
 
 				sess.populate( table_str );
 
@@ -99,7 +99,7 @@ parentPort.on(
 			{
 				// retrieve session
 				const sess = sessions.get( sessionId );
-				const { rule, word } = payload;
+				const { rule, word } = worker_payload;
 				console.log( `worker received rule ${rule}, word ${word}` );
 				const result = sess.apply_rule( rule, word );
 				console.log( `worker apply_rule result: ${result}` );
@@ -114,7 +114,7 @@ parentPort.on(
 			else if ( type === "APPLY_MANY" )
 			{
 				const sess = sessions.get( sessionId );
-				let { rules, word } = payload;
+				let { rules, word } = worker_payload;
 				console.log( `worker received rules` );
 				for ( let r of rules )
 				{
@@ -141,7 +141,7 @@ parentPort.on(
 			{
 				// retrieve session
 				const sess = sessions.get( sessionId );
-				const { segment } = payload;
+				const { segment } = worker_payload;
 				console.log( `worker received segment ${segment}` );
 				const result = sess.features_str( segment );
 				console.log( `worker features_str result: ${result}` );
@@ -155,16 +155,21 @@ parentPort.on(
 			}
 			else if ( type === "DELETE_SESSION" )
 			{
-				const sess = sess.get( sessionId );
+				console.log( "worker in delete session msg type" );
+				const sess = sessions.get( sessionId );
 				if ( sess )
 				{
+					console.log( "worker found session to delete" );
 					sess.delete();
 					sessions.delete( sessionId );
 				}
+				msg = `worker deleted session ${sessionId}`;
+				console.log( msg );
 				parentPort.postMessage(
 					{
-						type: "RESULT", 
-						message: `worker deleted session ${sessionId}`
+						type: "RESULT",
+						sessionId: sessionId,
+						result: msg,
 					}
 				);
 			}

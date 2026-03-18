@@ -221,7 +221,7 @@ EMSCRIPTEN_BINDINGS( phmask )
 		.constructor<>()
 		.function( "populate", &PhmaskSession::populate )
 		.function( "apply_rule", &PhmaskSession::apply_rule_to_word )
-		.function( "apply_many", &PhmaskSession::apply_rules_to_word );
+		.function( "apply_many", &PhmaskSession::apply_rules_to_word )
 		.function( "features_str", &PhmaskSession::seg_feats_str );
 }
 #endif

@@ -86,7 +86,7 @@ create_session( req, res )
 					{
 						type: "CREATE_SESSION",
 						sessionId,
-						payload: { table_str }
+						worker_payload: { table_str }
 					}
 				);
 			}
@@ -130,7 +130,7 @@ apply_rule( req, res )
 				{
 					type: "APPLY_RULE", 
 					sessionId,
-					payload: { rule, word } 
+					worker_payload: { rule, word } 
 				}
 			);
 		}
@@ -156,7 +156,7 @@ apply_many( req, res )
 				{
 					type: "APPLY_MANY", 
 					sessionId,
-					payload: { rules, word } 
+					worker_payload: { rules, word } 
 				}
 			);
 		}
@@ -184,7 +184,7 @@ features_str( req, res )
 				{
 					type: "FEATURES_STR",
 					sessionId,
-					payload: { segment }
+					worker_payload: { segment }
 				}
 			);
 		}
@@ -201,6 +201,7 @@ features_str( req, res )
 async function
 delete_session( req, res )
 {
+	const { sessionId } = req.body;
 	const resultProm = new Promise(
 		( resolve ) =>
 		{
@@ -209,6 +210,7 @@ delete_session( req, res )
 				{
 					type: "DELETE_SESSION",
 					sessionId,
+					worker_payload: { sessionId }
 				}
 			);
 		}
