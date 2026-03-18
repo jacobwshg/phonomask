@@ -122,6 +122,41 @@ create_session( req, res )
 }
 
 async function
+get_base_profile( req, res )
+{
+	const { sessionId } = req.body;
+	const resultProm = new Promise(
+		( resolve ) =>
+		{
+			pendingRequests.set( sessionId, resolve );
+			worker.postMessage(
+				{
+					type: "GET_BASE_PROFILE",
+					sessionId: sessionId,
+					worker_payload: { }
+				}
+			)
+		}
+	)
+	const worker_response = await resultProm;
+	if ( worker_response.type === "ERROR" )
+	{
+		res.status( 500 ).send( worker_response.error );
+		return;
+	}
+
+	const table_str = worker_response.result;
+
+	res.json(
+		{
+			sessionId: sessionId,
+			result: table_str
+		}
+	);
+}
+
+
+async function
 update_profile( req, res )
 {
 	const { sessionId, table_str } = req.body;
@@ -156,6 +191,8 @@ update_profile( req, res )
 		}
 	);
 }
+
+
 
 async function
 apply_rule( req, res )
@@ -267,6 +304,8 @@ delete_session( req, res )
 
 
 app.post( "/session", create_session );
+
+app.get( "/base_profile", get_base_profile );
 
 app.post( "/profile", update_profile );
 

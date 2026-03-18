@@ -108,6 +108,25 @@ parentPort.on(
 				console.log( "worker create_session success" );
 			}
 
+			else if ( type === "GET_BASE_PROFILE" )
+			{
+				// retrieve session
+				const sess = sessions.get( sessionId );
+				const { } = worker_payload;
+
+				const data = fs.readFileSync( BASE_PROFILE_PATH );
+				const table_str = data.toString();
+
+				parentPort.postMessage(
+					{
+						type: "SUCCESS",
+						sessionId: sessionId,
+						result: table_str
+					}
+				);
+				console.log( "worker retrieve base profile success" );
+			}
+	
 			else if ( type === "UPDATE_PROFILE" )
 			{
 				// retrieve session

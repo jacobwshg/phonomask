@@ -33,6 +33,15 @@ def update_profile( sid, table_str ):
 	json = response.json()
 	print( json[ "result" ] )
 
+def get_base_profile( sid ):
+	url = baseurl + "/base_profile"
+	body = { "sessionId": sid }
+	response = requests.get( url, json=body )
+	print( "get_base_profile response: " )
+	print( response )
+	return response.json()[ "result" ]
+	
+
 def apply_rule( sid, rule, word ):
 	url = baseurl + "/api/apply_rule"
 	body = {
@@ -94,8 +103,15 @@ u,-,+,+,+,+
 	session_id = create_session( )
 	print(f"Created session: {session_id}")
 
-	update_profile( session_id, feature_table )
-	
+	#update_profile( session_id, feature_table )
+
+	base_table_str = get_base_profile( session_id )
+	bp_path =  "./base_profile.csv"
+	with open ( bp_path, "w" ) as bpf:
+		bpf.write( base_table_str )
+	print( "base profile written to " + bp_path )
+
+
 	# Apply rules
 	rules = [
 		"∅ -> a / [ -syl ] _ [ -syl ] ",
