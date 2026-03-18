@@ -8,6 +8,15 @@ app.use( express.json() );
 const worker = new Worker( "./worker.js" );
 export const pendingRequests = new Map(); // Track callbacks for async worker responses
 
+const PORT = process.env.PORT || 3000;
+app.listen(
+	PORT,
+	"0.0.0.0",
+	() => {
+		console.log( `Phonomask server running at ${PORT}` );
+	}
+);
+
 worker.on(
 	"message",
 	( msg ) =>
@@ -29,16 +38,6 @@ worker.on(
 			}
 		}
 });
-
-const PORT = 3000;
-app.listen(
-	PORT,
-	"0.0.0.0",
-	() => {
-		console.log( `Phonomask server running at ${PORT}` );
-	}
-);
-
 
 app.get(
 	"/",

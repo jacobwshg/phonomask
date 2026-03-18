@@ -4,8 +4,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY *.js ./
-COPY *.wasm ./
+COPY ./server.js ./worker.js ./phmask.js ./
+COPY ./phmask.wasm ./
 #RUN npm run build # frontend
 
 # stage 2: deploy

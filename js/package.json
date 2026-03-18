@@ -11,6 +11,7 @@
 	"scripts":
 	{
 		"dev": "node server.js",
+		"start": "node server.js",
 		"dkr": "docker build -t phonomask-build ."
 	},
 
@@ -19,6 +20,11 @@
 		"aws-sdk": "^2.1693.0",
 		"express": "^5.2.1",
 		"uuid": "^13.0.0"
+	},
+
+	"engines":
+	{
+		"node": ">=14.x"
 	}
 }
 
