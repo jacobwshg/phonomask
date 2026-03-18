@@ -47,7 +47,7 @@ app.get(
 		{
 			res.json(
 				{
-					message: "Welcome to Phonomask, a bitmap-based phonology engine"
+					message: "Welcome to Phonomask, a bitmask-based phonology engine"
 				}
 			);
 		}
@@ -68,9 +68,7 @@ create_session( req, res )
 {
 	//try
 	//{
-		const { table_str } = req.body;
-
-		console.log( "table_str: ", table_str );
+		const { } = req.body;
 
 		const { v4 } = await import('uuid');
 		let sessionId = v4();
@@ -86,12 +84,11 @@ create_session( req, res )
 					{
 						type: "CREATE_SESSION",
 						sessionId,
-						worker_payload: { table_str }
+						worker_payload: { }
 					}
 				);
 			}
 		);
-
 
 		console.log( "server waiting for worker create_session promise" );
 		const response = await resultProm;
@@ -100,12 +97,20 @@ create_session( req, res )
 		{
 			sessionId = -1;
 			console.error( "server create_session response error" );
-			return res.status( 468 ).send( response.error );
+			res.status( 500 ).send( response.error );
+			return;
 		}
+
+		const table_str = response.result;
+
+		let result = "Welcome to Phonomask, a bitmask-based phonology engine.\n\nSample feature profile loaded:\n\n";
+		result += table_str;
+		result += "\nYou can download it or upload your own.\n"
+
 		res.json(
 			{
-				sessionId,
-				result: response.result
+				sessionId: sessionId,
+				result: result
 			}
 		);
 	//}
@@ -225,7 +230,7 @@ delete_session( req, res )
 }
 
 
-app.post( "/api/create_session", create_session );
+app.post( "/session", create_session );
 
 app.post( "/api/apply_rule", apply_rule );
 

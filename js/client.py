@@ -7,10 +7,10 @@ baseurl = "http://localhost:3000"
 
 # Step 1: Create a session
 def create_session(table_str):
-	url = baseurl + "/api/create_session"
-	payload = { "table_str": table_str }
+	url = baseurl + "/session"
+	payload = { }
 	
-	response = requests.post(url, json=payload)
+	response = requests.post( url, json=payload )
 	
 	#while True:
 	#	pass
@@ -18,8 +18,9 @@ def create_session(table_str):
 	print( "create_session response:" )
 	print( response )
 
-	data = response.json()
-	return data["sessionId"]
+	json = response.json()
+	print( json["result"] )
+	return json["sessionId"]
 
 def apply_rule( sid, rule, word ):
 	url = baseurl + "/api/apply_rule"

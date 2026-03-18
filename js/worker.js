@@ -2,7 +2,9 @@
 import { parentPort } from "worker_threads";
 
 import { fileURLToPath } from "url";
-import { dirname } from "path";
+import path, { dirname } from "path";
+
+import fs from "fs";
 
 const __filename = fileURLToPath( import.meta.url );
 let __dirname;
@@ -66,6 +68,8 @@ await import( wasmModulePath ).then(
 });
 */
 
+const BASE_PROFILE_PATH = "../lx301-base.csv";
+
 /* listen for msg from parent */
 parentPort.on(
 	"message", 
@@ -81,8 +85,14 @@ parentPort.on(
 			{
 				const sess = new phmask.PhmaskSession();
 				console.log( "worker initialized wasm session" );
-				const { table_str } = worker_payload;
 
+				let table_str;
+				const data = fs.readFileSync( BASE_PROFILE_PATH );
+				//console.log( "worker base profile raw data: ",data );
+				table_str = data.toString();
+				//console.log( "worker table str: ", table_str );
+
+				//console.log( "worker table str before populate: ", table_str );
 				sess.populate( table_str );
 
 				console.log( "worker wasm session populated" );
@@ -91,9 +101,11 @@ parentPort.on(
 				parentPort.postMessage(
 					{
 						type: "SUCCESS",
-						sessionId: sessionId
+						sessionId: sessionId,
+						result: table_str
 					}
 				);
+				console.log( "worker create_session success" );
 			}
 			else if ( type === "APPLY_RULE" )
 			{
