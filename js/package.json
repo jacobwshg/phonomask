@@ -12,7 +12,8 @@
 	{
 		"dev": "node server.js",
 		"start": "node server.js",
-		"dkr": "docker build -t phonomask-build ."
+		"dkr-build": "docker build -t phonomask-build .",
+		"dkr-run": "docker run -p 3000:3000 phonomask-build"
 	},
 
 	"dependencies":

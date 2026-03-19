@@ -68,7 +68,7 @@ await import( wasmModulePath ).then(
 });
 */
 
-const BASE_PROFILE_PATH = "../lx301-base.csv";
+const BASE_PROFILE_PATH = "./lx301-base.csv";
 
 /* listen for msg from parent */
 parentPort.on(
@@ -160,6 +160,7 @@ parentPort.on(
 					}
 				);
 			} 
+
 			else if ( type === "APPLY_MANY" )
 			{
 				const sess = sessions.get( sessionId );
@@ -186,22 +187,24 @@ parentPort.on(
 					}
 				);
 			}
-			else if ( type === "FEATURES_STR" )
+
+			else if ( type === "GET_FEATURES_STR" )
 			{
 				// retrieve session
 				const sess = sessions.get( sessionId );
 				const { segment } = worker_payload;
 				console.log( `worker received segment ${segment}` );
-				const result = sess.features_str( segment );
-				console.log( `worker features_str result: ${result}` );
+				const feats_str = sess.features_str( segment );
+				console.log( `worker features_str result: ${ feats_str }` );
 				parentPort.postMessage(
 					{
 						type: "RESULT",
 						sessionId: sessionId,
-						result: result
+						result: feats_str
 					}
 				);
 			}
+
 			else if ( type === "DELETE_SESSION" )
 			{
 				console.log( "worker in delete session msg type" );

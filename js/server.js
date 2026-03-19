@@ -218,6 +218,7 @@ apply_rule( req, res )
 	if ( response.type === "ERROR" ) 
 	{
 		res.status( 500 ).send( response.error );
+		return;
 	}
 	res.json( { result: response.result } );
 }
@@ -246,12 +247,13 @@ apply_many( req, res )
 	if ( response.type === "ERROR" ) 
 	{
 		res.status( 500 ).send( response.error );
+		return;
 	}
 	res.json( { result: response.result } );
 }
 
 async function
-features_str( req, res )
+get_features_str( req, res )
 {
 	const { sessionId, segment } = req.body;
 	const resultProm = new Promise(
@@ -260,7 +262,7 @@ features_str( req, res )
 			pendingRequests.set( sessionId, resolve );
 			worker.postMessage(
 				{
-					type: "FEATURES_STR",
+					type: "GET_FEATURES_STR",
 					sessionId,
 					worker_payload: { segment }
 				}
@@ -268,12 +270,14 @@ features_str( req, res )
 		}
 	);
 	const response = await resultProm;
-	console.log( "worker features_str response: ", response  );
+	console.log( "worker features_str response: ", response );
 	if ( response.type === "ERROR" )
 	{
 		res.status( 500 ).send( response.error );
+		return;
 	}
-	res.json( { result: response.result } );
+	const feats_str = response.result;
+	res.json( { result: feats_str } );
 }
 
 async function
@@ -298,6 +302,7 @@ delete_session( req, res )
 	if ( response.type === "ERROR" )
 	{
 		res.status( 500 ).send( response.error );
+		return;
 	}
 	res.json( { result: response.result } );
 }
@@ -309,11 +314,11 @@ app.get( "/base_profile", get_base_profile );
 
 app.post( "/profile", update_profile );
 
-app.post( "/api/apply_rule", apply_rule );
+app.post( "/apply_rule", apply_rule );
 
-app.post( "/api/apply_many", apply_many );
+app.post( "/apply_many", apply_many );
 
-app.get( "/api/features_str", features_str );
+app.get( "/features_str", get_features_str );
 
-app.post( "/api/delete_session", delete_session );
+app.delete( "/session", delete_session );
 

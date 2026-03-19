@@ -109,10 +109,10 @@ u,-,+,+,+,+
 	print( "base profile written to " + bp_path )
 	print()
 
-	test_segments = [ "p", "g", "a" ]
+	test_segments = [ "p", "k", "g", "a", "u", "x" ]
 
 	feats_strs = [ get_features_str( session_id, ts ) for ts in test_segments ]
-	print( "Feature str test on base profile: " )
+	print( "Feature strs on base profile: " )
 	for ts, fstr in zip( test_segments, feats_strs ):
 		print( f"[{ ts }] = { fstr }" )
 	print()
@@ -139,8 +139,8 @@ u,-,+,+,+,+
 	update_profile( session_id, feature_table )
 	print()
 
-	feats_strs = [ get_features_str( session_id, ts ) for s in test_segments ]
-	print( "Feature str test on base profile: " )
+	feats_strs = [ get_features_str( session_id, ts ) for ts in test_segments ]
+	print( "Feature strs on user profile: " )
 	for ts, fstr in zip( test_segments, feats_strs ):
 		print( f"[{ ts }] = { fstr }" )
 	print()
