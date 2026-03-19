@@ -7,7 +7,7 @@ WORKDIR /
 COPY ./lx301-base.csv ./
 # copy src files
 COPY ./package*.json ./
-RUN npm ci
+RUN npm install --production
 COPY ./server.js ./worker.js ./phmask.js ./
 COPY ./phmask.wasm ./
 

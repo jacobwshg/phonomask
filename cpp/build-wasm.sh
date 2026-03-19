@@ -4,6 +4,9 @@ OUTF="phmask.js"
 
 rm -rf ./$OUTF
 
+#emsdk update
+#embuilder build icu
+
 emcc -O2 --bind -std=c++20 -s MODULARIZE=1 -s EXPORT_ES6=1 \
 	-s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1\
 	-o ./$OUTF\
