@@ -15,7 +15,7 @@
 namespace Phmask
 {
 	std::size_t
-	update_pos(std::size_t, std::size_t, bool decr);
+	update_pos( std::size_t, std::size_t, bool decr );
 
 	bool
 	try_rule_context(
@@ -42,7 +42,7 @@ word_to_segments( const std::string &word )
 		return {};
 	}
 
-	UNISTR u_word { UNISTR::fromUTF8(word) };
+	UNISTR u_word { UNISTR::fromUTF8( word ) };
 	const std::int32_t uwlen { u_word.length() };
 
 	/* Buffer for a single segment (which may be >= 1 Unicode chars) */
@@ -64,11 +64,11 @@ word_to_segments( const std::string &word )
 
 	bool tied { false };
 
-	for (std::int32_t i { 0 }; i < uwlen; ++i)
+	for ( std::int32_t i { 0 }; i < uwlen; ++i )
 	{
 		UChar32 c { u_word.char32At(i) };
 		UCharCategory ccateg { U_CHAR_CATEGORY_COUNT };
-		switch (c)
+		switch ( c )
 		{
 		case U'(':
 		case U')':
@@ -88,7 +88,7 @@ word_to_segments( const std::string &word )
 			   a symbol will incorrectly overwrite end of the previous segment 
 			   and be flushed twice
 			 */
-			segments.emplace_back(unistr_to_str(u_segbuf));
+			segments.emplace_back( unistr_to_str( u_segbuf ) );
 			u_segbuf = c;
 			break;
 		case U'͡':
@@ -97,8 +97,8 @@ word_to_segments( const std::string &word )
 			u_segbuf += c;
 			break;
 		default:
-			ccateg = static_cast<UCharCategory>(u_charType(c));
-			switch (ccateg)
+			ccateg = static_cast<UCharCategory>( u_charType( c ) );
+			switch ( ccateg )
 			{
 			/*
 			   If a full character is encountered, in order for it to be 
@@ -113,14 +113,14 @@ word_to_segments( const std::string &word )
 			 */
 			case U_LOWERCASE_LETTER:
 			case U_OTHER_LETTER:
-				if (u_segbuf.isEmpty() || tied)
+				if ( u_segbuf.isEmpty() || tied )
 				{
 					u_segbuf += c;
 					tied = false;
 				}
 				else
 				{
-					segments.emplace_back(unistr_to_str(u_segbuf));
+					segments.emplace_back( unistr_to_str( u_segbuf ) );
 					u_segbuf = c; 
 				}
 				break;
@@ -134,14 +134,14 @@ word_to_segments( const std::string &word )
 			break;
 		}
 	}
-	if (!u_segbuf.isEmpty())
+	if ( !u_segbuf.isEmpty() )
 	{
-		segments.emplace_back(unistr_to_str(u_segbuf));
+		segments.emplace_back( unistr_to_str( u_segbuf ) );
 	}
 	/* Pad word end with word boundary symbol if it does not exist */
 	if ( word[ word.size()-1 ] != '#' )
 	{
-		segments.emplace_back("#");
+		segments.emplace_back( "#" );
 	}
 
 	/*
@@ -175,11 +175,11 @@ update_pos(
 	bool decr = false
 )
 {
-	if (pos == endpos)
+	if ( pos == endpos )
 	{
 		return endpos;
 	}
-	if (decr)
+	if ( decr )
 	{
 		return pos == 0 ? endpos : --pos;
 	}
@@ -260,8 +260,8 @@ try_rule_context(
 		{
 			return false;
 		}
-		const SegRepr &wx { wordrepr.segreprs[wxpos] };
-		const RuleElem &rx { rule.X[rxpos] };
+		const SegRepr &wx { wordrepr.segreprs[ wxpos ] };
+		const RuleElem &rx { rule.X[ rxpos ] };
 
 		/* Word boundary test */
 		const bool
@@ -311,8 +311,8 @@ try_rule_context(
 		{
 			return false;
 		}
-		const SegRepr &wy { wordrepr.segreprs[wypos] };
-		const RuleElem &ry { rule.Y[rypos] };
+		const SegRepr &wy { wordrepr.segreprs[ wypos ] };
+		const RuleElem &ry { rule.Y[ rypos ] };
 
 		/* Word boundary test */
 		const bool
@@ -373,7 +373,7 @@ WordRepr::housekeep( void )
 
 	for ( std::size_t i { 0 }; i < cur_size; ++i )
 	{
-		const feat_mtx_t insert_fm { this->segreprs[i].insert_before_fm };
+		const feat_mtx_t insert_fm { this->segreprs[ i ].insert_before_fm };
 		if ( insert_fm.any() && !insert_fm.test( this->null_bit ) )
 		/* Exists segment to be inserted before position I */
 		{
@@ -386,12 +386,12 @@ WordRepr::housekeep( void )
 					EMPTY_FEAT_MTX,
 				}
 			);
-			this->segreprs[i].insert_before_fm = EMPTY_FEAT_MTX;
+			this->segreprs[ i ].insert_before_fm = EMPTY_FEAT_MTX;
 		}
-		if ( !this->segreprs[i].isnull( this->null_bit ) )
+		if ( !this->segreprs[ i ].isnull( this->null_bit ) )
 		/* Segment at position I not deleted */
 		{
-			segreprs_new.emplace_back( std::move( this->segreprs[i] ) );
+			segreprs_new.emplace_back( std::move( this->segreprs[ i ] ) );
 		}
 	}
 	this->segreprs = std::move( segreprs_new );
@@ -511,8 +511,8 @@ WordRepr::apply_rule(
 	/* Apply rule at all eligible positions identified above */
 	for ( std::size_t pos { 0 }; pos < wlen; ++pos )
 	{
-		SegRepr &cur_seg { this->segreprs[pos] };
-		if ( !this->apply_at[pos] )
+		SegRepr &cur_seg { this->segreprs[ pos ] };
+		if ( !this->apply_at[ pos ] )
 		{
 			continue;
 		}

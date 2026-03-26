@@ -38,7 +38,7 @@ rule_str_toks( const std::string &rule_str )
 
 	for ( std::size_t i { 0 }; i < r_len; ++i )
 	{
-		const char c { rule_str[i] };
+		const char c { rule_str[ i ] };
 		switch ( c )
 		{
 		// TODO: use ICU to capture non-ascii arrows
@@ -118,8 +118,8 @@ parse_feature_bundle_str( const std::string_view fb_str )
 
 	for (std::size_t i { 0 }; i < fb_len; ++i)
 	{
-		const char c { fb_str[i] };
-		switch (c)
+		const char c { fb_str[ i ] };
+		switch ( c )
 		{
 		case '[':
 		case ']':
